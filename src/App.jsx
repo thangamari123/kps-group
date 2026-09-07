@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Footer from './components/layout/Footer';
 import ScrollToTop from './components/common/ScrollToTop';
-import NewsletterPopup from './components/common/NewsletterPopup';
 
 // Page Imports
 import Home from './pages/Home';
@@ -85,9 +84,6 @@ export default function App() {
 
         {/* Global corporate footer */}
         <Footer />
-
-        {/* Subtle, non-aggressive newsletter popup modal */}
-        <NewsletterPopup />
       </div>
     </Router>
   );
