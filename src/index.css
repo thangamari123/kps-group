@@ -1,0 +1,127 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-green: #0f5132;
+  --color-brand-green-light: #146c43;
+  --color-brand-green-dark: #0a3622;
+  --color-brand-green-bg: #e8f0ec;
+  
+  --color-brand-yellow: #ffc107;
+  --color-brand-yellow-light: #ffcd39;
+  --color-brand-yellow-dark: #ba8b00;
+  
+  --color-brand-gray-light: #f8f9fa;
+  --color-brand-gray-muted: #e9ecef;
+  --color-brand-gray: #6c757d;
+  --color-brand-gray-dark: #212529;
+
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-family: var(--font-sans);
+    background-color: #ffffff;
+    color: var(--color-brand-gray-dark);
+    overflow-x: hidden;
+  }
+
+  /* Custom focus ring for accessibility */
+  :focus-visible {
+    outline: none;
+    outline: 2px solid var(--color-brand-green);
+    outline-offset: 2px;
+  }
+}
+
+/* Custom scrollbar for premium touch */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background-color: var(--color-brand-gray-light);
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-brand-green);
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-brand-green-light);
+}
+
+/* Visual overlays and gradients */
+.overlay-dark {
+  background: rgba(10, 54, 34, 0.75);
+}
+
+.gradient-green {
+  background: linear-gradient(135deg, #0f5132 0%, #0a3622 100%);
+}
+
+/* Custom styles for animations & slider */
+.slide-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.slide-inactive {
+  opacity: 0;
+  transform: scale(1.05);
+}
+
+/* Custom infinite marquee scrolling */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 20s linear infinite;
+}
+
+/* Pause scroll animation on user hover for accessibility */
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Service Card Custom Slants */
+
+.service-card-hexagon {
+  position: absolute;
+  z-index: 20;
+  left: 50%;
+  top: 160px;
+  transform: translate(-50%, -50%);
+}
+@media (min-width: 640px) {
+  .service-card-hexagon {
+    left: 40%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.hexagon-clip {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.why-card-container {
+  clip-path: polygon(0 0, 94% 0, 100% 6%, 100% 100%, 0 100%);
+}
+@media (min-width: 640px) {
+  .why-card-container {
+    clip-path: polygon(0 0, 97% 0, 100% 3%, 100% 100%, 0 100%);
+  }
+}
