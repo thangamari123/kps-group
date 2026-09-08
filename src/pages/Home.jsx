@@ -14,6 +14,13 @@ import { officesData } from '../data/offices';
 import { awardsData } from '../data/awards';
 import SEO from '../components/common/SEO';
 
+import automotiveLogisticsImg from '../assets/Automotive Logistics.webp';
+import automotivePartsLogisticsImg from '../assets/Automotive Parts Logistics.webp';
+import fmcgLogisticsImg from '../assets/FMCG Logistics.webp';
+import manufacturingLogisticsImg from '../assets/Manufacturing & Industrial Logistics.webp';
+import healthcareLogisticsImg from '../assets/Healthcare Logistics.webp';
+import projectCargoLogisticsImg from '../assets/Project Cargo Logistics.webp';
+
 // Animated Counter Component for trust statistics
 function Counter({ value, duration = 1.5 }) {
   const [count, setCount] = useState(0);
@@ -202,8 +209,6 @@ export default function Home() {
   const [selectedAward, setSelectedAward] = useState(null);
   const [activeInsight, setActiveInsight] = useState(0);
   const [isInsightPaused, setIsInsightPaused] = useState(false);
-  const [activeIndustry, setActiveIndustry] = useState(0);
-  const [isIndustryPaused, setIsIndustryPaused] = useState(false);
   const [activeAwardSlide, setActiveAwardSlide] = useState(0);
   const [isAwardPaused, setIsAwardPaused] = useState(false);
   const [activeHeroHeading, setActiveHeroHeading] = useState(0);
@@ -242,15 +247,6 @@ export default function Home() {
     }, 3500);
     return () => clearInterval(timer);
   }, [isInsightPaused]);
-
-  // Auto-slide for Industries (Mobile only)
-  useEffect(() => {
-    if (isIndustryPaused) return;
-    const timer = setInterval(() => {
-      setActiveIndustry((prev) => (prev + 1) % 6);
-    }, 3500);
-    return () => clearInterval(timer);
-  }, [isIndustryPaused]);
 
   // Auto-slide for Awards (Mobile only)
   useEffect(() => {
@@ -466,7 +462,8 @@ export default function Home() {
     {
       id: "automotive-logistics",
       name: "Automotive Logistics",
-      desc: "Reliable transportation and supply chain support for automotive operations.",
+      tag: "Auto & RoRo",
+      desc: "Reliable vehicle transportation and assembly line feeding for automotive OEMs.",
       bullets: [
         "Vehicle transportation",
         "Inbound & outbound logistics",
@@ -474,12 +471,13 @@ export default function Home() {
         "Supply chain coordination"
       ],
       path: "/industries/automotive-logistics",
-      image: "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=600&q=80"
+      image: automotiveLogisticsImg
     },
     {
       id: "automotive-parts-logistics",
       name: "Automotive Parts Logistics",
-      desc: "JIT delivery, warehousing and distribution solutions for automotive components.",
+      tag: "Tier-1 Parts",
+      desc: "Just-In-Time delivery, sequencing and distribution for tier-1 auto components.",
       bullets: [
         "Spare parts transportation",
         "Just-in-time (JIT) delivery",
@@ -487,12 +485,13 @@ export default function Home() {
         "Component movement"
       ],
       path: "/industries/automotive-parts-logistics",
-      image: "https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?auto=format&fit=crop&w=600&q=80"
+      image: automotivePartsLogisticsImg
     },
     {
       id: "fmcg-logistics",
       name: "FMCG Logistics",
-      desc: "Fast and efficient transportation and distribution for time-sensitive FMCG shipments.",
+      tag: "FMCG / Retail",
+      desc: "Fast, agile transportation and distribution for time-sensitive FMCG shipments.",
       bullets: [
         "FMCG transportation",
         "Distribution & last-mile delivery",
@@ -500,12 +499,13 @@ export default function Home() {
         "Time-sensitive shipments"
       ],
       path: "/industries/fmcg-logistics",
-      image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80"
+      image: fmcgLogisticsImg
     },
     {
       id: "manufacturing-industrial-logistics",
       name: "Manufacturing & Industrial Logistics",
-      desc: "Specialized logistics for industrial equipment, raw materials and heavy cargo.",
+      tag: "Industrial Plants",
+      desc: "Specialized logistics for industrial equipment, raw materials, and heavy cargo.",
       bullets: [
         "Industrial equipment transportation",
         "Raw material movement",
@@ -513,12 +513,13 @@ export default function Home() {
         "Heavy & specialized cargo"
       ],
       path: "/industries/manufacturing-industrial-logistics",
-      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80"
+      image: manufacturingLogisticsImg
     },
     {
       id: "healthcare-logistics",
       name: "Healthcare Logistics",
-      desc: "Secure and time-critical logistics solutions for healthcare and pharmaceutical requirements.",
+      tag: "Pharma & Health",
+      desc: "Temperature-controlled and time-critical logistics for pharma and medical devices.",
       bullets: [
         "Medical equipment transportation",
         "Pharmaceutical logistics",
@@ -526,12 +527,13 @@ export default function Home() {
         "Secure & time-critical delivery"
       ],
       path: "/industries/healthcare-logistics",
-      image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80"
+      image: healthcareLogisticsImg
     },
     {
       id: "project-cargo-logistics",
       name: "Project Cargo Logistics",
-      desc: "Planned transportation solutions for oversized, heavy and specialized project cargo.",
+      tag: "Heavy Lift & ODC",
+      desc: "Planned turnkey solutions for oversized, heavy-lift, and specialized project cargo.",
       bullets: [
         "Oversized & heavy cargo",
         "Machinery transportation",
@@ -539,7 +541,7 @@ export default function Home() {
         "Project-based logistics planning"
       ],
       path: "/industries/project-cargo-logistics",
-      image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=600&q=80"
+      image: projectCargoLogisticsImg
     }
   ];
 
@@ -1233,70 +1235,75 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 6 — INDUSTRIES WE SERVE (Image-First Corporate Responsive Grid with Compact Mobile Typography) */}
-      <section className="py-10 sm:py-20 md:py-24 bg-[#fafcfb] text-brand-gray-dark border-t border-brand-gray-muted">
-        <div className="container mx-auto px-4 sm:px-6">
+      {/* SECTION 6 — INDUSTRIES WE SERVE (Compact Responsive Image-First Corporate Grid) */}
+      <section className="py-8 sm:py-16 md:py-20 bg-[#fafcfb] text-brand-gray-dark border-t border-brand-gray-muted">
+        <div className="container mx-auto px-3 sm:px-6">
           
           {/* Section Header */}
-          <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-14 space-y-2 sm:space-y-2.5">
+          <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-10 space-y-1.5 sm:space-y-2">
             <div className="flex items-center justify-center space-x-1.5 sm:space-x-2">
-              <span className="w-3.5 sm:w-8 h-[1.5px] sm:h-[2px] bg-brand-yellow"></span>
-              <span className="text-brand-yellow-dark font-extrabold text-[10px] sm:text-xs md:text-sm uppercase tracking-widest">
+              <span className="w-3.5 sm:w-6 h-[1.5px] sm:h-[2px] bg-brand-yellow"></span>
+              <span className="text-brand-yellow-dark font-extrabold text-[10px] sm:text-xs uppercase tracking-widest">
                 INDUSTRIES WE SERVE
               </span>
-              <span className="w-3.5 sm:w-8 h-[1.5px] sm:h-[2px] bg-brand-yellow"></span>
+              <span className="w-3.5 sm:w-6 h-[1.5px] sm:h-[2px] bg-brand-yellow"></span>
             </div>
 
-            <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-extrabold sm:font-black tracking-tight text-brand-green-dark leading-snug sm:leading-tight">
+            <h2 className="text-lg sm:text-2xl md:text-3xl font-black tracking-tight text-brand-green-dark leading-tight">
               Specialized Logistics Solutions for Every Industry
             </h2>
 
-            <p className="text-[11px] sm:text-sm md:text-base text-brand-gray leading-relaxed font-light max-w-2xl mx-auto px-2 sm:px-0">
-              We provide reliable and flexible logistics solutions tailored to the unique transportation, warehousing, and supply chain requirements of different industries.
+            <p className="text-[11px] sm:text-sm text-brand-gray leading-relaxed font-light max-w-xl mx-auto px-1 sm:px-0">
+              Reliable multimodal freight, statutory customs clearance, and dedicated warehousing tailored to critical industry supply chains.
             </p>
           </div>
 
-          {/* Image-First Responsive Grid (2-Column on Mobile, 3-Column on Desktop) */}
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-6 lg:gap-7">
+          {/* Compact Responsive Grid: 2-Column on Mobile, 3-Column on Desktop */}
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4 md:gap-5">
             {industries.map((ind, idx) => (
               <Link 
-                key={idx}
+                key={ind.id || idx}
                 to={ind.path}
-                className="group relative h-48 sm:h-64 md:h-72 lg:h-80 rounded-xl sm:rounded-2xl overflow-hidden shadow-xs hover:shadow-xl border border-gray-200 transition-all duration-500 flex flex-col justify-end p-2.5 sm:p-6 bg-brand-green-dark cursor-pointer transform hover:-translate-y-1"
+                className="group relative h-[185px] xs:h-[205px] sm:h-[240px] md:h-[260px] lg:h-[275px] rounded-xl sm:rounded-2xl overflow-hidden shadow-xs hover:shadow-xl border border-slate-200/90 hover:border-brand-yellow/60 transition-all duration-300 flex flex-col justify-between p-2.5 xs:p-3 sm:p-4 md:p-5 bg-brand-green-dark cursor-pointer transform hover:-translate-y-1"
               >
                 {/* High-Resolution Industry Background Image */}
                 <img
                   src={ind.image}
                   alt={ind.name}
                   loading="lazy"
-                  onError={(e) => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80";
-                  }}
-                  className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 opacity-75 group-hover:opacity-65"
+                  className="absolute inset-0 w-full h-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700 ease-out"
                 />
                 
-                {/* Cinematic Dark Emerald / Charcoal Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#072419] via-[#072419]/80 to-transparent"></div>
+                {/* Cinematic Dark Emerald Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#051a12] via-[#051a12]/60 via-45% to-black/15 group-hover:via-[#051a12]/50 transition-colors duration-300 pointer-events-none"></div>
                 
                 {/* Top Gold Accent Bar */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-brand-yellow/0 group-hover:bg-brand-yellow transition-all duration-300"></div>
+                <div className="absolute top-0 inset-x-0 h-0.5 sm:h-1 bg-brand-yellow scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left z-20"></div>
 
-                {/* Card Content (Image-First with Minimal Text) */}
-                <div className="relative z-10 space-y-1 sm:space-y-2">
-                  <h3 className="text-xs sm:text-base md:text-lg lg:text-xl font-bold sm:font-black text-white tracking-tight leading-tight sm:leading-snug group-hover:text-brand-yellow transition-colors drop-shadow-sm line-clamp-2">
+                {/* Top Row: Sector Badge & Action Icon */}
+                <div className="relative z-10 flex items-center justify-between gap-1">
+                  <span className="inline-flex items-center px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded bg-black/45 backdrop-blur-xs border border-white/15 text-[8px] xs:text-[9px] sm:text-[10px] font-semibold text-brand-yellow uppercase tracking-wider">
+                    {ind.tag}
+                  </span>
+                  
+                  <div className="w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7 rounded-full bg-black/35 backdrop-blur-xs border border-white/20 flex items-center justify-center text-white/90 group-hover:bg-brand-yellow group-hover:text-brand-green-dark group-hover:border-brand-yellow transition-all duration-300 transform group-hover:rotate-[-45deg] shrink-0">
+                    <ArrowRight className="w-2.5 h-2.5 xs:w-3 xs:h-3 sm:w-3.5 sm:h-3.5" />
+                  </div>
+                </div>
+
+                {/* Bottom Content Area */}
+                <div className="relative z-10 space-y-1 sm:space-y-1.5">
+                  <h3 className="text-[11.5px] xs:text-[13px] sm:text-base md:text-lg font-bold sm:font-extrabold text-white tracking-tight leading-tight sm:leading-snug group-hover:text-brand-yellow transition-colors line-clamp-2 drop-shadow-xs">
                     {ind.name}
                   </h3>
                   
-                  {/* Little bit of text - compact on mobile */}
-                  <p className="text-[9.5px] sm:text-xs text-gray-200 leading-snug sm:leading-relaxed font-light line-clamp-2 drop-shadow-xs">
+                  <p className="text-[9px] xs:text-[10px] sm:text-xs text-gray-200/90 leading-tight sm:leading-relaxed font-light line-clamp-2 drop-shadow-2xs">
                     {ind.desc}
                   </p>
 
-                  {/* Clean Learn More link with arrow */}
-                  <div className="pt-0.5 sm:pt-2 flex items-center space-x-1 sm:space-x-1.5 text-[8.5px] sm:text-xs font-bold text-brand-yellow group-hover:text-white transition-colors">
-                    <span>Learn More</span>
-                    <ArrowRight className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 transform group-hover:translate-x-1.5 transition-transform" />
+                  <div className="pt-0.5 flex items-center space-x-1 text-[8.5px] xs:text-[9.5px] sm:text-xs font-bold text-brand-yellow group-hover:text-white transition-colors">
+                    <span>Explore Solutions</span>
+                    <ArrowRight className="w-2.5 h-2.5 sm:w-3 sm:h-3 transform group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>
               </Link>
@@ -1304,10 +1311,10 @@ export default function Home() {
           </div>
 
           {/* Bottom Callout */}
-          <div className="text-center mt-8 sm:mt-14">
+          <div className="text-center mt-6 sm:mt-10">
             <Link
               to="/contact-us"
-              className="inline-flex items-center space-x-2 bg-brand-green-dark hover:bg-brand-green text-white font-bold px-4 sm:px-7 py-2.5 sm:py-3.5 rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-[11px] sm:text-sm transform hover:-translate-y-0.5"
+              className="inline-flex items-center space-x-2 bg-brand-green-dark hover:bg-brand-green text-white font-bold px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-[11px] sm:text-xs md:text-sm transform hover:-translate-y-0.5"
             >
               <span>Speak with an Industry Specialist</span>
               <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-yellow" />

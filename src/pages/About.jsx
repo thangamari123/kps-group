@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { Play, X, Compass, Eye, CheckCircle2, Award, Users, ShieldCheck, HeartHandshake } from 'lucide-react';
+import { Play, X, Compass, Eye, Award, ShieldCheck, HeartHandshake } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { companyDetails } from '../data/company';
 import PageHero from '../components/common/PageHero';
 import SEO from '../components/common/SEO';
+import founderImg from '../assets/Mr. Srinivasa Pragasam.webp';
+import mdImg from '../assets/Mr. B.S. Prassanna.webp';
 
 export default function About() {
   const [activeVideoUrl, setActiveVideoUrl] = useState(null);
@@ -11,15 +13,19 @@ export default function About() {
   const videos = [
     {
       id: "vid1",
-      title: "Logistics Fleet Operations",
-      thumbnail: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=800&q=80",
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ" // Placeholder embed
+      tag: "Logistics & Fleet",
+      title: "Logistics Fleet & Port Operations",
+      subtitle: "Multimodal transport, container movement & vessel stevedoring",
+      thumbnail: "https://res.cloudinary.com/vm9q4qwp/video/upload/v1788875259/about-video-1.jpg",
+      videoUrl: "https://res.cloudinary.com/vm9q4qwp/video/upload/v1788875259/about-video-1.mp4"
     },
     {
       id: "vid2",
-      title: "FTWZ Warehouse Management",
-      thumbnail: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80",
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ" // Placeholder embed
+      tag: "Warehouse & FTWZ",
+      title: "FTWZ & Cargo Handling Operations",
+      subtitle: "High-throughput storage, inventory sorting & bonded handling",
+      thumbnail: "https://res.cloudinary.com/vm9q4qwp/video/upload/v1788875264/about-video-2.jpg",
+      videoUrl: "https://res.cloudinary.com/vm9q4qwp/video/upload/v1788875264/about-video-2.mp4"
     }
   ];
 
@@ -115,149 +121,243 @@ export default function About() {
         </div>
       </section>
 
-      {/* 2. Founder Section */}
-      <section className="py-12 sm:py-20 bg-brand-gray-light border-y border-brand-gray-muted text-brand-gray-dark">
+      {/* 2. Executive Leadership Section (Responsive & Compact Cards) */}
+      <section className="py-10 sm:py-16 md:py-20 bg-brand-gray-light border-y border-brand-gray-muted text-brand-gray-dark">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            
-            {/* Image Box */}
-            <div className="lg:col-span-5 relative">
-              <div className="rounded-2xl overflow-hidden shadow-xl aspect-[3/4] max-w-full relative z-10 bg-brand-green-dark">
-                <img
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80"
-                  alt="Founder & Chairman, K.P.S & Co. - Mr. Srinivasa Pragasam (Seenu)"
-                  className="w-full h-full object-cover grayscale contrast-125 opacity-90"
-                />
-              </div>
-              <div className="absolute -bottom-3 -right-3 sm:-bottom-4 sm:-right-4 w-full h-full border-4 border-brand-yellow rounded-2xl -z-0"></div>
+          
+          {/* Section Header */}
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-1.5 sm:space-y-2">
+            <div className="flex items-center justify-center space-x-1.5 sm:space-x-2">
+              <span className="w-3.5 sm:w-6 h-[1.5px] sm:h-[2px] bg-brand-yellow"></span>
+              <span className="text-brand-yellow-dark font-extrabold text-[10px] sm:text-xs uppercase tracking-widest">
+                EXECUTIVE LEADERSHIP
+              </span>
+              <span className="w-3.5 sm:w-6 h-[1.5px] sm:h-[2px] bg-brand-yellow"></span>
             </div>
 
-            {/* Content Box */}
-            <div className="lg:col-span-7 space-y-4 sm:space-y-5">
-              <div>
-                <span className="text-brand-yellow-dark font-extrabold text-[10px] sm:text-xs uppercase tracking-wider mb-1 block">
-                  Founder & Chairman, K.P.S & Co.
-                </span>
-                <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-brand-green-dark">
-                  Mr. Srinivasa Pragasam (Seenu)
-                </h3>
-              </div>
-
-              <p className="text-xs sm:text-sm text-brand-gray leading-relaxed">
-                I began this journey in 1985, at the age of 24, without any industry background just inspiration from my uncle and an eagerness to learn. I didn’t join any company or take a job. I simply decided to build something on my own.
-              </p>
-              
-              <p className="text-xs sm:text-sm text-brand-gray leading-relaxed">
-                With hard work and self-study, I cleared the required exams and obtained my logistics license. One unforgettable moment in my early days came while I was visiting the bank for company work. I noticed an elderly man struggling to fill a cheque deposit form. I helped him just as any young person should. A month later, that same man, now too old to continue in business, handed me his entire logistics operation.
-              </p>
-
-              <blockquote className="border-l-4 border-brand-yellow pl-4 py-2 italic text-gray-800 font-semibold text-sm sm:text-base leading-relaxed bg-white/70 rounded-r-lg">
-                &ldquo;That experience shaped my belief: Help others without expecting anything in return good things will always follow.&rdquo;
-              </blockquote>
-
-              <div className="pt-2 border-t border-gray-200">
-                <h4 className="text-xs sm:text-sm font-extrabold text-brand-green-dark uppercase tracking-wider mb-1.5">
-                  KPS Logistics Team
-                </h4>
-                <p className="text-xs sm:text-sm text-brand-gray leading-relaxed">
-                  Since then, we’ve grown K.P.S & Co. with the values of trust, consistency, and long-term partnerships. I’ve always believed in investing in people and building customer relationships that last. In 2008, I proudly handed over the leadership to my son, Mr. Prasssanna B.S., who shares the same commitment and vision for our future.
-                </p>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* 3. Managing Director Section */}
-      <section className="py-12 sm:py-20 text-brand-gray-dark bg-white">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            
-            {/* Content Box (Left) */}
-            <div className="lg:col-span-7 space-y-4 sm:space-y-5 lg:order-1">
-              <div>
-                <span className="text-brand-yellow-dark font-extrabold text-[10px] sm:text-xs uppercase tracking-wider mb-1 block">
-                  Managing Director, K.P.S & Co.
-                </span>
-                <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-brand-green-dark">
-                  Mr. B.S. Prassanna
-                </h3>
-              </div>
-
-              <p className="text-xs sm:text-sm text-brand-gray leading-relaxed">
-                In 2008, at the age of just 20, Mr. B.S. Prassanna stepped into the world of shipping and logistics, taking over the reins of K.P.S & Co. after completing his Bachelor’s degree in Computer Engineering. Though young, he entered the business with a clear vision: to transform the traditional logistics landscape using modern technology and to offer clients more solution-driven, simplified experiences.
-              </p>
-
-              <p className="text-xs sm:text-sm text-brand-gray leading-relaxed">
-                Prassanna’s focus from the very beginning has been to reduce complexity and enhance transparency in logistics operations. With a passion for innovation, he identified the key pain points clients faced and began building tech-enabled solutions that not only improved operational efficiency but also strengthened client satisfaction and trust.
-              </p>
-
-              <div className="pt-2 flex flex-wrap gap-2.5">
-                <div className="inline-flex items-center space-x-1.5 bg-[#eaf4ef] text-brand-green-dark font-bold text-xs px-3 py-1.5 rounded-lg border border-brand-green/20">
-                  <ShieldCheck className="w-3.5 h-3.5 text-brand-green" />
-                  <span>Tech-Driven Operations</span>
-                </div>
-                <div className="inline-flex items-center space-x-1.5 bg-[#fef7e0] text-brand-green-dark font-bold text-xs px-3 py-1.5 rounded-lg border border-brand-yellow/30">
-                  <HeartHandshake className="w-3.5 h-3.5 text-brand-yellow-dark" />
-                  <span>Customer Trust & Transparency</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Image Box (Right) */}
-            <div className="lg:col-span-5 relative lg:order-2">
-              <div className="rounded-2xl overflow-hidden shadow-xl aspect-[3/4] max-w-full relative z-10 bg-brand-green-dark">
-                <img
-                  src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80"
-                  alt="Managing Director Mr. B.S. Prassanna"
-                  className="w-full h-full object-cover grayscale opacity-90"
-                />
-              </div>
-              <div className="absolute -bottom-3 -left-3 sm:-bottom-4 sm:-left-4 w-full h-full border-4 border-brand-green rounded-2xl -z-0"></div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* 4. Operations in Action Video Section */}
-      <section className="py-12 sm:py-20 bg-brand-gray-light border-y border-brand-gray-muted text-brand-gray-dark">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16 space-y-1.5 sm:space-y-2">
-            <span className="text-brand-yellow-dark font-extrabold text-[10px] sm:text-xs uppercase tracking-wider block">
-              Our Operations in Action
-            </span>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-brand-green-dark">
-              Experience K.P.S & Co.
+              Guiding K.P.S & Co. Across Four Decades
             </h2>
-            <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
-              Watch our team and technology in motion, delivering excellence across the supply chain.
+
+            <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light max-w-xl mx-auto">
+              Founded on core values of integrity and lasting relationships in 1985, and advanced through next-generation supply chain technology.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
-            {videos.map((vid) => (
-              <div key={vid.id} className="bg-white rounded-xl shadow-md overflow-hidden border border-brand-gray-muted group">
-                <div className="relative aspect-video cursor-pointer overflow-hidden" onClick={() => setActiveVideoUrl(vid.videoUrl)}>
+          {/* 2-Card Responsive Compact Grid: 1 Column on Mobile, 2 Columns on Desktop */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 max-w-6xl mx-auto">
+            
+            {/* Card 1: Founder & Chairman */}
+            <div className="bg-white rounded-2xl border border-brand-gray-muted shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between group">
+              <div>
+                {/* Photo Container */}
+                <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                   <img
-                    src={vid.thumbnail}
-                    alt={vid.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    src={founderImg}
+                    alt="Founder & Chairman Mr. Srinivasa Pragasam (Seenu)"
+                    className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-brand-green-dark/40 flex items-center justify-center group-hover:bg-brand-green-dark/50 transition-colors">
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-brand-yellow text-brand-green-dark flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300">
-                      <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current ml-1" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
+                  
+                  {/* Floating Badges */}
+                  <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+                    <span className="px-2.5 py-1 rounded-md bg-black/65 backdrop-blur-xs border border-white/20 text-[9.5px] sm:text-[10.5px] font-bold text-brand-yellow uppercase tracking-wider">
+                      FOUNDER & CHAIRMAN
+                    </span>
+                    <span className="px-2.5 py-1 rounded-full bg-brand-green/90 backdrop-blur-xs text-[9.5px] sm:text-[10px] font-bold text-white uppercase tracking-wider shadow-xs">
+                      Est. 1985
+                    </span>
+                  </div>
+
+                  <div className="absolute bottom-3 left-3 right-3 text-white">
+                    <span className="text-[11px] font-semibold text-brand-yellow tracking-wide block">
+                      K.P.S & Co. Founder
+                    </span>
+                    <h3 className="text-lg sm:text-xl font-extrabold tracking-tight text-white drop-shadow-sm">
+                      Mr. Srinivasa Pragasam (Seenu)
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Accent Line */}
+                <div className="h-1 bg-gradient-to-r from-brand-yellow via-brand-yellow-light to-brand-yellow"></div>
+
+                {/* Card Body */}
+                <div className="p-5 sm:p-7 space-y-3.5">
+                  <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
+                    I began this journey in 1985 at the age of 24 without any industry background — just inspiration from my uncle and an eagerness to learn. Through hard work and independent study, I cleared the required exams and secured my logistics license to build something of my own.
+                  </p>
+
+                  <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
+                    One unforgettable moment came during a bank visit when I helped an elderly gentleman struggling to fill a cheque deposit form. A month later, ready to retire, that same gentleman handed me his entire logistics operation — becoming our foundational client.
+                  </p>
+
+                  <blockquote className="border-l-3 border-brand-yellow pl-3.5 py-2 italic text-gray-800 font-medium text-xs sm:text-[13px] leading-relaxed bg-[#fffdf0] rounded-r-lg">
+                    &ldquo;Help others without expecting anything in return — good things will always follow.&rdquo;
+                  </blockquote>
+                </div>
+              </div>
+
+              {/* Card Footer */}
+              <div className="px-5 pb-5 sm:px-7 sm:pb-6 pt-2 border-t border-brand-gray-muted/60 flex items-center justify-between text-[11px] sm:text-xs text-brand-gray">
+                <span className="font-semibold text-brand-green-dark">Leadership Handover: 2008</span>
+                <span className="text-brand-yellow-dark font-bold">40+ Years of Excellence</span>
+              </div>
+            </div>
+
+            {/* Card 2: Managing Director */}
+            <div className="bg-white rounded-2xl border border-brand-gray-muted shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between group">
+              <div>
+                {/* Photo Container */}
+                <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                  <img
+                    src={mdImg}
+                    alt="Managing Director Mr. B.S. Prassanna"
+                    className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
+
+                  {/* Floating Badges */}
+                  <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
+                    <span className="px-2.5 py-1 rounded-md bg-black/65 backdrop-blur-xs border border-white/20 text-[9.5px] sm:text-[10.5px] font-bold text-brand-yellow uppercase tracking-wider">
+                      MANAGING DIRECTOR
+                    </span>
+                    <span className="px-2.5 py-1 rounded-full bg-brand-green/90 backdrop-blur-xs text-[9.5px] sm:text-[10px] font-bold text-white uppercase tracking-wider shadow-xs">
+                      Since 2008
+                    </span>
+                  </div>
+
+                  <div className="absolute bottom-3 left-3 right-3 text-white">
+                    <span className="text-[11px] font-semibold text-brand-yellow tracking-wide block">
+                      Operations & Innovation
+                    </span>
+                    <h3 className="text-lg sm:text-xl font-extrabold tracking-tight text-white drop-shadow-sm">
+                      Mr. B.S. Prassanna
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Accent Line */}
+                <div className="h-1 bg-gradient-to-r from-brand-green via-brand-green-light to-brand-green"></div>
+
+                {/* Card Body */}
+                <div className="p-5 sm:p-7 space-y-3.5">
+                  <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
+                    In 2008, at the age of just 20, Mr. B.S. Prassanna stepped into the shipping and logistics industry, taking over the reins of K.P.S & Co. after completing his Bachelor’s degree in Computer Engineering. He entered with a clear vision: to modernize traditional logistics through digital automation and simplified client workflows.
+                  </p>
+
+                  <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
+                    Prassanna’s focus has been eliminating supply chain complexity and maximizing transparency. By identifying key industry friction points, he developed tech-enabled tracking and custom clearance protocols that significantly elevated operational velocity, client satisfaction, and corporate trust.
+                  </p>
+
+                  {/* Highlight Badges */}
+                  <div className="pt-1 flex flex-wrap gap-2">
+                    <div className="inline-flex items-center space-x-1.5 bg-[#eaf4ef] text-brand-green-dark font-bold text-[11px] sm:text-xs px-3 py-1.5 rounded-lg border border-brand-green/20">
+                      <ShieldCheck className="w-3.5 h-3.5 text-brand-green" />
+                      <span>Tech-Driven Operations</span>
+                    </div>
+                    <div className="inline-flex items-center space-x-1.5 bg-[#fef7e0] text-brand-green-dark font-bold text-[11px] sm:text-xs px-3 py-1.5 rounded-lg border border-brand-yellow/30">
+                      <HeartHandshake className="w-3.5 h-3.5 text-brand-yellow-dark" />
+                      <span>Client Trust & Transparency</span>
+                    </div>
+                    <div className="inline-flex items-center space-x-1.5 bg-brand-gray-light text-brand-green-dark font-bold text-[11px] sm:text-xs px-3 py-1.5 rounded-lg border border-brand-gray-muted">
+                      <Award className="w-3.5 h-3.5 text-brand-green" />
+                      <span>B.E. Computer Engineering</span>
                     </div>
                   </div>
                 </div>
-                <div className="p-3.5 sm:p-4 bg-white flex items-center justify-between">
-                  <h4 className="font-bold text-brand-green-dark text-sm sm:text-base">{vid.title}</h4>
-                  <span className="text-[10px] font-semibold text-brand-green uppercase tracking-wider">Watch Video</span>
+              </div>
+
+              {/* Card Footer */}
+              <div className="px-5 pb-5 sm:px-7 sm:pb-6 pt-2 border-t border-brand-gray-muted/60 flex items-center justify-between text-[11px] sm:text-xs text-brand-gray">
+                <span className="font-semibold text-brand-green-dark">Leadership: Next-Gen Supply Chain</span>
+                <span className="text-brand-green font-bold">Technology & Innovation</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </section>
+
+      {/* 3. Operations in Action Video Section (Compact & Responsive) */}
+      <section className="py-8 sm:py-14 md:py-16 bg-brand-gray-light border-y border-brand-gray-muted text-brand-gray-dark">
+        <div className="container mx-auto px-4 md:px-6">
+          
+          {/* Section Header */}
+          <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-10 space-y-1.5 sm:space-y-2">
+            <div className="flex items-center justify-center space-x-1.5 sm:space-x-2">
+              <span className="w-3.5 sm:w-6 h-[1.5px] sm:h-[2px] bg-brand-yellow"></span>
+              <span className="text-brand-yellow-dark font-extrabold text-[10px] sm:text-xs uppercase tracking-widest">
+                OUR OPERATIONS IN ACTION
+              </span>
+              <span className="w-3.5 sm:w-6 h-[1.5px] sm:h-[2px] bg-brand-yellow"></span>
+            </div>
+
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-brand-green-dark">
+              Experience K.P.S & Co.
+            </h2>
+
+            <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light max-w-xl mx-auto">
+              Watch our team, heavy-lift fleets, and FTWZ warehousing technology in motion across India.
+            </p>
+          </div>
+
+          {/* Video Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
+            {videos.map((vid) => (
+              <div 
+                key={vid.id} 
+                onClick={() => setActiveVideoUrl(vid.videoUrl)}
+                className="bg-white rounded-xl sm:rounded-2xl shadow-xs hover:shadow-xl overflow-hidden border border-brand-gray-muted transition-all duration-300 group cursor-pointer flex flex-col justify-between transform hover:-translate-y-1"
+              >
+                {/* Video Thumbnail Box */}
+                <div className="relative aspect-video overflow-hidden bg-slate-900">
+                  <img
+                    src={vid.thumbnail}
+                    alt={vid.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  
+                  {/* Subtle Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent group-hover:from-black/85 transition-colors"></div>
+
+                  {/* Top Badge */}
+                  <div className="absolute top-2.5 left-2.5">
+                    <span className="px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-xs border border-white/20 text-[9px] sm:text-[10px] font-bold text-brand-yellow uppercase tracking-wider">
+                      {vid.tag}
+                    </span>
+                  </div>
+
+                  {/* Centered Play Button */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-brand-yellow text-brand-green-dark flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:bg-white transition-all duration-300">
+                      <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current ml-1 text-brand-green-dark" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Info Bar */}
+                <div className="p-3 sm:p-4 bg-white flex items-center justify-between gap-3">
+                  <div className="space-y-0.5 min-w-0">
+                    <h3 className="font-bold text-brand-green-dark text-xs sm:text-sm md:text-base group-hover:text-brand-green transition-colors truncate">
+                      {vid.title}
+                    </h3>
+                    <p className="text-[10.5px] sm:text-xs text-brand-gray font-light truncate">
+                      {vid.subtitle}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-[#eaf4ef] text-brand-green font-bold text-[10px] sm:text-xs shrink-0 group-hover:bg-brand-green group-hover:text-white transition-colors">
+                    <Play className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current" />
+                    <span>Watch</span>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
+
         </div>
       </section>
 
@@ -317,72 +417,40 @@ export default function About() {
         </div>
       </section>
 
-      {/* 6. Happy Customers Section */}
-      <section className="py-14 sm:py-20 bg-brand-green-dark text-white overflow-hidden relative">
-        <div className="absolute inset-0 bg-cover bg-center mix-blend-overlay opacity-15" style={{ backgroundImage: `url('https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=1920&q=80')` }}></div>
-        <div className="container mx-auto px-4 md:px-6 relative z-10">
-          
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center max-w-6xl mx-auto">
-            
-            {/* Stats block */}
-            <div className="lg:col-span-5 text-center lg:text-left space-y-2 sm:space-y-3">
-              <span className="text-5xl sm:text-6xl font-black tracking-tight text-brand-yellow block">
-                6890+
-              </span>
-              <h3 className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-snug">
-                Happy Customers
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-300 leading-relaxed max-w-sm mx-auto lg:mx-0 font-light">
-                Our vision to create an inclusive and dynamic environment
-              </p>
-            </div>
 
-            {/* List block */}
-            <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-5">
-              {[
-                "Custom Brokerage",
-                "Liquid Bulk",
-                "Trade Compliance Consultations",
-                "Warehouse - FTWZ"
-              ].map((item, idx) => (
-                <div key={idx} className="flex items-center space-x-3 bg-white/10 border border-white/15 rounded-xl p-3.5 sm:p-4 hover:bg-white/15 transition-colors">
-                  <div className="p-1.5 sm:p-2 bg-brand-yellow text-brand-green-dark rounded-full flex-shrink-0">
-                    <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                  </div>
-                  <span className="font-bold text-xs sm:text-sm tracking-wide">{item}</span>
-                </div>
-              ))}
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Video Modal Player */}
+      {/* Video Modal Player (Native HTML5 MP4 with Controls) */}
       <AnimatePresence>
         {activeVideoUrl && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-sm"
+            onClick={() => setActiveVideoUrl(null)}
+          >
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-4xl bg-black rounded-lg overflow-hidden shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-4xl bg-black rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl border border-white/10"
             >
               <button
                 onClick={() => setActiveVideoUrl(null)}
-                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+                className="absolute top-3 right-3 z-20 p-2 rounded-full bg-black/60 text-white hover:bg-white hover:text-black transition-colors"
                 aria-label="Close video player"
               >
                 <X className="w-5 h-5" />
               </button>
-              <div className="aspect-video">
-                <iframe
-                  title="Operations Video Player"
+              
+              <div className="aspect-video w-full bg-black flex items-center justify-center">
+                <video
+                  key={activeVideoUrl}
                   src={activeVideoUrl}
-                  className="w-full h-full border-0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
+                  controls
+                  autoPlay
+                  playsInline
+                  className="w-full h-full object-contain"
+                >
+                  Your browser does not support the video tag.
+                </video>
               </div>
             </motion.div>
           </div>

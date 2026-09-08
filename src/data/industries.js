@@ -1,3 +1,10 @@
+import automotiveLogisticsImg from '../assets/Automotive Logistics.webp';
+import automotivePartsLogisticsImg from '../assets/Automotive Parts Logistics.webp';
+import fmcgLogisticsImg from '../assets/FMCG Logistics.webp';
+import manufacturingLogisticsImg from '../assets/Manufacturing & Industrial Logistics.webp';
+import healthcareLogisticsImg from '../assets/Healthcare Logistics.webp';
+import projectCargoLogisticsImg from '../assets/Project Cargo Logistics.webp';
+
 export const industriesData = {
   "automotive-logistics": {
     slug: "automotive-logistics",
@@ -12,7 +19,7 @@ export const industriesData = {
       "Time-critical deliveries",
       "Supply chain coordination"
     ],
-    image: "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1200&q=80",
+    image: automotiveLogisticsImg,
     challenges: [
       {
         title: "Assembly Line Stoppage Risk",
@@ -65,7 +72,7 @@ export const industriesData = {
       "Warehousing & distribution",
       "Component movement"
     ],
-    image: "https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=1200&q=80",
+    image: automotivePartsLogisticsImg,
     challenges: [
       {
         title: "Fluctuating JIT Delivery Windows",
@@ -114,7 +121,7 @@ export const industriesData = {
       "Inventory movement",
       "Time-sensitive shipments"
     ],
-    image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80",
+    image: fmcgLogisticsImg,
     challenges: [
       {
         title: "Perishability & Expiry Management",
@@ -163,7 +170,7 @@ export const industriesData = {
       "Factory-to-site logistics",
       "Heavy & specialized cargo"
     ],
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200&q=80",
+    image: manufacturingLogisticsImg,
     challenges: [
       {
         title: "Heavy & Oversized Dimensions",
@@ -212,7 +219,7 @@ export const industriesData = {
       "Temperature-sensitive shipments",
       "Secure & time-critical delivery"
     ],
-    image: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=1200&q=80",
+    image: healthcareLogisticsImg,
     challenges: [
       {
         title: "Drug Controller (CDSCO) Approvals",
@@ -261,7 +268,7 @@ export const industriesData = {
       "Multimodal transportation",
       "Project-based logistics planning"
     ],
-    image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=1200&q=80",
+    image: projectCargoLogisticsImg,
     challenges: [
       {
         title: "Extreme Weight & Dimension Constraints",
