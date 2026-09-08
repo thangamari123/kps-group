@@ -1264,7 +1264,7 @@ export default function Home() {
               <Link 
                 key={ind.id || idx}
                 to={ind.path}
-                className="group relative h-[185px] xs:h-[205px] sm:h-[240px] md:h-[260px] lg:h-[275px] rounded-xl sm:rounded-2xl overflow-hidden shadow-xs hover:shadow-xl border border-slate-200/90 hover:border-brand-yellow/60 transition-all duration-300 flex flex-col justify-between p-2.5 xs:p-3 sm:p-4 md:p-5 bg-brand-green-dark cursor-pointer transform hover:-translate-y-1"
+                className="group relative h-[150px] xs:h-[170px] sm:h-[200px] md:h-[225px] lg:h-[240px] rounded-xl sm:rounded-2xl overflow-hidden shadow-xs hover:shadow-xl border border-slate-200/90 hover:border-brand-yellow/60 transition-all duration-300 flex flex-col justify-between p-3 sm:p-4 md:p-5 bg-brand-green-dark cursor-pointer transform hover:-translate-y-1"
               >
                 {/* High-Resolution Industry Background Image */}
                 <img
@@ -1275,36 +1275,24 @@ export default function Home() {
                 />
                 
                 {/* Cinematic Dark Emerald Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#051a12] via-[#051a12]/60 via-45% to-black/15 group-hover:via-[#051a12]/50 transition-colors duration-300 pointer-events-none"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#051a12]/95 via-[#051a12]/45 via-45% to-black/15 group-hover:from-[#051a12] group-hover:via-[#051a12]/55 transition-colors duration-300 pointer-events-none"></div>
                 
                 {/* Top Gold Accent Bar */}
                 <div className="absolute top-0 inset-x-0 h-0.5 sm:h-1 bg-brand-yellow scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left z-20"></div>
 
-                {/* Top Row: Sector Badge & Action Icon */}
-                <div className="relative z-10 flex items-center justify-between gap-1">
-                  <span className="inline-flex items-center px-1.5 py-0.5 sm:px-2.5 sm:py-1 rounded bg-black/45 backdrop-blur-xs border border-white/15 text-[8px] xs:text-[9px] sm:text-[10px] font-semibold text-brand-yellow uppercase tracking-wider">
-                    {ind.tag}
-                  </span>
-                  
-                  <div className="w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7 rounded-full bg-black/35 backdrop-blur-xs border border-white/20 flex items-center justify-center text-white/90 group-hover:bg-brand-yellow group-hover:text-brand-green-dark group-hover:border-brand-yellow transition-all duration-300 transform group-hover:rotate-[-45deg] shrink-0">
+                {/* Top Action Icon */}
+                <div className="relative z-10 flex justify-end">
+                  <div className="w-5 h-5 xs:w-6 xs:h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-full bg-black/35 backdrop-blur-xs border border-white/20 flex items-center justify-center text-white/90 group-hover:bg-brand-yellow group-hover:text-brand-green-dark group-hover:border-brand-yellow transition-all duration-300 transform group-hover:rotate-[-45deg] shrink-0">
                     <ArrowRight className="w-2.5 h-2.5 xs:w-3 xs:h-3 sm:w-3.5 sm:h-3.5" />
                   </div>
                 </div>
 
-                {/* Bottom Content Area */}
-                <div className="relative z-10 space-y-1 sm:space-y-1.5">
-                  <h3 className="text-[11.5px] xs:text-[13px] sm:text-base md:text-lg font-bold sm:font-extrabold text-white tracking-tight leading-tight sm:leading-snug group-hover:text-brand-yellow transition-colors line-clamp-2 drop-shadow-xs">
+                {/* Bottom Content Area: Heading Text Only */}
+                <div className="relative z-10">
+                  <div className="w-4 sm:w-6 h-[2px] bg-brand-yellow mb-1.5 sm:mb-2 scale-x-75 origin-left group-hover:scale-x-100 transition-transform duration-300"></div>
+                  <h3 className="text-xs xs:text-sm sm:text-base md:text-lg lg:text-xl font-bold sm:font-extrabold text-white tracking-tight leading-tight sm:leading-snug group-hover:text-brand-yellow transition-colors line-clamp-2 drop-shadow-md">
                     {ind.name}
                   </h3>
-                  
-                  <p className="text-[9px] xs:text-[10px] sm:text-xs text-gray-200/90 leading-tight sm:leading-relaxed font-light line-clamp-2 drop-shadow-2xs">
-                    {ind.desc}
-                  </p>
-
-                  <div className="pt-0.5 flex items-center space-x-1 text-[8.5px] xs:text-[9.5px] sm:text-xs font-bold text-brand-yellow group-hover:text-white transition-colors">
-                    <span>Explore Solutions</span>
-                    <ArrowRight className="w-2.5 h-2.5 sm:w-3 sm:h-3 transform group-hover:translate-x-1 transition-transform" />
-                  </div>
                 </div>
               </Link>
             ))}
