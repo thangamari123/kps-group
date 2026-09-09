@@ -265,7 +265,7 @@ export default function Home() {
       tag: "FCL • LCL • Specialized Reefer",
       desc: "Reliable, scheduled container shipping solutions optimized for high-volume trade lanes with real-time digital equipment monitoring.",
       path: "/services/containerized-cargo",
-      image: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=800&q=80",
+      image: "https://res.cloudinary.com/vm9q4qwp/image/upload/v1788879983/Containerized_Cargo_FCL_LCL.png",
       icon: <Package className="w-5 h-5" />
     },
     {
@@ -274,7 +274,7 @@ export default function Home() {
       tag: "Break Bulk • RoRo • Turnkey Logistics",
       desc: "Turnkey project logistics for break bulk charters, heavy industrial components, rolling stock, and specialized port vessel stevedoring.",
       path: "/services/project-logistics",
-      image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=800&q=80",
+      image: "https://res.cloudinary.com/vm9q4qwp/image/upload/v1788880001/Project_Cargo_Maritime_Operations.png",
       icon: <Anchor className="w-5 h-5" />
     },
     {
@@ -283,7 +283,7 @@ export default function Home() {
       tag: "Hydraulic Multi-Axle • Route Feasibility",
       desc: "Heavy-haul transport with comprehensive civil surveys, bridge load engineering, hydraulic modular trailers, and dedicated route escorts.",
       path: "/services/odc",
-      image: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=800&q=80",
+      image: "https://res.cloudinary.com/vm9q4qwp/image/upload/v1788880025/Over_Dimensional_Cargo_ODC.png",
       icon: <Truck className="w-5 h-5" />
     },
     {
@@ -292,7 +292,7 @@ export default function Home() {
       tag: "CHA License R-50 • 24/7 ICEGATE",
       desc: "In-house licensed customs brokerage (R-50/Chennai), direct port clearance desks, precise HTS tariff coding, and duty benefit optimization.",
       path: "/services/customs-brokerage",
-      image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80",
+      image: "https://res.cloudinary.com/vm9q4qwp/image/upload/v1788880076/Customs_Brokerage_CHA_Compliance.png",
       icon: <FileText className="w-5 h-5" />
     },
     {
@@ -301,7 +301,7 @@ export default function Home() {
       tag: "Sea + Air + Road • Global Corridors",
       desc: "Seamless intermodal transit combining ocean carriers, expedited air charters, and nationwide express trucking networks.",
       path: "/services/freight-forwarding",
-      image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80",
+      image: "https://res.cloudinary.com/vm9q4qwp/image/upload/v1788880102/Multimodal_Freight_Forwarding.png",
       icon: <Globe className="w-5 h-5" />
     },
     {
@@ -310,7 +310,7 @@ export default function Home() {
       tag: "Duty Deferment • Covered & Open Storage",
       desc: "Strategic warehousing, bonded customs facilities, dedicated ODC open storage yards, and tax-deferred Free Trade Warehousing Zones (FTWZ).",
       path: "/services/warehousing",
-      image: "https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&w=800&q=80",
+      image: "https://res.cloudinary.com/vm9q4qwp/image/upload/v1788880119/Industrial_Warehousing_FTWZ_Hubs.png",
       icon: <Warehouse className="w-5 h-5" />
     }
   ];
@@ -600,24 +600,6 @@ export default function Home() {
     }
   ];
 
-  const aboutFeatures = [
-    {
-      title: "Bridging Logistics & Project Engineering",
-      desc: "From single LCL cartons to ultra-heavy industrial plants across major trade lanes.",
-      icon: <Cpu className="w-5 h-5 text-brand-yellow" />
-    },
-    {
-      title: "Four Decades of Proven Experience",
-      desc: "Planning, executing, and managing freight movements since 1985.",
-      icon: <Award className="w-5 h-5 text-brand-yellow" />
-    },
-    {
-      title: "Regulatory Command & Coordination",
-      desc: "Delivering reliable cargo movement for conventional and specialized requirements.",
-      icon: <ShieldCheck className="w-5 h-5 text-brand-yellow" />
-    }
-  ];
-
   return (
     <div className="bg-white">
       <SEO 
@@ -712,22 +694,6 @@ export default function Home() {
                 </AnimatePresence>
               </div>
 
-              {/* Subtitle / Description */}
-              <div className="min-h-[26px] xs:min-h-[32px] sm:min-h-[46px] md:min-h-[54px] mb-2.5 xs:mb-3.5 sm:mb-8">
-                <AnimatePresence mode="wait">
-                  <motion.p
-                    key={activeHeroHeading}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.35 }}
-                    className="text-[10px] xs:text-[11px] sm:text-base md:text-lg lg:text-xl text-gray-200 max-w-2xl leading-relaxed font-light drop-shadow-sm line-clamp-2 xs:line-clamp-none"
-                  >
-                    {heroHeadings[activeHeroHeading].desc}
-                  </motion.p>
-                </AnimatePresence>
-              </div>
-
               {/* CTA Action Buttons */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -819,17 +785,21 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-y-10 lg:gap-x-16 items-center">
             
             {/* Title / Header block (order-1 on mobile, left side on desktop) */}
-            <div className="lg:col-span-7 order-1 space-y-4">
+            <div className="lg:col-span-7 order-1 space-y-3">
               <div>
                 <span className="text-brand-green font-bold text-xs uppercase tracking-widest block">
-                  ABOUT KPS WORLDWIDE LOGISTICS
+                  ABOUT K.P.S & CO
                 </span>
                 <div className="w-10 h-[2px] bg-brand-yellow mt-1 mb-4"></div>
               </div>
               
               <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-brand-green-dark leading-tight">
-                Moving Your Commerce. <span className="text-brand-yellow-dark">Shaping Global Trade.</span>
+                About K.P.S & Co
               </h2>
+
+              <p className="text-base sm:text-lg font-extrabold text-brand-yellow-dark">
+                Trusted Shipping & Logistics Since 1985
+              </p>
             </div>
 
             {/* Image Card (order-2 on mobile, right side on desktop taking full height) */}
@@ -837,50 +807,94 @@ export default function Home() {
               {/* Gold outline frame behind image */}
               <div className="absolute -top-4 -left-4 w-full h-full border border-brand-yellow rounded-2xl -z-10"></div>
               
-              {/* Warehouse Image */}
-              <div className="rounded-2xl overflow-hidden shadow-2xl relative z-10 aspect-[4/3] bg-brand-green-dark">
+              {/* About Section Card Image */}
+              <div className="rounded-2xl overflow-hidden shadow-2xl relative z-10 aspect-square bg-brand-green-dark">
                 <img
-                  src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80"
-                  alt="KPS warehousing operations racks"
+                  src="https://res.cloudinary.com/vm9q4qwp/image/upload/v1788966808/about_card.png"
+                  alt="About K.P.S & Co"
                   className="w-full h-full object-cover transform hover:scale-102 transition-transform duration-500"
                 />
               </div>
             </div>
 
-            {/* Description & Features Block (order-3 on mobile, fits underneath Title on desktop) */}
-            <div className="lg:col-span-7 order-3 lg:order-2 space-y-6 mt-8 lg:mt-0">
-              <p className="text-base text-brand-green-dark font-medium leading-relaxed">
-                At KPS Worldwide Logistics Pvt Ltd., we bridge the gap between standard logistics and complex project engineering.
+            {/* Content & Features Block */}
+            <div className="lg:col-span-7 order-3 lg:order-2 space-y-4 sm:space-y-5 mt-4 lg:mt-0">
+              <p className="text-sm sm:text-base text-brand-gray leading-relaxed font-light">
+                Founded by <strong className="font-bold text-brand-green-dark">Mr. Srinivasa Pragasam (Seenu)</strong>, K.P.S & Co. has grown from a humble beginning into a trusted name in shipping and logistics. With over <strong className="font-bold text-brand-green-dark">40 years of industry experience</strong>, we combine reliable service, strong global relationships, and modern logistics solutions to move your cargo with confidence.
               </p>
-              <p className="text-sm text-brand-gray leading-relaxed font-light">
-                For four decades, our experienced professionals have planned, executed, and managed freight movements across major international trade lanes, from single LCL cartons to ultra heavy industrial plants. We combine logistics expertise, technical planning, regulatory knowledge, and global coordination to deliver reliable cargo movement for both conventional and specialized requirements.
+
+              <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
+                Today, under the leadership of Managing Director <strong className="font-bold text-brand-green-dark">Mr. B.S. Prassanna</strong>, we combine licensed customs clearance heritage with advanced digital operations, multimodal freight forwarding, and specialized project cargo handling across key global trade corridors.
               </p>
-              
-              <div className="space-y-4 mb-8">
-                {aboutFeatures.map((feat, idx) => (
-                  <div 
-                    key={idx}
-                    className="bg-brand-gray-light/60 border border-brand-gray-muted rounded-xl p-4 flex items-center space-x-4 hover:shadow-sm transition-all duration-300"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-brand-green-dark text-brand-yellow flex items-center justify-center flex-shrink-0 shadow-md">
-                      {feat.icon}
-                    </div>
-                    <div className="w-[2px] h-8 bg-brand-yellow flex-shrink-0"></div>
-                    <div className="space-y-0.5">
-                      <h4 className="text-sm font-bold text-brand-green-dark">{feat.title}</h4>
-                      <p className="text-xs text-brand-gray leading-relaxed font-light">{feat.desc}</p>
-                    </div>
-                  </div>
-                ))}
+
+              {/* Core Values Strip */}
+              <div className="inline-flex items-center space-x-2 bg-brand-green/5 border border-brand-green/20 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-extrabold text-brand-green-dark tracking-wide">
+                <span className="w-2 h-2 rounded-full bg-brand-yellow"></span>
+                <span>Experience</span>
+                <span className="text-brand-yellow-dark">•</span>
+                <span>Trust</span>
+                <span className="text-brand-yellow-dark">•</span>
+                <span>Reliability</span>
               </div>
 
-              <div className="pt-2">
+              {/* 4 Key Strategic Highlights Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 pt-1">
+                <div className="bg-[#f8faf9] border border-[#e5ece8] rounded-xl p-3 flex items-start space-x-3 group hover:border-brand-green/50 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-brand-green/10 text-brand-green flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-brand-green group-hover:text-brand-yellow transition-colors">
+                    <Award className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-bold text-brand-green-dark leading-snug">40+ Years Legacy</h4>
+                    <p className="text-[11px] text-brand-gray font-light mt-0.5">Continuous trust & excellence since 1985.</p>
+                  </div>
+                </div>
+
+                <div className="bg-[#f8faf9] border border-[#e5ece8] rounded-xl p-3 flex items-start space-x-3 group hover:border-brand-green/50 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-brand-green/10 text-brand-green flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-brand-green group-hover:text-brand-yellow transition-colors">
+                    <ShieldCheck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-bold text-brand-green-dark leading-snug">Licensed CHA Broker</h4>
+                    <p className="text-[11px] text-brand-gray font-light mt-0.5">Reg. 50 in-house customs clearance desks.</p>
+                  </div>
+                </div>
+
+                <div className="bg-[#f8faf9] border border-[#e5ece8] rounded-xl p-3 flex items-start space-x-3 group hover:border-brand-green/50 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-brand-green/10 text-brand-green flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-brand-green group-hover:text-brand-yellow transition-colors">
+                    <Globe className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-bold text-brand-green-dark leading-snug">Global Multimodal</h4>
+                    <p className="text-[11px] text-brand-gray font-light mt-0.5">Ocean, air, road & FTWZ warehousing.</p>
+                  </div>
+                </div>
+
+                <div className="bg-[#f8faf9] border border-[#e5ece8] rounded-xl p-3 flex items-start space-x-3 group hover:border-brand-green/50 transition-colors">
+                  <div className="w-8 h-8 rounded-lg bg-brand-green/10 text-brand-green flex items-center justify-center flex-shrink-0 mt-0.5 group-hover:bg-brand-green group-hover:text-brand-yellow transition-colors">
+                    <Users className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-bold text-brand-green-dark leading-snug">6,000+ Clients</h4>
+                    <p className="text-[11px] text-brand-gray font-light mt-0.5">Trusted by leading industrial enterprises.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 flex flex-wrap items-center gap-3">
                 <Link
                   to="/about-us"
-                  className="inline-flex items-center justify-center bg-brand-green-dark hover:bg-brand-green text-white font-semibold px-6 py-3.5 rounded-md shadow-md hover:shadow-lg transition-all duration-300 group text-sm"
+                  className="inline-flex items-center justify-center bg-brand-green-dark hover:bg-brand-green text-white font-semibold px-6 py-3 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 group text-xs sm:text-sm"
                 >
                   <span>Discover KPS Worldwide</span>
                   <ArrowRight className="w-4 h-4 ml-2 text-brand-yellow transform group-hover:translate-x-1 transition-transform" />
+                </Link>
+
+                <Link
+                  to="/contact-us"
+                  className="inline-flex items-center justify-center bg-white hover:bg-[#f4f7f5] text-brand-green-dark font-semibold px-5 py-3 rounded-xl border border-brand-green/20 hover:border-brand-green/40 transition-all duration-300 text-xs sm:text-sm shadow-2xs"
+                >
+                  <span>Get in Touch</span>
                 </Link>
               </div>
             </div>
@@ -906,70 +920,47 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-black tracking-tight text-brand-green-dark leading-tight">
               Precision Logistics & Global Freight Solutions
             </h2>
-
-            <p className="text-xs sm:text-sm md:text-base text-brand-gray leading-relaxed font-light max-w-2xl mx-auto">
-              From high-volume containerized freight to complex project logistics and customs brokerage, KPS Worldwide delivers end-to-end engineered capabilities.
-            </p>
           </div>
 
-          {/* 6-Card Corporate Grid */}
+          {/* 6-Card Corporate Grid - Visual Cards with Heading Only */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8">
             {servicesList.map((service, idx) => (
-              <div 
+              <Link 
                 key={idx}
-                className="bg-white border border-[#e5e9e7] hover:border-brand-green/60 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1 relative"
+                to={service.path}
+                className="bg-white border border-[#e5e9e7] hover:border-brand-green/60 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col group hover:-translate-y-1 relative"
               >
-                {/* Top Image Banner with Corporate Overlay */}
-                <div className="h-44 sm:h-48 relative overflow-hidden bg-brand-green-dark">
+                {/* Visual Image Banner */}
+                <div className="relative aspect-[16/11] sm:aspect-[4/3] overflow-hidden bg-[#f4f7f5]">
                   <img
                     src={service.image}
                     alt={service.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#072419]/90 via-[#072419]/30 to-transparent"></div>
                   
                   {/* Top Right Numeric Indicator */}
-                  <div className="absolute top-3.5 right-3.5 bg-black/40 backdrop-blur-md border border-white/20 text-white font-mono font-bold text-xs px-2.5 py-1 rounded-lg">
+                  <div className="absolute top-3.5 right-3.5 bg-black/60 backdrop-blur-md border border-white/20 text-white font-mono font-bold text-xs px-2.5 py-1 rounded-lg shadow-sm">
                     {service.id}
-                  </div>
-
-                  {/* Floating Icon Badge & Sub-tag */}
-                  <div className="absolute bottom-3.5 left-4 right-4 flex items-center space-x-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-brand-green text-brand-yellow border-2 border-white/80 shadow-md flex items-center justify-center group-hover:bg-brand-yellow group-hover:text-brand-green-dark transition-colors duration-300 flex-shrink-0">
-                      {service.icon}
-                    </div>
-                    <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider text-brand-yellow-light bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded border border-white/10 truncate">
-                      {service.tag}
-                    </span>
                   </div>
                 </div>
 
-                {/* Content Body */}
-                <div className="p-5 sm:p-6 flex flex-col justify-between flex-grow space-y-3">
-                  <div className="space-y-2">
+                {/* Heading Only Body */}
+                <div className="p-5 sm:p-6 flex items-center justify-between gap-3 bg-white flex-grow">
+                  <div className="flex items-center space-x-3.5 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-brand-green/10 text-brand-green flex items-center justify-center group-hover:bg-brand-green group-hover:text-brand-yellow transition-colors duration-300 flex-shrink-0">
+                      {service.icon}
+                    </div>
                     <h3 className="text-base sm:text-lg font-extrabold text-brand-green-dark leading-snug group-hover:text-brand-green transition-colors">
                       {service.name}
                     </h3>
-                    <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
-                      {service.desc}
-                    </p>
                   </div>
 
-                  {/* Bottom Action Strip */}
-                  <div className="pt-4 border-t border-gray-100 flex items-center justify-between mt-auto">
-                    <Link
-                      to={service.path}
-                      className="inline-flex items-center space-x-1.5 text-xs font-bold text-brand-green hover:text-brand-green-light transition-colors group/link"
-                    >
-                      <span>Explore Capability</span>
-                      <ArrowRight className="w-3.5 h-3.5 transform group-hover/link:translate-x-1 transition-transform" />
-                    </Link>
-                    <span className="text-[10px] font-bold text-gray-400 group-hover:text-brand-green transition-colors">
-                      View Details &rarr;
-                    </span>
+                  <div className="w-9 h-9 rounded-xl bg-gray-50 border border-gray-200 text-brand-green flex items-center justify-center group-hover:bg-brand-green group-hover:border-brand-green group-hover:text-white transition-all duration-300 flex-shrink-0">
+                    <ArrowRight className="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
 
@@ -1012,10 +1003,6 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight text-[#072419] leading-tight">
               One Partner. Complete Supply Chain <span className="text-brand-green">Solutions.</span>
             </h2>
-
-            <p className="text-xs sm:text-sm text-brand-gray max-w-2xl mx-auto leading-relaxed font-light">
-              From origin cargo pickup to final-mile site delivery, KPS Worldwide Logistics coordinates every critical milestone with precision logistics engineering.
-            </p>
           </div>
 
           {/* Desktop Connected 7-Stage Pipeline (lg: 1024px+) */}
@@ -1048,11 +1035,6 @@ export default function Home() {
                       </h4>
                       <div className="w-4 h-[2px] bg-brand-yellow mt-1 mb-1.5 group-hover:w-8 transition-all"></div>
                     </div>
-
-                    {/* Description */}
-                    <p className="text-[11px] text-brand-gray leading-relaxed font-light line-clamp-3">
-                      {step.desc}
-                    </p>
                   </div>
 
                   {/* Bottom Accent Indicator */}
@@ -1089,10 +1071,6 @@ export default function Home() {
                   <h4 className="text-xs sm:text-sm font-extrabold text-[#072419] tracking-tight">
                     {step.fullTitle || step.title}
                   </h4>
-                  
-                  <p className="text-[11px] sm:text-xs text-brand-gray leading-relaxed font-light">
-                    {step.desc}
-                  </p>
                 </div>
 
               </div>
@@ -1108,9 +1086,6 @@ export default function Home() {
               <h4 className="text-sm sm:text-base font-extrabold text-white">
                 Looking for an End-to-End Single-Point Logistics Partner?
               </h4>
-              <p className="text-xs text-gray-300 font-light">
-                From route planning to customs clearance and heavy haulage, our directors manage the entire journey.
-              </p>
             </div>
 
             <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 flex-shrink-0">
@@ -1150,10 +1125,6 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-black tracking-tight text-brand-green-dark leading-tight">
               Why Global Enterprises Choose <span className="text-brand-green">KPS Worldwide</span>
             </h2>
-
-            <p className="text-xs sm:text-sm md:text-base text-brand-gray leading-relaxed font-light max-w-2xl mx-auto">
-              Strategic logistics advantages engineered to eliminate customs delays, ensure complete regulatory compliance, and optimize your global supply chain costs.
-            </p>
           </div>
 
           {/* 6 Strategic Pillars Grid with Compact Mobile 2-Column Grid */}
@@ -1183,11 +1154,6 @@ export default function Home() {
                       {item.title}
                     </h3>
                   </div>
-
-                  {/* Main Description */}
-                  <p className="text-[10px] sm:text-xs text-brand-gray leading-relaxed font-light line-clamp-2 sm:line-clamp-none">
-                    {item.desc}
-                  </p>
 
                   {/* Key Strategic Importance Points Checklist */}
                   <div className="pt-2 sm:pt-3 border-t border-gray-200/70 space-y-1.5 sm:space-y-2">
@@ -1252,10 +1218,6 @@ export default function Home() {
             <h2 className="text-lg sm:text-2xl md:text-3xl font-black tracking-tight text-brand-green-dark leading-tight">
               Specialized Logistics Solutions for Every Industry
             </h2>
-
-            <p className="text-[11px] sm:text-sm text-brand-gray leading-relaxed font-light max-w-xl mx-auto px-1 sm:px-0">
-              Reliable multimodal freight, statutory customs clearance, and dedicated warehousing tailored to critical industry supply chains.
-            </p>
           </div>
 
           {/* Compact Responsive Grid: 2-Column on Mobile, 3-Column on Desktop */}
@@ -1329,10 +1291,6 @@ export default function Home() {
             <h2 className="text-xl sm:text-3xl md:text-4xl font-black tracking-tight text-brand-green-dark leading-tight">
               Our Offices
             </h2>
-
-            <p className="text-[11px] sm:text-sm text-brand-gray leading-relaxed font-light px-2 sm:px-0">
-              Direct port clearance desks, inland cargo hubs, and corporate offices across India's key industrial corridors.
-            </p>
           </div>
 
           {/* Offices Grid (Compact 2-Column on Mobile, 4-Column on Desktop) */}
@@ -1686,10 +1644,6 @@ export default function Home() {
             <h2 className="text-xl sm:text-3xl md:text-4xl font-black tracking-tight text-brand-green-dark leading-tight">
               Honored for Logistics Excellence & Leadership
             </h2>
-
-            <p className="text-[11px] sm:text-sm md:text-base text-brand-gray leading-relaxed font-light max-w-2xl mx-auto px-2 sm:px-0">
-              Recognized by prominent shipping conclaves, maritime bodies, and multinational supply chain partners for four decades of service excellence.
-            </p>
           </div>
 
           {/* 1. Mobile-Only Compact Auto-Sliding Carousel (< 768px) */}
@@ -1745,12 +1699,9 @@ export default function Home() {
                         <div className="text-[7.5px] font-bold text-brand-yellow-dark uppercase tracking-wider">
                           Accolade #{String(idx + 1).padStart(2, '0')}
                         </div>
-                        <h3 className="text-[11px] font-extrabold text-brand-green-dark leading-snug line-clamp-1">
+                        <h3 className="text-[11px] font-extrabold text-brand-green-dark leading-snug line-clamp-2">
                           {award.title}
                         </h3>
-                        <p className="text-[8.5px] text-brand-gray leading-tight font-light line-clamp-2">
-                          {award.description}
-                        </p>
                       </div>
 
                       {/* Footer Row with Meta and Slider Arrows */}
@@ -1856,10 +1807,6 @@ export default function Home() {
                     <h3 className="text-base font-extrabold text-brand-green-dark group-hover:text-brand-green transition-colors leading-snug line-clamp-2">
                       {award.title}
                     </h3>
-
-                    <p className="text-xs text-brand-gray leading-relaxed font-light line-clamp-3">
-                      {award.description}
-                    </p>
                   </div>
 
                   {/* Bottom Meta Row */}
@@ -1901,9 +1848,6 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-brand-green-dark leading-tight">
               Logistics Insights & Industry Knowledge
             </h2>
-            <p className="text-xs sm:text-sm text-brand-gray mt-2 leading-relaxed">
-              Practical insights, industry updates, and expert perspectives on logistics, customs, trade, and supply chain management.
-            </p>
             <div className="w-12 h-[3px] bg-brand-yellow mx-auto mt-3 sm:mt-4 rounded-full"></div>
           </div>
 
@@ -1964,9 +1908,6 @@ export default function Home() {
                       <h3 className="text-sm sm:text-base font-bold text-brand-green-dark leading-snug line-clamp-2">
                         {post.title}
                       </h3>
-                      <p className="text-[11px] text-brand-gray leading-relaxed font-light line-clamp-2">
-                        {post.desc}
-                      </p>
                     </div>
 
                     <div className="pt-2.5 border-t border-gray-100 flex items-center justify-between">
@@ -2064,9 +2005,6 @@ export default function Home() {
                     <h3 className="text-base font-bold text-brand-green-dark leading-snug group-hover:text-brand-green transition-colors">
                       {post.title}
                     </h3>
-                    <p className="text-xs text-brand-gray leading-relaxed font-light">
-                      {post.desc}
-                    </p>
                   </div>
 
                   <div className="mt-6 pt-4 border-t border-brand-gray-muted flex justify-end">
