@@ -1,0 +1,6 @@
+# Cloudflare Pages 301 Permanent Redirects
+/corporate /about-us 301
+/awards /corporate/awards 301
+/blog /blogs 301
+/blog/* /blogs/:splat 301
+/lead-form /quote 301
