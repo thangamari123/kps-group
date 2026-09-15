@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Play, X, Compass, Eye, Award, ShieldCheck, HeartHandshake } from 'lucide-react';
+import { Play, X, Compass, Eye, Award, ShieldCheck, HeartHandshake, Globe, Layers } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { companyDetails } from '@/data/company';
 import PageHero from '@/components/common/PageHero';
@@ -36,7 +36,7 @@ export default function AboutContent() {
       {/* Page Hero */}
       <PageHero 
         title="About Us" 
-        description="Over 40+ years of trust, technology-driven operations, and dedicated logistics solutions in India." 
+        description="Moving Your Commerce. Shaping Global Trade. Over 40+ years of trusted logistics excellence and project engineering." 
         bgImage="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1920&q=80"
       />
 
@@ -50,17 +50,21 @@ export default function AboutContent() {
               <div className="flex items-center space-x-2.5">
                 <div className="w-6 sm:w-8 h-[2px] bg-brand-yellow"></div>
                 <span className="text-brand-yellow-dark font-extrabold text-[11px] sm:text-xs uppercase tracking-widest block">
-                  K.P.S
+                  ABOUT KPS WORLDWIDE LOGISTICS
                 </span>
               </div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-brand-green-dark tracking-tight leading-tight">
-                Technology-Driven Logistics Solutions in India
+              <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[42px] font-extrabold text-brand-green-dark tracking-tight leading-tight">
+                Moving Your Commerce. <br className="hidden sm:inline" />
+                <span className="text-brand-yellow-dark">Shaping Global Trade.</span>
               </h2>
-              <p className="text-sm sm:text-base text-brand-green-dark font-medium leading-relaxed">
-                KPS is a technology-driven logistics service provider in India that enables businesses to make their supply chain more efficient through integrated services such as Custom Clearance, Freight Forwarding, Transportation, FTWZ & Warehousing, Project Handling, and End-To-End Logistics. We use cutting-edge technology to make the logistics process more streamlined and efficient for businesses.
+              <p className="text-base sm:text-lg text-brand-green-dark font-semibold leading-relaxed">
+                At KPS Worldwide Logistics Pvt Ltd., we bridge the gap between standard logistics and complex project engineering.
+              </p>
+              <p className="text-sm sm:text-base text-brand-gray leading-relaxed font-normal">
+                For four decades, our experienced professionals have planned, executed, and managed freight movements across major international trade lanes, from single LCL cartons to ultra-heavy industrial plants.
               </p>
               <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
-                We have been a leading provider of Logistics Solutions for over 40+ years and are proud to say that we have been helping Indian businesses grow exponentially and compete on a global scale. We provide a world-class supply chain solution and constantly strive to help our client's requirements with modern technology.
+                We combine logistics expertise, technical planning, regulatory knowledge, and global coordination to deliver reliable cargo movement for both conventional and specialized requirements.
               </p>
             </div>
 
@@ -82,23 +86,39 @@ export default function AboutContent() {
 
           {/* THE KPS ADVANTAGE 4 PILLARS */}
           <div className="mt-12 sm:mt-16 pt-8 sm:pt-12 border-t border-brand-gray-muted/60">
-            <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10 space-y-1">
-              <span className="text-brand-yellow-dark font-bold text-[10px] sm:text-xs uppercase tracking-widest block">
-                THE KPS ADVANTAGE
-              </span>
-              <h3 className="text-xl sm:text-2xl font-extrabold text-brand-green-dark">
+            <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10 space-y-1.5">
+              <div className="flex items-center justify-center space-x-1.5 sm:space-x-2">
+                <span className="w-3.5 sm:w-6 h-[1.5px] sm:h-[2px] bg-brand-yellow"></span>
+                <span className="text-brand-yellow-dark font-extrabold text-[10px] sm:text-xs uppercase tracking-widest">
+                  THE KPS ADVANTAGE
+                </span>
+                <span className="w-3.5 sm:w-6 h-[1.5px] sm:h-[2px] bg-brand-yellow"></span>
+              </div>
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-brand-green-dark">
                 Engineered for Reliability & Scale
               </h3>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {companyDetails.advantagePillars.map((pillar, idx) => (
-                <div key={idx} className="bg-brand-gray-light border border-brand-gray-muted rounded-xl p-3.5 sm:p-5 hover:border-brand-green transition-all shadow-xs flex flex-col justify-between">
+                <div 
+                  key={idx} 
+                  className="bg-brand-gray-light border border-brand-gray-muted rounded-xl p-5 sm:p-6 hover:border-brand-green hover:shadow-lg transition-all duration-300 shadow-xs flex flex-col justify-between group"
+                >
                   <div>
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-brand-green text-white flex items-center justify-center font-bold text-xs mb-2.5 sm:mb-3">
-                      0{idx + 1}
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-9 h-9 rounded-xl bg-brand-green text-white flex items-center justify-center font-black text-xs group-hover:bg-brand-yellow group-hover:text-brand-green-dark transition-colors shadow-xs">
+                        0{idx + 1}
+                      </div>
+                      <span className="text-[10px] font-bold text-brand-gray uppercase tracking-widest">
+                        Pillar 0{idx + 1}
+                      </span>
                     </div>
-                    <h4 className="font-bold text-xs sm:text-sm text-brand-green-dark mb-1 leading-snug">{pillar.title}</h4>
-                    <p className="text-[10.5px] sm:text-xs text-brand-gray leading-relaxed font-light">{pillar.desc}</p>
+                    <h4 className="font-extrabold text-xs sm:text-sm text-brand-green-dark mb-2 tracking-wide uppercase leading-snug">
+                      {pillar.title}
+                    </h4>
+                    <p className="text-xs sm:text-[13px] text-brand-gray leading-relaxed font-light">
+                      {pillar.desc}
+                    </p>
                   </div>
                 </div>
               ))}

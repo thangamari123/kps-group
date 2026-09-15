@@ -71,10 +71,12 @@ export const companyDetails = {
   },
 
   about: {
-    title: "K.P.S",
-    headline: "Technology-Driven Logistics Solutions",
-    intro: "KPS is a technology-driven logistics service provider in India that enables businesses to make their supply chain more efficient through integrated services such as Custom Clearance, Freight Forwarding, Transportation, FTWZ & Warehousing, Project Handling, and End-To-End Logistics. We use cutting-edge technology to make the logistics process more streamlined and efficient for businesses.",
-    detailedDescription: "We have been a leading provider of Logistics Solutions for over 40+ years and are proud to say that we have been helping Indian businesses grow exponentially and compete on a global scale. We provide a world-class supply chain solution and constantly strive to help our client's requirements with modern technology.",
+    title: "ABOUT KPS WORLDWIDE LOGISTICS",
+    headline: "Moving Your Commerce. Shaping Global Trade.",
+    intro: "At KPS Worldwide Logistics Pvt Ltd., we bridge the gap between standard logistics and complex project engineering.",
+    paragraph1: "For four decades, our experienced professionals have planned, executed, and managed freight movements across major international trade lanes, from single LCL cartons to ultra-heavy industrial plants.",
+    paragraph2: "We combine logistics expertise, technical planning, regulatory knowledge, and global coordination to deliver reliable cargo movement for both conventional and specialized requirements.",
+    detailedDescription: "For four decades, our experienced professionals have planned, executed, and managed freight movements across major international trade lanes, from single LCL cartons to ultra-heavy industrial plants. We combine logistics expertise, technical planning, regulatory knowledge, and global coordination to deliver reliable cargo movement for both conventional and specialized requirements.",
     
     beginningsTitle: "Our Humble Beginnings",
     beginningsText: "Founded in 1985 by Mr. Srinivasa Pragasam, fondly known in the industry as Seenu, KPS has grown into one of the most trusted names in shipping and logistics. With no prior work experience in the field, Seenu started the company at just 24 years old, driven purely by inspiration from his uncle and a deep desire to build something of his own.",
@@ -93,22 +95,22 @@ export const companyDetails = {
   advantagePillars: [
     {
       id: "comprehensive",
-      title: "Comprehensive Capability",
-      desc: "A single source logistics partner for both standard freight and specialized cargo movements."
+      title: "COMPREHENSIVE CAPABILITY",
+      desc: "A single-source logistics partner for both standard freight and specialized cargo movements."
     },
     {
       id: "network",
-      title: "Global Network",
-      desc: "Seamless multi port coordination across major international trade lanes and continents."
+      title: "GLOBAL NETWORK",
+      desc: "Seamless multi-port coordination across major international trade lanes and continents."
     },
     {
       id: "engineering",
-      title: "Engineering Excellence",
+      title: "ENGINEERING EXCELLENCE",
       desc: "Technical route surveys, cargo planning, lifting plans, and execution support for complex freight."
     },
     {
       id: "regulatory",
-      title: "Regulatory Command",
+      title: "REGULATORY COMMAND",
       desc: "Licensed customs brokerage and documentation expertise to facilitate efficient and compliant cargo clearance."
     }
   ],

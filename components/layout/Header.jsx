@@ -197,13 +197,12 @@ export default function Header() {
 
             {/* Desktop CTA Button */}
             <div className="hidden lg:flex items-center">
-              {/* Get a Quote Button */}
-              <Link
-                href="/lead-form"
-                className="text-sm font-bold bg-brand-green hover:bg-brand-green-light text-white px-5 py-3 rounded-md transition-all duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green"
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('open-quote-modal'))}
+                className="text-sm font-bold bg-brand-green hover:bg-brand-green-light text-white px-5 py-3 rounded-md transition-all duration-300 shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-green cursor-pointer"
               >
                 Get a Custom Quote
-              </Link>
+              </button>
             </div>
 
             {/* Mobile Menu Button */}
@@ -294,12 +293,15 @@ export default function Header() {
                     <span>{companyDetails.contact.phone}</span>
                   </a>
 
-                  <Link
-                    href="/lead-form"
-                    className="block text-center bg-brand-green hover:bg-brand-green-light text-white font-bold py-3.5 rounded shadow transition-colors"
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      window.dispatchEvent(new CustomEvent('open-quote-modal'));
+                    }}
+                    className="w-full text-center bg-brand-green hover:bg-brand-green-light text-white font-bold py-3.5 rounded shadow transition-colors cursor-pointer"
                   >
                     Get a Custom Quote
-                  </Link>
+                  </button>
                 </div>
               </div>
             </motion.div>

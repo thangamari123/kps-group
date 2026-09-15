@@ -15,7 +15,10 @@ export default function AwardsContent() {
   const [selectedYear, setSelectedYear] = useState('ALL');
   const [sortOrder, setSortOrder] = useState('desc');
 
-  const availableYears = ['ALL', '2025', '2023', '2022'];
+  const availableYears = useMemo(() => {
+    const years = Array.from(new Set(awardsData.map((item) => item.year))).sort().reverse();
+    return ['ALL', ...years];
+  }, []);
 
   const processedAwards = useMemo(() => {
     let list = [...awardsData];
@@ -46,7 +49,7 @@ export default function AwardsContent() {
     <div className="bg-white">
       <PageHero 
         title="Awards & Recognitions" 
-        description="At KPS & Co., we take pride in being recognized by prominent shipping conclaves, maritime councils, and multinational logistics partners for our four-decade legacy of excellence and dependable service."
+        description="At KPS & Co., we take pride in being recognized by prominent shipping conclaves, maritime councils, and multinational logistics partners for our four-decade legacy of excellence and dependable service." 
         bgImage="https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1920&q=80"
       />
 
@@ -79,7 +82,7 @@ export default function AwardsContent() {
                           : 'text-gray-600 hover:text-brand-green'
                       }`}
                     >
-                      {year === 'ALL' ? 'All (5)' : year}
+                      {year === 'ALL' ? `All (${awardsData.length})` : year}
                     </button>
                   ))}
                 </div>
@@ -107,7 +110,7 @@ export default function AwardsContent() {
                   onClick={() => setSelectedAwardIndex(index)}
                   className="bg-[#fafcfb] border border-[#e2e8e5] hover:border-brand-green/60 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1 relative cursor-pointer"
                 >
-                  <div className="relative h-52 sm:h-64 md:h-72 w-full overflow-hidden bg-gradient-to-b from-[#f4f7f5] to-[#eaefec] flex items-center justify-center p-3.5 sm:p-5 flex-shrink-0 border-b border-[#e5ece8]">
+                  <div className="relative h-56 sm:h-64 md:h-72 w-full overflow-hidden bg-gradient-to-b from-[#f4f7f5] to-[#eaefec] flex items-center justify-center p-3.5 sm:p-5 flex-shrink-0 border-b border-[#e5ece8]">
                     <img
                       src={award.image}
                       alt={award.title}
@@ -134,15 +137,20 @@ export default function AwardsContent() {
                     <div className="absolute inset-0 bg-[#072419]/25 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                       <span className="bg-[#072419]/90 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg border border-white/20 flex items-center space-x-1.5">
                         <ZoomIn className="w-3.5 h-3.5 text-brand-yellow" />
-                        <span>View Certificate</span>
+                        <span>View Certificate / Plaque</span>
                       </span>
                     </div>
                   </div>
 
                   <div className="p-4 sm:p-6 flex flex-col justify-between flex-grow space-y-3 bg-white">
                     <div className="space-y-2">
-                      <div className="flex items-center space-x-1.5 text-[10px] font-bold text-brand-yellow-dark uppercase tracking-wider">
-                        <span>Milestone Accolade #{formattedNumber}</span>
+                      <div className="flex items-center justify-between gap-2 text-[10px] font-bold text-brand-yellow-dark uppercase tracking-wider">
+                        <span>Milestone #{formattedNumber}</span>
+                        {award.category && (
+                          <span className="bg-[#eef5f1] text-brand-green-dark px-2 py-0.5 rounded text-[9.5px] font-bold normal-case">
+                            {award.category}
+                          </span>
+                        )}
                       </div>
 
                       <h3 className="text-sm sm:text-base font-extrabold text-brand-green-dark group-hover:text-brand-green transition-colors leading-snug">
@@ -226,12 +234,17 @@ export default function AwardsContent() {
                 </div>
 
                 <div className="w-full sm:w-1/2 space-y-3">
-                  <div className="flex items-center space-x-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="inline-flex items-center space-x-1 bg-[#072419] text-brand-yellow font-bold text-xs px-2.5 py-1 rounded-md border border-brand-yellow/30">
                       <Calendar className="w-3 h-3 text-brand-yellow" />
                       <span>{activeAward.year}</span>
                     </span>
                     <span className="text-xs font-semibold text-gray-500">{activeAward.date}</span>
+                    {activeAward.category && (
+                      <span className="bg-[#eef5f1] text-brand-green-dark px-2 py-0.5 rounded text-[10.5px] font-bold">
+                        {activeAward.category}
+                      </span>
+                    )}
                   </div>
 
                   <h3 className="text-base sm:text-lg font-extrabold text-[#072419] leading-snug">

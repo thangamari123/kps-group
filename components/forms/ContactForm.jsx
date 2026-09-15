@@ -30,11 +30,13 @@ export default function ContactForm() {
     }
     
     if (!formData.phone.trim()) {
-      tempErrors.phone = 'Phone is required';
+      tempErrors.phone = 'Phone number is required';
     } else {
-      const phoneRegex = /^[0-9\s\-+()]{7,15}$/;
-      if (!phoneRegex.test(formData.phone)) {
-        tempErrors.phone = 'Please enter a valid phone number';
+      const digitsOnly = formData.phone.replace(/\D/g, '');
+      if (digitsOnly.length < 10) {
+        tempErrors.phone = `Enter 10 digits (${digitsOnly.length}/10 entered)`;
+      } else if (!/^[6-9]\d{9}$/.test(digitsOnly)) {
+        tempErrors.phone = 'Please enter a valid 10-digit mobile number';
       }
     }
 
@@ -44,7 +46,13 @@ export default function ContactForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    let formattedValue = value;
+
+    if (name === 'phone') {
+      formattedValue = value.replace(/\D/g, '').slice(0, 10);
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: formattedValue }));
     // Clear error for that field
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
@@ -157,20 +165,29 @@ export default function ContactForm() {
               <label htmlFor="phone" className="block text-xs font-bold text-brand-gray-dark uppercase tracking-wider mb-2">
                 Phone Number <span className="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                disabled={status === 'loading'}
-                className={`w-full px-4 py-3 rounded-md text-sm border focus:ring-2 focus:ring-offset-2 transition-all ${
-                  errors.phone
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-brand-gray-muted focus:ring-brand-green focus:border-brand-green'
-                }`}
-                placeholder="+91 XXXXX XXXXX"
-              />
+              <div className="flex rounded-md shadow-2xs">
+                <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-brand-gray-muted bg-gray-100 text-gray-700 font-bold text-sm select-none">
+                  +91
+                </span>
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={10}
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  disabled={status === 'loading'}
+                  className={`w-full px-4 py-3 rounded-r-md text-sm border focus:ring-2 focus:ring-offset-2 transition-all ${
+                    errors.phone
+                      ? 'border-red-500 focus:ring-red-500'
+                      : 'border-brand-gray-muted focus:ring-brand-green focus:border-brand-green'
+                  }`}
+                  placeholder="Enter your number"
+                  autoComplete="tel-national"
+                />
+              </div>
               {errors.phone && (
                 <p className="mt-1 text-xs text-red-500 flex items-center">
                   <AlertCircle className="w-3.5 h-3.5 mr-1" />
