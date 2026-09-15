@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
 import { X, Calculator } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LeadForm from '@/components/forms/LeadForm';
@@ -10,31 +9,14 @@ const kpsLogo = '/images/kpslogo.webp';
 
 export default function QuotePopup() {
   const [isOpen, setIsOpen] = useState(false);
-  const pathname = usePathname();
 
   useEffect(() => {
     // Listen for manual trigger events from header / CTA buttons
     const handleOpenModal = () => setIsOpen(true);
     window.addEventListener('open-quote-modal', handleOpenModal);
 
-    // Auto-open when visiting the website if not already on /quote page
-    if (pathname !== '/quote') {
-      const alreadyShown = sessionStorage.getItem('kps_quote_popup_shown');
-      if (!alreadyShown) {
-        const timer = setTimeout(() => {
-          setIsOpen(true);
-          sessionStorage.setItem('kps_quote_popup_shown', 'true');
-        }, 1200); // 1.2s delay on first visit
-
-        return () => {
-          clearTimeout(timer);
-          window.removeEventListener('open-quote-modal', handleOpenModal);
-        };
-      }
-    }
-
     return () => window.removeEventListener('open-quote-modal', handleOpenModal);
-  }, [pathname]);
+  }, []);
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -50,7 +32,6 @@ export default function QuotePopup() {
 
   const closeModal = () => {
     setIsOpen(false);
-    sessionStorage.setItem('kps_quote_popup_shown', 'true');
   };
 
   return (

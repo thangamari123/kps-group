@@ -4,6 +4,7 @@ import './globals.css';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import QuotePopup from '@/components/common/QuotePopup';
+import WhatsAppButton from '@/components/common/WhatsAppButton';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -25,14 +26,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="font-sans min-h-screen flex flex-col overflow-x-hidden bg-white text-[#212529]">
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <body className="font-sans min-h-screen flex flex-col overflow-x-hidden bg-white text-[#212529]" suppressHydrationWarning>
         <Header />
         <main className="flex-grow">
           {children}
         </main>
         <Footer />
         <QuotePopup />
+        <WhatsAppButton />
       </body>
     </html>
   );

@@ -21,6 +21,9 @@ export const companyDetails = {
 
   contact: {
     phone: "044 - 45088099",
+    whatsapp: "+91 9884388099",
+    whatsappNumber: "9884388099",
+    whatsappUrl: "https://wa.me/919884388099?text=Hello%20KPS%20Worldwide%20Logistics%2C%20I%20would%20like%20to%20inquire%20about%20your%20logistics%20services.",
     email: "info@kpsgroups.net",
     inquiryEmail: "selvamani.c@kpsgroups.net",
     generalEmail: "info@kpsgroups.net",
