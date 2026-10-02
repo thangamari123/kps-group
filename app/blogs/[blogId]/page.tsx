@@ -101,7 +101,7 @@ export default async function BlogDetailPage({ params }: PageProps) {
                 Regulatory & Operational Highlights in India
               </h4>
               <p>
-                The logistics infrastructure in India continues to adapt to newer digital tracking standards, customs ICEGATE portal updates, and BS6 freight mandates. K.P.S & Co. updates this news archive periodically to keep our logistics partners and clients aware of trade developments.
+                The logistics infrastructure in India continues to adapt to newer digital tracking standards, customs ICEGATE portal updates, and BS6 freight mandates. K.P.S updates this news archive periodically to keep our logistics partners and clients aware of trade developments.
               </p>
               <ul className="list-disc pl-5 space-y-2 mt-4 text-brand-green-dark font-medium">
                 <li>Regulatory customs policy developments.</li>

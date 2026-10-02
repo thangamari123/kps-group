@@ -130,7 +130,7 @@ export default function ServiceSidebar({ currentPath, bgImage }) {
               href="/quote"
               className="w-full inline-flex items-center justify-center space-x-2 text-xs font-bold bg-brand-yellow text-brand-green-dark px-4 py-3 rounded-xl hover:bg-white transition-colors shadow-md"
             >
-              <span>Request a Custom Quote</span>
+              <span>Get Quote</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>

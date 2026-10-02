@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Phone, Mail, MapPin, Ship, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Facebook, Instagram, Linkedin } from '@/components/common/SocialIcons';
@@ -10,6 +11,7 @@ import { companyDetails } from '@/data/company';
 const kpsLogo = '/images/kpslogo.webp';
 
 export default function Footer() {
+  const pathname = usePathname();
   const [openSections, setOpenSections] = useState({
     services: false,
     quickLinks: false,
@@ -24,6 +26,10 @@ export default function Footer() {
     }));
   };
 
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
   return (
     <footer className="bg-brand-green-dark text-white pt-10 sm:pt-14 pb-8 border-t border-brand-green-light/40">
       <div className="container mx-auto px-4 sm:px-6">
@@ -34,12 +40,15 @@ export default function Footer() {
           {/* Column 1: Company Branding & Summary (Always Visible) */}
           <div className="lg:col-span-2 space-y-3.5 pb-4 md:pb-0 border-b md:border-b-0 border-white/10">
             <Link href="/" className="inline-block group" aria-label="KPS Worldwide Logistics Home">
-              <div className="inline-block bg-white/95 backdrop-blur-sm p-2 sm:p-2.5 rounded-xl shadow-md border border-white/20 group-hover:scale-105 transition-transform duration-300">
+              <div className="inline-flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm px-3 py-2 sm:px-3.5 sm:py-2.5 rounded-xl shadow-md border border-white/20 group-hover:scale-105 transition-transform duration-300">
                 <img 
                   src={kpsLogo} 
                   alt="KPS Worldwide Logistics Logo" 
                   className="h-10 sm:h-12 w-auto object-contain"
                 />
+                <span className="text-[6.5px] sm:text-[7.5px] font-bold text-brand-green-dark tracking-[0.22em] uppercase mt-1 leading-none select-none">
+                  DELIVERY SMILE
+                </span>
               </div>
             </Link>
             

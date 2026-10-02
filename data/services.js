@@ -449,7 +449,7 @@ export const servicesData = {
     id: "odc",
     slug: "odc",
     sectionLabel: "04. OVER DIMENSIONAL CARGO",
-    title: "Over Dimensional Cargo (ODC) Transportation",
+    title: "Over Dimensional Cargo Transportation",
     tagline: "Engineered Heavy Transport & Route Surveys",
     shortDesc: "Specialized Over Dimensional Cargo (ODC) transportation for out-of-gauge and oversized freight backed by comprehensive route surveys.",
     description: "KPS Worldwide Logistics specializes in Over Dimensional Cargo (ODC) transportation for out-of-gauge and oversized freight. ODC transportation requires considerably more planning than standard freight movement. Route conditions, bridge capacity, road accessibility, obstacles, equipment selection, permits, handling, and delivery requirements can all influence the transportation plan. KPS supports the planning and execution of complex ODC movements with route feasibility studies and specialized transportation equipment.",
@@ -785,7 +785,7 @@ export const servicesData = {
     id: "ftwz",
     slug: "ftwz",
     sectionLabel: "FREE TRADE & WAREHOUSING ZONE",
-    title: "Free Trade & Warehousing Zone (FTWZ) Solutions",
+    title: "Free Trade & Warehousing Zone Solutions",
     tagline: "Duty-Deferred Global Hubbing",
     shortDesc: "Duty-deferred warehousing inside Free Trade Zones for international trading, hubbing, and tax optimization.",
     description: "KPS provides Free Trade & Warehousing Zone solutions, enabling tax-efficient, flexible storage and distribution for international trade.",
@@ -822,19 +822,19 @@ export const servicesData = {
   coreCapabilities: [
     {
       id: "01",
-      title: "Containerized Cargo: FCL and LCL",
+      title: "Containerized Cargo Solutions",
       desc: "Reliable, flexible, and cost-effective container shipping solutions tailored to your needs.",
       path: "/services/containerized-cargo"
     },
     {
       id: "02",
       title: "Project Cargo and Specialized Maritime",
-      desc: "End-to-end solutions for break bulk, heavy lift, RoRo, and specialized maritime operations.",
+      desc: "End-to-end solutions for break bulk, heavy lift, maritime shipping, and specialized port operations.",
       path: "/services/project-logistics"
     },
     {
       id: "03",
-      title: "Over Dimensional Cargo (ODC)",
+      title: "Over Dimensional Cargo",
       desc: "Expertise in planning, route surveys, and execution of complex over dimensional cargo worldwide.",
       path: "/services/odc"
     },

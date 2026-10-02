@@ -7,7 +7,7 @@ export const awardsData = [
     date: "2015 – 2025",
     organization: "Kangaro Group",
     category: "Partnership of Excellence",
-    description: "Special gold plaque awarded to K.P.S & Co. celebrating 10 years of excellence and innovation in logistics, honoring KPS as an integral partner throughout their growth journey.",
+    description: "Special gold plaque awarded to K.P.S celebrating 10 years of excellence and innovation in logistics, honoring KPS as an integral partner throughout their growth journey.",
     image: "/images/kangaroo-logistics.webp"
   },
   {
@@ -37,7 +37,7 @@ export const awardsData = [
     date: "24th June 2022, Chennai",
     organization: "Exim India - Shipping Times",
     category: "Customs Brokerage Excellence",
-    description: "Award for Excellence in Cargo and Logistics Sector presented to K.P.S & Co. as Finalist for 'Customs Broker of the Year' at the 13th South East Cargo & Logistics Awards 2022.",
+    description: "Award for Excellence in Cargo and Logistics Sector presented to K.P.S as Finalist for 'Customs Broker of the Year' at the 13th South East Cargo & Logistics Awards 2022.",
     image: "/images/13th-southeast-cargo.webp"
   },
   {

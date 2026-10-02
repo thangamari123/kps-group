@@ -1,11 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { companyDetails } from '@/data/company';
 
 export default function WhatsAppButton() {
+  const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
   const whatsappUrl = companyDetails.contact.whatsappUrl || 'https://wa.me/919884388099?text=Hello%20KPS%20Worldwide%20Logistics%2C%20I%20would%20like%20to%20inquire%20about%20your%20logistics%20services.';
+
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-18 right-4 sm:bottom-22 sm:right-6 z-40 flex items-center flex-row-reverse">

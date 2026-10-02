@@ -12,7 +12,7 @@ export const industriesData = {
     eyebrow: "AUTOMOTIVE SUPPLY CHAINS",
     heroH1: "Specialized Automotive Logistics & Finished Vehicle Transportation",
     shortDesc: "Reliable transportation and supply chain support for automotive operations.",
-    fullDesc: "K.P.S & Co delivers end-to-end automotive logistics across major automotive manufacturing clusters in India. From finished vehicle transport to CKD/SKD import clearance and assembly line feeding, we ensure zero line-stoppage operations.",
+    fullDesc: "K.P.S delivers end-to-end automotive logistics across major automotive manufacturing clusters in India. From finished vehicle transport to CKD/SKD import clearance and assembly line feeding, we ensure zero line-stoppage operations.",
     bullets: [
       "Vehicle transportation",
       "Inbound & outbound logistics",

@@ -57,7 +57,7 @@ export default function IndustryContent({ industry }) {
                 href="/quote"
                 className="inline-flex items-center space-x-2 bg-brand-yellow hover:bg-brand-yellow-light text-brand-green-dark font-extrabold px-6 py-3.5 rounded-xl shadow-lg transition-all text-xs sm:text-sm transform hover:-translate-y-0.5"
               >
-                <span>Request Custom Quote</span>
+                <span>Get Quote</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link

@@ -4,9 +4,9 @@
 export const companyDetails = {
   name: "KPS Worldwide Logistics Pvt. Ltd.",
   shortName: "KPS Worldwide Logistics",
-  legacyName: "K.P.S & Co.",
+  legacyName: "K.P.S",
   foundedYear: 1985,
-  founder: "Mr. Srinivasa Pragasam (Seenu)",
+  founder: "Mr. Srinivasa Pragasam",
   managingDirector: "Mr. B.S. Prassanna",
   
   taglines: {
@@ -128,27 +128,27 @@ export const companyDetails = {
   ],
 
   founderSection: {
-    title: "Founder & Chairman, K.P.S & Co.",
-    name: "Mr. Srinivasa Pragasam (Seenu)",
+    title: "Founder & Chairman, K.P.S",
+    name: "Mr. Srinivasa Pragasam",
     quote: "Help others without expecting anything in return good things will always follow.",
     text1: "I began this journey in 1985, at the age of 24, without any industry background just inspiration from my uncle and an eagerness to learn. I didn’t join any company or take a job. I simply decided to build something on my own.",
     text2: "With hard work and self-study, I cleared the required exams and obtained my logistics license. One unforgettable moment in my early days came while I was visiting the bank for company work. I noticed an elderly man struggling to fill a cheque deposit form. I helped him just as any young person should. A month later, that same man, now too old to continue in business, handed me his entire logistics operation.",
     experienceBelief: "That experience shaped my belief: Help others without expecting anything in return good things will always follow.",
     teamTitle: "KPS Logistics Team",
-    text3: "Since then, we’ve grown K.P.S & Co. with the values of trust, consistency, and long-term partnerships. I’ve always believed in investing in people and building customer relationships that last. In 2008, I proudly handed over the leadership to my son, Mr. Prasssanna B.S., who shares the same commitment and vision for our future."
+    text3: "Since then, we’ve grown K.P.S with the values of trust, consistency, and long-term partnerships. I’ve always believed in investing in people and building customer relationships that last. In 2008, I proudly handed over the leadership to my son, Mr. Prasssanna B.S., who shares the same commitment and vision for our future."
   },
 
   mdSection: {
-    title: "Managing Director, K.P.S & Co.",
+    title: "Managing Director, K.P.S",
     name: "Mr. B.S. Prassanna",
-    text1: "In 2008, at the age of just 20, Mr. B.S. Prassanna stepped into the world of shipping and logistics, taking over the reins of K.P.S & Co. after completing his Bachelor’s degree in Computer Engineering. Though young, he entered the business with a clear vision: to transform the traditional logistics landscape using modern technology and to offer clients more solution-driven, simplified experiences.",
+    text1: "In 2008, at the age of just 20, Mr. B.S. Prassanna stepped into the world of shipping and logistics, taking over the reins of K.P.S after completing his Bachelor’s degree in Computer Engineering. Though young, he entered the business with a clear vision: to transform the traditional logistics landscape using modern technology and to offer clients more solution-driven, simplified experiences.",
     text2: "Prassanna’s focus from the very beginning has been to reduce complexity and enhance transparency in logistics operations. With a passion for innovation, he identified the key pain points clients faced and began building tech-enabled solutions that not only improved operational efficiency but also strengthened client satisfaction and trust."
   },
 
   missionVision: {
-    missionTitle: "Our Mission",
+    missionTitle: "Mission",
     mission: "Committed to integrity and service excellence, we empower our employees, strengthen partnerships with our clients and vendors, and harness technology to enhance the well-being of our region and beyond.",
-    visionTitle: "Our Vision",
+    visionTitle: "Vision",
     vision: "Our vision is to create an inclusive and dynamic environment where integrity and service guide our every action. We aim to empower our employees, nurture strong partnerships with our clients and vendors, and leverage the latest technological advancements to drive innovation and growth in our region, ensuring a brighter future for our community."
   },
 

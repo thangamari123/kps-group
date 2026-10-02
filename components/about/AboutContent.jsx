@@ -143,7 +143,7 @@ export default function AboutContent() {
             </div>
 
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-brand-green-dark">
-              Guiding K.P.S & Co. Across Four Decades
+              Guiding K.P.S Across Four Decades
             </h2>
 
             <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light max-w-xl mx-auto">
@@ -161,7 +161,7 @@ export default function AboutContent() {
                 <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                   <img
                     src={founderImg}
-                    alt="Founder & Chairman Mr. Srinivasa Pragasam (Seenu)"
+                    alt="Founder & Chairman Mr. Srinivasa Pragasam"
                     className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
@@ -178,10 +178,10 @@ export default function AboutContent() {
 
                   <div className="absolute bottom-3 left-3 right-3 text-white">
                     <span className="text-[11px] font-semibold text-brand-yellow tracking-wide block">
-                      K.P.S & Co. Founder
+                      K.P.S Founder
                     </span>
                     <h3 className="text-lg sm:text-xl font-extrabold tracking-tight text-white drop-shadow-sm">
-                      Mr. Srinivasa Pragasam (Seenu)
+                      Mr. Srinivasa Pragasam
                     </h3>
                   </div>
                 </div>
@@ -250,7 +250,7 @@ export default function AboutContent() {
                 {/* Card Body */}
                 <div className="p-5 sm:p-7 space-y-3.5">
                   <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
-                    In 2008, at the age of just 20, Mr. B.S. Prassanna stepped into the shipping and logistics industry, taking over the reins of K.P.S & Co. after completing his Bachelor’s degree in Computer Engineering. He entered with a clear vision: to modernize traditional logistics through digital automation and simplified client workflows.
+                    In 2008, at the age of just 20, Mr. B.S. Prassanna stepped into the shipping and logistics industry, taking over the reins of K.P.S after completing his Bachelor’s degree in Computer Engineering. He entered with a clear vision: to modernize traditional logistics through digital automation and simplified client workflows.
                   </p>
 
                   <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
@@ -302,11 +302,11 @@ export default function AboutContent() {
             </div>
 
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-brand-green-dark">
-              Experience K.P.S & Co.
+              Experience K.P.S
             </h2>
 
             <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light max-w-xl mx-auto">
-              Watch our team, heavy-lift fleets, and FTWZ warehousing technology in motion across India.
+              Watch our team, heavy-lift fleets, and free trade warehousing technology in motion across India.
             </p>
           </div>
 
@@ -392,7 +392,7 @@ export default function AboutContent() {
                     <Compass className="w-6 h-6" />
                   </div>
                   <h3 className="text-xl sm:text-2xl font-bold text-brand-green-dark">
-                    Our Mission
+                    Mission
                   </h3>
                 </div>
                 <p className="text-xs sm:text-sm text-brand-gray leading-relaxed relative z-10 font-light">
@@ -412,7 +412,7 @@ export default function AboutContent() {
                     <Eye className="w-6 h-6" />
                   </div>
                   <h3 className="text-xl sm:text-2xl font-bold text-brand-green-dark">
-                    Our Vision
+                    Vision
                   </h3>
                 </div>
                 <p className="text-xs sm:text-sm text-brand-gray leading-relaxed relative z-10 font-light">

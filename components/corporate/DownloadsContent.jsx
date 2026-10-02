@@ -16,10 +16,10 @@ export default function DownloadsContent() {
       title: "KPS COMPANY PROFILE",
       subtext: "Click below to download the resource",
       category: "Company Profile",
-      file: "/downloads/kps-company-profile.pdf",
-      downloadName: "KPS-Company-Profile.pdf",
+      file: "/downloads/KPS Worldwide Profile  (1).pdf",
+      downloadName: "KPS Worldwide Profile  (1).pdf",
       fileType: "PDF",
-      fileSize: "940 KB"
+      fileSize: "1.2 MB"
     },
     {
       id: 2,

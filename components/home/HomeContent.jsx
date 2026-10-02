@@ -14,6 +14,8 @@ import { companyDetails } from '@/data/company';
 import { servicesData } from '@/data/services';
 import { officesData } from '@/data/offices';
 import { awardsData } from '@/data/awards';
+import ServicesSection from '@/components/home/ServicesSection';
+import CTASection from '@/components/common/CTASection';
 
 
 const automotiveLogisticsImg = '/images/automotive-logistics.webp';
@@ -209,8 +211,6 @@ function KochiLandmark() {
 export default function HomeContent() {
   const [selectedOffice, setSelectedOffice] = useState(null);
   const [selectedAward, setSelectedAward] = useState(null);
-  const [activeInsight, setActiveInsight] = useState(0);
-  const [isInsightPaused, setIsInsightPaused] = useState(false);
   const [activeAwardSlide, setActiveAwardSlide] = useState(0);
   const [isAwardPaused, setIsAwardPaused] = useState(false);
   const [activeHeroHeading, setActiveHeroHeading] = useState(0);
@@ -229,7 +229,7 @@ export default function HomeContent() {
     {
       title: "Customs Brokerage,",
       highlight: "Transportation & Warehousing Solutions",
-      desc: "In-house CHA clearance (R-50), nationwide multi-axle fleet distribution, and tax-deferred FTWZ warehousing across major trade lanes."
+      desc: "In-house customs clearance (R-50), nationwide multi-axle fleet distribution, and tax-deferred free trade warehousing across major trade lanes."
     }
   ];
 
@@ -241,15 +241,6 @@ export default function HomeContent() {
     return () => clearInterval(timer);
   }, [heroHeadings.length]);
 
-  // Auto-slide for Insights (Mobile only)
-  useEffect(() => {
-    if (isInsightPaused) return;
-    const timer = setInterval(() => {
-      setActiveInsight((prev) => (prev + 1) % 3);
-    }, 3500);
-    return () => clearInterval(timer);
-  }, [isInsightPaused]);
-
   // Auto-slide for Awards (Mobile only)
   useEffect(() => {
     if (isAwardPaused) return;
@@ -259,63 +250,7 @@ export default function HomeContent() {
     return () => clearInterval(timer);
   }, [isAwardPaused]);
 
-  // Section 3: 6 Core Capabilities cards list
-  const servicesList = [
-    {
-      id: "01",
-      name: "Containerized Cargo (FCL & LCL)",
-      tag: "FCL • LCL • Specialized Reefer",
-      desc: "Reliable, scheduled container shipping solutions optimized for high-volume trade lanes with real-time digital equipment monitoring.",
-      path: "/services/containerized-cargo",
-      image: "https://res.cloudinary.com/vm9q4qwp/image/upload/v1788879983/Containerized_Cargo_FCL_LCL.png",
-      icon: <Package className="w-5 h-5" />
-    },
-    {
-      id: "02",
-      name: "Project Cargo & Maritime Operations",
-      tag: "Break Bulk • RoRo • Turnkey Logistics",
-      desc: "Turnkey project logistics for break bulk charters, heavy industrial components, rolling stock, and specialized port vessel stevedoring.",
-      path: "/services/project-logistics",
-      image: "https://res.cloudinary.com/vm9q4qwp/image/upload/v1788880001/Project_Cargo_Maritime_Operations.png",
-      icon: <Anchor className="w-5 h-5" />
-    },
-    {
-      id: "03",
-      name: "Over Dimensional Cargo (ODC)",
-      tag: "Hydraulic Multi-Axle • Route Feasibility",
-      desc: "Heavy-haul transport with comprehensive civil surveys, bridge load engineering, hydraulic modular trailers, and dedicated route escorts.",
-      path: "/services/odc",
-      image: "https://res.cloudinary.com/vm9q4qwp/image/upload/v1788880025/Over_Dimensional_Cargo_ODC.png",
-      icon: <Truck className="w-5 h-5" />
-    },
-    {
-      id: "04",
-      name: "Customs Brokerage & CHA Compliance",
-      tag: "CHA License R-50 • 24/7 ICEGATE",
-      desc: "In-house licensed customs brokerage (R-50/Chennai), direct port clearance desks, precise HTS tariff coding, and duty benefit optimization.",
-      path: "/services/customs-brokerage",
-      image: "https://res.cloudinary.com/vm9q4qwp/image/upload/v1788880076/Customs_Brokerage_CHA_Compliance.png",
-      icon: <FileText className="w-5 h-5" />
-    },
-    {
-      id: "05",
-      name: "Multimodal Freight Forwarding",
-      tag: "Sea + Air + Road • Global Corridors",
-      desc: "Seamless intermodal transit combining ocean carriers, expedited air charters, and nationwide express trucking networks.",
-      path: "/services/freight-forwarding",
-      image: "https://res.cloudinary.com/vm9q4qwp/image/upload/v1788880102/Multimodal_Freight_Forwarding.png",
-      icon: <Globe className="w-5 h-5" />
-    },
-    {
-      id: "06",
-      name: "Industrial Warehousing & FTWZ Hubs",
-      tag: "Duty Deferment • Covered & Open Storage",
-      desc: "Strategic warehousing, bonded customs facilities, dedicated ODC open storage yards, and tax-deferred Free Trade Warehousing Zones (FTWZ).",
-      path: "/services/warehousing",
-      image: "https://res.cloudinary.com/vm9q4qwp/image/upload/v1788880119/Industrial_Warehousing_FTWZ_Hubs.png",
-      icon: <Warehouse className="w-5 h-5" />
-    }
-  ];
+
 
   // Section 4: End-to-end supply chain steps
   const journeySteps = [
@@ -382,20 +317,20 @@ export default function HomeContent() {
     {
       id: "01",
       tag: "LICENSED CUSTOMS BROKERAGE",
-      title: "Direct Port Clearance Authority (CHA R-50)",
+      title: "Direct Port Customs Clearance Authority",
       highlight: "In-House Custom Broker (Zero Middlemen)",
-      desc: "Operating with our own direct CHA License R-50 at Chennai Customs with 24/7 direct ICEGATE digital EDI clearances across major Indian sea and air ports.",
+      desc: "Operating with our direct in-house customs broker license at Chennai Customs with 24/7 digital customs clearances across major Indian sea and air ports.",
       points: [
-        "In-house licensed Custom House Agent (CHA License R-50)",
-        "24/7 direct ICEGATE digital EDI filing & duty calculation",
-        "Expert HTS tariff classification & project duty exemptions"
+        "In-house licensed Customs Broker with direct port authority",
+        "24/7 direct electronic customs filing & duty calculation",
+        "Expert harmonized tariff classification & project duty exemptions"
       ],
       icon: <ShieldCheck className="w-5 h-5" />
     },
     {
       id: "02",
       tag: "PROJECT & HEAVY-LIFT ENGINEERING",
-      title: "Turnkey Over Dimensional Cargo (ODC)",
+      title: "Turnkey Over Dimensional Cargo",
       highlight: "Engineering-Backed Heavy Haulage",
       desc: "Dedicated route feasibility studies, bridge load simulations, hydraulic modular multi-axles, and dedicated escort operations for ultra-heavy machinery.",
       points: [
@@ -413,19 +348,19 @@ export default function HomeContent() {
       desc: "Strategic branch offices and on-site port clearance desks across Chennai, Ennore, Kattupalli, Tuticorin, Kochi, and Bengaluru industrial hubs.",
       points: [
         "Permanent desks across all key South Indian maritime ports",
-        "Multi-port coordination for Break Bulk, RoRo & Containerized cargo",
-        "Direct road & rail feeder access to Inland Container Depots (ICDs)"
+        "Multi-port coordination for Break Bulk, Maritime Shipping & Containerized cargo",
+        "Direct road & rail feeder access to Inland Container Depots"
       ],
       icon: <Globe className="w-5 h-5" />
     },
     {
       id: "04",
       tag: "TAX & WORKING CAPITAL OPTIMIZATION",
-      title: "Free Trade Warehousing Zone (FTWZ) Hubs",
+      title: "Free Trade Warehousing Zone Hubs",
       highlight: "Customs Duty Deferment & Trading Hubs",
-      desc: "Notified FTWZ warehousing allowing 100% customs duty deferment, international trading, foreign currency transactions, and repackaging.",
+      desc: "Specialized free trade warehousing allowing 100% customs duty deferment, international trading, foreign currency transactions, and repackaging.",
       points: [
-        "Indefinite duty deferment until goods enter Domestic Tariff Area (DTA)",
+        "Indefinite duty deferment until goods enter Domestic Tariff Area",
         "Foreign currency billing & offshore cargo consolidation",
         "Value-added sorting, kitting, lab testing, and industrial crating"
       ],
@@ -453,7 +388,7 @@ export default function HomeContent() {
       points: [
         "Direct single point of contact with senior logistics engineers",
         "Real-time GPS tracking & proactive milestone escalation",
-        "Tailored SLA compliance reports for executive supply chain teams"
+        "Tailored service-level compliance reports for executive supply chain teams"
       ],
       icon: <Users className="w-5 h-5" />
     }
@@ -621,14 +556,14 @@ export default function HomeContent() {
             Your browser does not support the video tag.
           </video>
           
-          {/* Deep Emerald & Vignette Overlays for Crisp Legibility */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#072419]/95 via-[#072419]/80 to-[#072419]/50"></div>
-          <div className="absolute inset-0 bg-black/25"></div>
-          <div className="absolute inset-x-0 bottom-0 h-16 sm:h-28 bg-gradient-to-t from-[#072419] to-transparent"></div>
+          {/* Deep Emerald & Vignette Overlays for Crisp Legibility - Less Opacity */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#072419]/75 via-[#072419]/50 to-[#072419]/25"></div>
+          <div className="absolute inset-0 bg-black/15"></div>
+          <div className="absolute inset-x-0 bottom-0 h-16 sm:h-24 bg-gradient-to-t from-[#072419]/90 to-transparent"></div>
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-20 w-full py-4 xs:py-6 sm:pt-20 sm:pb-24 md:py-0">
+        <div className="relative z-20 w-full pt-24 pb-8 xs:pt-28 sm:pt-32 md:py-0">
           <div className="container mx-auto px-3.5 xs:px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl lg:max-w-4xl">
               
@@ -689,7 +624,7 @@ export default function HomeContent() {
                   href="/quote"
                   className="inline-flex items-center justify-center space-x-1 xs:space-x-1.5 sm:space-x-2.5 bg-brand-yellow hover:bg-brand-yellow-light text-brand-green-dark font-extrabold px-2.5 py-1.5 xs:px-3.5 xs:py-2 sm:px-8 sm:py-4 text-[10px] xs:text-[11px] sm:text-sm rounded-md xs:rounded-lg sm:rounded-xl shadow-md sm:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-brand-yellow text-center"
                 >
-                  <span>Request a Custom Quote</span>
+                  <span>Get Quote</span>
                   <ArrowRight className="w-2.5 h-2.5 xs:w-3 xs:h-3 sm:w-4 sm:h-4" />
                 </Link>
 
@@ -772,13 +707,13 @@ export default function HomeContent() {
             <div className="lg:col-span-7 order-1 space-y-3">
               <div>
                 <span className="text-brand-green font-bold text-xs uppercase tracking-widest block">
-                  ABOUT K.P.S & CO
+                  ABOUT K.P.S
                 </span>
                 <div className="w-10 h-[2px] bg-brand-yellow mt-1 mb-4"></div>
               </div>
               
               <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-brand-green-dark leading-tight">
-                About K.P.S & Co
+                About K.P.S
               </h2>
 
               <p className="text-base sm:text-lg font-extrabold text-brand-yellow-dark">
@@ -795,7 +730,7 @@ export default function HomeContent() {
               <div className="rounded-2xl overflow-hidden shadow-2xl relative z-10 aspect-square bg-brand-green-dark">
                 <img
                   src="https://res.cloudinary.com/vm9q4qwp/image/upload/v1788966808/about_card.png"
-                  alt="About K.P.S & Co"
+                  alt="About K.P.S"
                   className="w-full h-full object-cover transform hover:scale-102 transition-transform duration-500"
                 />
               </div>
@@ -804,7 +739,7 @@ export default function HomeContent() {
             {/* Content & Features Block */}
             <div className="lg:col-span-7 order-3 lg:order-2 space-y-4 sm:space-y-5 mt-4 lg:mt-0">
               <p className="text-sm sm:text-base text-brand-gray leading-relaxed font-light">
-                Founded by <strong className="font-bold text-brand-green-dark">Mr. Srinivasa Pragasam (Seenu)</strong>, K.P.S & Co. has grown from a humble beginning into a trusted name in shipping and logistics. With over <strong className="font-bold text-brand-green-dark">40 years of industry experience</strong>, we combine reliable service, strong global relationships, and modern logistics solutions to move your cargo with confidence.
+                Founded by <strong className="font-bold text-brand-green-dark">Mr. Srinivasa Pragasam</strong>, K.P.S has grown from a humble beginning into a trusted name in shipping and logistics. With over <strong className="font-bold text-brand-green-dark">40 years of industry experience</strong>, we combine reliable service, strong global relationships, and modern logistics solutions to move your cargo with confidence.
               </p>
 
               <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
@@ -838,7 +773,7 @@ export default function HomeContent() {
                     <ShieldCheck className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="text-xs sm:text-sm font-bold text-brand-green-dark leading-snug">Licensed CHA Broker</h4>
+                    <h4 className="text-xs sm:text-sm font-bold text-brand-green-dark leading-snug">Licensed Custom Broker</h4>
                     <p className="text-[11px] text-brand-gray font-light mt-0.5">Reg. 50 in-house customs clearance desks.</p>
                   </div>
                 </div>
@@ -887,80 +822,8 @@ export default function HomeContent() {
         </div>
       </section>
 
-      {/* SECTION 3 — OUR CORE CAPABILITIES (Corporate Tier-1 Design) */}
-      <section className="py-14 sm:py-20 md:py-24 bg-[#fafcfb] text-brand-gray-dark border-t border-brand-gray-muted relative">
-        <div className="container mx-auto px-4 sm:px-6">
-          
-          {/* Corporate Header */}
-          <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16 space-y-2.5">
-            <div className="flex items-center justify-center space-x-2">
-              <span className="w-5 sm:w-8 h-[2px] bg-brand-yellow"></span>
-              <span className="text-brand-yellow-dark font-extrabold text-xs sm:text-sm uppercase tracking-widest">
-                OUR CORE CAPABILITIES
-              </span>
-              <span className="w-5 sm:w-8 h-[2px] bg-brand-yellow"></span>
-            </div>
-
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-black tracking-tight text-brand-green-dark leading-tight">
-              Precision Logistics & Global Freight Solutions
-            </h2>
-          </div>
-
-          {/* 6-Card Corporate Grid - Visual Cards with Heading Only */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8">
-            {servicesList.map((service, idx) => (
-              <Link 
-                key={idx}
-                href={service.path}
-                className="bg-white border border-[#e5e9e7] hover:border-brand-green/60 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col group hover:-translate-y-1 relative"
-              >
-                {/* Visual Image Banner */}
-                <div className="relative aspect-[16/11] sm:aspect-[4/3] overflow-hidden bg-[#f4f7f5]">
-                  <img
-                    src={service.image}
-                    alt={service.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                  
-                  {/* Top Right Numeric Indicator */}
-                  <div className="absolute top-3.5 right-3.5 bg-black/60 backdrop-blur-md border border-white/20 text-white font-mono font-bold text-xs px-2.5 py-1 rounded-lg shadow-sm">
-                    {service.id}
-                  </div>
-                </div>
-
-                {/* Heading Only Body */}
-                <div className="p-5 sm:p-6 flex items-center justify-between gap-3 bg-white flex-grow">
-                  <div className="flex items-center space-x-3.5 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-brand-green/10 text-brand-green flex items-center justify-center group-hover:bg-brand-green group-hover:text-brand-yellow transition-colors duration-300 flex-shrink-0">
-                      {service.icon}
-                    </div>
-                    <h3 className="text-base sm:text-lg font-extrabold text-brand-green-dark leading-snug group-hover:text-brand-green transition-colors">
-                      {service.name}
-                    </h3>
-                  </div>
-
-                  <div className="w-9 h-9 rounded-xl bg-gray-50 border border-gray-200 text-brand-green flex items-center justify-center group-hover:bg-brand-green group-hover:border-brand-green group-hover:text-white transition-all duration-300 flex-shrink-0">
-                    <ArrowRight className="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform" />
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-
-          {/* Bottom Corporate Callout Action */}
-          <div className="mt-12 sm:mt-14 text-center">
-            <Link
-              href="/services"
-              className="inline-flex items-center space-x-2 bg-brand-green hover:bg-brand-green-light text-white font-bold px-7 py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-xs sm:text-sm transform hover:-translate-y-0.5"
-            >
-              <span>View All Logistics Services</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-
-        </div>
-      </section>
+      {/* SECTION 3 — OUR CORE SERVICES (7 Services with Custom Logistics Vector Icons) */}
+      <ServicesSection />
 
 
 
@@ -1267,7 +1130,7 @@ export default function HomeContent() {
             <div className="flex items-center justify-center space-x-1.5 sm:space-x-2">
               <span className="w-3.5 sm:w-8 h-[1.5px] sm:h-[2px] bg-brand-yellow"></span>
               <span className="text-brand-yellow-dark font-extrabold text-[9px] sm:text-xs md:text-sm uppercase tracking-widest">
-                OUR NETWORK & PRESENCE
+                OUR NETWORK
               </span>
               <span className="w-3.5 sm:w-8 h-[1.5px] sm:h-[2px] bg-brand-yellow"></span>
             </div>
@@ -1596,7 +1459,7 @@ export default function HomeContent() {
 
                     <div className="pt-3">
                       <Link
-                        href="/corporate/awards"
+                        href="/awards"
                         onClick={() => setSelectedAward(null)}
                         className="inline-flex items-center space-x-1.5 text-xs font-bold text-brand-green hover:text-brand-green-dark transition-colors"
                       >
@@ -1811,7 +1674,7 @@ export default function HomeContent() {
           {/* Bottom Action Link */}
           <div className="text-center mt-6 sm:mt-12">
             <Link
-              href="/corporate/awards"
+              href="/awards"
               className="inline-flex items-center space-x-2 bg-brand-green-dark hover:bg-brand-green text-white font-bold px-4 sm:px-7 py-2 sm:py-3.5 rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-[11px] sm:text-sm transform hover:-translate-y-0.5"
             >
               <span>View Full Awards & Recognition Timeline</span>
@@ -1822,199 +1685,8 @@ export default function HomeContent() {
         </div>
       </section>
 
-      {/* SECTION 12 — INSIGHTS & KNOWLEDGE HUB */}
-      <section className="py-12 sm:py-16 md:py-20 bg-white text-brand-gray-dark border-t border-brand-gray-muted">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12 md:mb-16">
-            <span className="text-brand-green font-bold text-xs uppercase tracking-widest mb-1.5 block">
-              INSIGHTS
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-brand-green-dark leading-tight">
-              Logistics Insights & Industry Knowledge
-            </h2>
-            <div className="w-12 h-[3px] bg-brand-yellow mx-auto mt-3 sm:mt-4 rounded-full"></div>
-          </div>
-
-          {/* 1. Mobile-Only Compact Auto-Sliding View (< 768px) */}
-          <div 
-            className="md:hidden space-y-3.5 max-w-md mx-auto"
-            onTouchStart={() => setIsInsightPaused(true)}
-            onTouchEnd={() => setIsInsightPaused(false)}
-            onMouseEnter={() => setIsInsightPaused(true)}
-            onMouseLeave={() => setIsInsightPaused(false)}
-          >
-            {[
-              {
-                title: "What is Customs Brokerage?",
-                category: "Customs Compliance",
-                date: "Aug 25, 2026",
-                image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80",
-                desc: "An in-depth explanation of custom clearance roles, CHA license exams, import declarations, and compliance structures."
-              },
-              {
-                title: "Understanding FTWZ and Its Business Benefits",
-                category: "Trade Optimization",
-                date: "Aug 12, 2026",
-                image: "https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&w=800&q=80",
-                desc: "How Free Trade Warehousing Zones defer custom duty payments, reduce warehousing compliance costs, and optimize cash flow."
-              },
-              {
-                title: "Air Freight vs Sea Freight: Choosing the Right Option",
-                category: "Supply Chain",
-                date: "Jul 28, 2026",
-                image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80",
-                desc: "A comparative evaluation of speed, cost structures, carbon footprint, and weight constraints for sea and air freight routing."
-              }
-            ].map((post, idx) => (
-              activeInsight === idx && (
-                <div 
-                  key={idx}
-                  className="bg-white rounded-2xl shadow-md border border-brand-gray-muted overflow-hidden flex flex-col justify-between transition-all duration-300 animate-fadeIn"
-                >
-                  {/* Compact Header Image */}
-                  <div className="h-36 relative overflow-hidden bg-brand-green-dark">
-                    <img
-                      src={post.image}
-                      alt={post.title}
-                      className="w-full h-full object-cover opacity-90"
-                    />
-                    <div className="absolute top-2.5 left-2.5 bg-brand-green text-white text-[9px] font-bold uppercase tracking-wider py-0.5 px-2 rounded shadow-xs">
-                      {post.category}
-                    </div>
-                    <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-xs text-white text-[9px] font-medium py-0.5 px-2 rounded">
-                      {post.date}
-                    </div>
-                  </div>
-
-                  {/* Compact Content */}
-                  <div className="p-4 flex-grow flex flex-col justify-between space-y-2.5">
-                    <div className="space-y-1">
-                      <h3 className="text-sm sm:text-base font-bold text-brand-green-dark leading-snug line-clamp-2">
-                        {post.title}
-                      </h3>
-                    </div>
-
-                    <div className="pt-2.5 border-t border-gray-100 flex items-center justify-between">
-                      <Link
-                        href="/blogs"
-                        className="inline-flex items-center space-x-1.5 text-xs font-bold text-brand-green hover:text-brand-green-light"
-                      >
-                        <span>Read Article</span>
-                        <ArrowRight className="w-3 h-3" />
-                      </Link>
-
-                      {/* Mini Prev / Next buttons */}
-                      <div className="flex items-center space-x-1.5">
-                        <button
-                          onClick={() => setActiveInsight((prev) => (prev - 1 + 3) % 3)}
-                          className="w-7 h-7 rounded-full bg-gray-100 hover:bg-brand-green hover:text-white flex items-center justify-center transition-colors text-gray-700 shadow-2xs"
-                          aria-label="Previous Insight"
-                        >
-                          <ChevronLeft className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => setActiveInsight((prev) => (prev + 1) % 3)}
-                          className="w-7 h-7 rounded-full bg-gray-100 hover:bg-brand-green hover:text-white flex items-center justify-center transition-colors text-gray-700 shadow-2xs"
-                          aria-label="Next Insight"
-                        >
-                          <ChevronRight className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )
-            ))}
-
-            {/* Mobile Pagination Dot Bars */}
-            <div className="flex items-center justify-center space-x-1.5 pt-1">
-              {[0, 1, 2].map((dotIdx) => (
-                <button
-                  key={dotIdx}
-                  onClick={() => setActiveInsight(dotIdx)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    activeInsight === dotIdx ? 'w-6 bg-brand-green' : 'w-2 bg-gray-300'
-                  }`}
-                  aria-label={`Go to slide ${dotIdx + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* 2. Desktop 3-Column Card Grid (>= 768px) */}
-          <div className="hidden md:grid md:grid-cols-3 gap-6 lg:gap-8">
-            {[
-              {
-                title: "What is Customs Brokerage?",
-                category: "Customs Compliance",
-                date: "Aug 25, 2026",
-                image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80",
-                desc: "An in-depth explanation of custom clearance roles, CHA license exams, import declarations, and compliance structures."
-              },
-              {
-                title: "Understanding FTWZ and Its Business Benefits",
-                category: "Trade Optimization",
-                date: "Aug 12, 2026",
-                image: "https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&w=800&q=80",
-                desc: "How Free Trade Warehousing Zones defer custom duty payments, reduce warehousing compliance costs, and optimize cash flow."
-              },
-              {
-                title: "Air Freight vs Sea Freight: Choosing the Right Option",
-                category: "Supply Chain",
-                date: "Jul 28, 2026",
-                image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80",
-                desc: "A comparative evaluation of speed, cost structures, carbon footprint, and weight constraints for sea and air freight routing."
-              }
-            ].map((post, idx) => (
-              <div 
-                key={idx}
-                className="bg-white rounded-xl shadow-md border border-brand-gray-muted overflow-hidden flex flex-col justify-between h-full hover:shadow-xl transition-shadow duration-300 group"
-              >
-                <div className="h-48 relative overflow-hidden bg-brand-green-dark">
-                  <img
-                    src={post.image}
-                    alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
-                  />
-                  <div className="absolute top-4 left-4 bg-brand-green text-white text-[9px] font-bold uppercase tracking-wider py-1 px-2.5 rounded">
-                    {post.category}
-                  </div>
-                </div>
-
-                <div className="p-5 flex-grow flex flex-col justify-between">
-                  <div className="space-y-3">
-                    <span className="text-[10px] text-brand-gray block">
-                      {post.date}
-                    </span>
-                    <h3 className="text-base font-bold text-brand-green-dark leading-snug group-hover:text-brand-green transition-colors">
-                      {post.title}
-                    </h3>
-                  </div>
-
-                  <div className="mt-6 pt-4 border-t border-brand-gray-muted flex justify-end">
-                    <Link
-                      href="/blogs"
-                      className="inline-flex items-center space-x-1.5 text-xs font-bold text-brand-green hover:text-brand-green-light"
-                    >
-                      <span>Read More</span>
-                      <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center mt-8 sm:mt-12">
-            <Link
-              href="/blogs"
-              className="inline-flex items-center justify-center bg-brand-green hover:bg-brand-green-light text-white font-semibold px-6 py-3 sm:py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-green focus:ring-offset-2"
-            >
-              View All Insights
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* Website-Wide Modern Call to Action (CTA) */}
+      <CTASection />
     </div>
   );
 }

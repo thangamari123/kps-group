@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { X, Calculator } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LeadForm from '@/components/forms/LeadForm';
@@ -9,6 +10,7 @@ const kpsLogo = '/images/kpslogo.webp';
 
 export default function QuotePopup() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     // Listen for manual trigger events from header / CTA buttons
@@ -33,6 +35,10 @@ export default function QuotePopup() {
   const closeModal = () => {
     setIsOpen(false);
   };
+
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
 
   return (
     <>
@@ -86,12 +92,15 @@ export default function QuotePopup() {
                 {/* Top Header with Compact Logo & Small Typography */}
                 <div className="text-center mb-2.5 sm:mb-3">
                   {/* Logo */}
-                  <div className="flex justify-center mb-0.5">
+                  <div className="flex flex-col items-center justify-center mb-1">
                     <img
                       src={kpsLogo}
                       alt="KPS Worldwide Logistics Logo"
                       className="h-6 sm:h-7 md:h-8 w-auto object-contain"
                     />
+                    <span className="text-[6px] sm:text-[6.5px] font-bold text-brand-green-dark tracking-[0.2em] uppercase mt-0.5 leading-none select-none">
+                      DELIVERY SMILE
+                    </span>
                   </div>
                   
                   {/* Tagline under Logo */}

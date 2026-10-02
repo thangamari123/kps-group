@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Send, AlertCircle, CheckCircle } from 'lucide-react';
+import { contactsApi } from '@/lib/api';
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -15,6 +16,7 @@ export default function ContactForm() {
   
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
+  const [apiError, setApiError] = useState('');
 
   const validate = () => {
     let tempErrors = {};
@@ -59,14 +61,22 @@ export default function ContactForm() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setApiError('');
     if (!validate()) return;
     
     setStatus('loading');
     
-    // Simulate API integration
-    setTimeout(() => {
+    try {
+      await contactsApi.submitContact({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        companyName: formData.companyName.trim() || undefined,
+        serviceRequired: formData.serviceRequired || undefined,
+        message: formData.message.trim(),
+      });
       setStatus('success');
       setFormData({
         name: '',
@@ -76,7 +86,10 @@ export default function ContactForm() {
         serviceRequired: '',
         message: ''
       });
-    }, 1500);
+    } catch (err) {
+      setStatus('error');
+      setApiError(err?.message || 'Failed to send message. Please try again or call us directly.');
+    }
   };
 
   return (
@@ -92,7 +105,7 @@ export default function ContactForm() {
           </div>
           <h4 className="text-lg font-bold text-emerald-800 mb-2">Message Sent Successfully!</h4>
           <p className="text-sm text-emerald-600">
-            Thank you for contacting K.P.S & Co. Our team will get back to you shortly.
+            Thank you for contacting K.P.S. Our team will get back to you shortly.
           </p>
           <button 
             onClick={() => setStatus('idle')}
@@ -103,6 +116,12 @@ export default function ContactForm() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-5">
+          {apiError && (
+            <div className="p-3.5 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 flex items-start space-x-2">
+              <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
+              <span>{apiError}</span>
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* Name */}
             <div>

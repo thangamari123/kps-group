@@ -49,7 +49,7 @@ export default function AwardsContent() {
     <div className="bg-white">
       <PageHero 
         title="Awards & Recognitions" 
-        description="At KPS & Co., we take pride in being recognized by prominent shipping conclaves, maritime councils, and multinational logistics partners for our four-decade legacy of excellence and dependable service." 
+        description="At K.P.S, we take pride in being recognized by prominent shipping conclaves, maritime councils, and multinational logistics partners for our four-decade legacy of excellence and dependable service." 
         bgImage="https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1920&q=80"
       />
 
@@ -66,7 +66,7 @@ export default function AwardsContent() {
                   Recognized by Global & Maritime Leaders
                 </h2>
                 <p className="text-xs sm:text-sm text-brand-gray font-light">
-                  A comprehensive record of prestigious industry awards, customer partner appreciations, and conclave recognitions honoring KPS & Co.
+                  A comprehensive record of prestigious industry awards, customer partner appreciations, and conclave recognitions honoring K.P.S.
                 </p>
               </div>
 
@@ -193,7 +193,7 @@ export default function AwardsContent() {
                 href="/quote"
                 className="bg-brand-yellow hover:bg-brand-yellow-light text-brand-green-dark font-bold px-6 py-3 rounded-xl shadow-md transition-all text-xs sm:text-sm"
               >
-                Request a Custom Quote
+                Get Quote
               </Link>
               <Link
                 href="/contact-us"

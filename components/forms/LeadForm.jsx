@@ -7,6 +7,7 @@ import {
   Check, AlertCircle, Lock, ChevronDown, FileText, Layers
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { quotesApi } from '@/lib/api';
 
 // Robust Validation Helpers
 export const validateField = (name, value, allValues = {}) => {
@@ -197,15 +198,32 @@ export default function LeadForm({ isModal = false, onClose = null }) {
     setStep(1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateStep2()) return;
     
     setStatus('loading');
     
-    setTimeout(() => {
+    try {
+      await quotesApi.submitQuote({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        company: formData.company.trim() || undefined,
+        service: formData.service,
+        origin: formData.origin.trim(),
+        destination: formData.destination.trim(),
+        cargoWeight: formData.cargoWeight.trim() || undefined,
+        cargoDetails: formData.cargoDetails.trim() || undefined,
+      });
       setStatus('success');
-    }, 1200);
+    } catch (err) {
+      setStatus('idle');
+      setErrors((prev) => ({
+        ...prev,
+        submit: err?.message || 'Failed to submit quote request. Please try again.',
+      }));
+    }
   };
 
   const handleReset = () => {
@@ -684,7 +702,7 @@ export default function LeadForm({ isModal = false, onClose = null }) {
                       </>
                     ) : (
                       <>
-                        <span>Get My Custom Quote</span>
+                        <span>Get Quote</span>
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                       </>
                     )}

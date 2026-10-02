@@ -20,7 +20,7 @@ export default function GalleryContent() {
   ];
 
   const videos = [
-    { id: 1, title: "KPS & Co. Corporate Showcase", thumbnail: "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=800&q=80", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
+    { id: 1, title: "K.P.S Corporate Showcase", thumbnail: "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=800&q=80", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
     { id: 2, title: "End-to-End Customs & Transport Fleet", thumbnail: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=800&q=80", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" },
     { id: 3, title: "Free Trade Warehousing Operations", thumbnail: "https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&w=800&q=80", url: "https://www.youtube.com/embed/dQw4w9WgXcQ" }
   ];
@@ -29,7 +29,7 @@ export default function GalleryContent() {
     <div className="bg-white">
       <PageHero 
         title="Our Gallery" 
-        description="A visual journey through our operations, milestones, and the people who make K.P.S & Co. a leader in logistics."
+        description="A visual journey through our operations, milestones, and the people who make K.P.S a leader in logistics."
         bgImage="https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=1920&q=80"
       />
 

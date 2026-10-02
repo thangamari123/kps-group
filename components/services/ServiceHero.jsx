@@ -24,13 +24,13 @@ export default function ServiceHero({
   stats = []
 }) {
   return (
-    <section className="relative min-h-0 sm:min-h-[360px] md:min-h-[420px] flex items-center bg-brand-green-dark text-white overflow-hidden pt-20 pb-6 sm:pt-24 sm:pb-8 md:pt-28 md:pb-12">
+    <section className="relative min-h-0 sm:min-h-[380px] md:min-h-[440px] flex items-center bg-brand-green-dark text-white overflow-hidden pt-32 pb-8 sm:pt-36 sm:pb-10 md:pt-40 md:pb-14">
       {/* Background Image with Deep Gradient Overlay */}
       <div 
-        className="absolute inset-0 bg-cover bg-center transition-all duration-1000 scale-105 opacity-20 mix-blend-overlay"
+        className="absolute inset-0 bg-cover bg-center transition-all duration-1000 scale-105 opacity-35 mix-blend-overlay"
         style={{ backgroundImage: `url('${bgImage}')` }}
       ></div>
-      <div className="absolute inset-0 bg-gradient-to-r from-brand-green-dark via-brand-green-dark/95 to-brand-green-dark/80"></div>
+      <div className="absolute inset-0 bg-gradient-to-r from-brand-green-dark/85 via-brand-green-dark/75 to-brand-green-dark/60"></div>
       <div className="absolute top-0 right-0 w-80 h-80 bg-brand-yellow/10 rounded-full blur-3xl pointer-events-none"></div>
 
       {/* Subtle Grid Accent */}
@@ -81,7 +81,7 @@ export default function ServiceHero({
                 href="/quote"
                 className="inline-flex items-center space-x-1.5 bg-brand-yellow hover:bg-brand-yellow-light text-brand-green-dark font-bold px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl shadow-xs transition-all duration-200 text-xs sm:text-sm transform hover:-translate-y-0.5"
               >
-                <span>Request Custom Quote</span>
+                <span>Get Quote</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
               <a

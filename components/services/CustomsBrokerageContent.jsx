@@ -344,7 +344,7 @@ export default function CustomsBrokerage() {
                     href="/quote"
                     className="w-full inline-flex items-center justify-center space-x-2 text-xs font-bold bg-brand-yellow text-brand-green-dark px-4 py-2.5 rounded-xl hover:bg-white transition-colors shadow-xs"
                   >
-                    <span>Request Custom Quote</span>
+                    <span>Get Quote</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import PageHero from '@/components/common/PageHero';
 import CareerApplicationForm from '@/components/forms/CareerApplicationForm';
+import OpenJobsList from '@/components/careers/OpenJobsList';
 import { TrendingUp, Cpu, Heart } from 'lucide-react';
 import { companyDetails } from '@/data/company';
 
@@ -28,7 +29,7 @@ export default function CareersPage() {
                 Work With Us
               </span>
               <h2 className="text-3xl font-bold tracking-tight leading-snug text-brand-green-dark">
-                Join K.P.S & Co. Logistics
+                Join K.P.S Family Logistics
               </h2>
               <p className="text-base text-brand-gray leading-relaxed">
                 {companyDetails.careers.intro}
@@ -77,6 +78,10 @@ export default function CareersPage() {
         </div>
       </section>
 
+      {/* Dynamic Published Jobs List from Cloudflare Worker API */}
+      <OpenJobsList />
+
+      {/* General Application Form Section */}
       <section className="py-16 bg-brand-gray-light border-t border-brand-gray-muted text-brand-gray-dark">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto">

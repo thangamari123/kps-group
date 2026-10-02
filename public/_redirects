@@ -4,3 +4,8 @@
 /blog /blogs 301
 /blog/* /blogs/:splat 301
 /lead-form /quote 301
+
+# Dynamic client-side routes fallback for Cloudflare Pages static hosting
+/career/* /career/view 200
+/admin/careers/jobs/* /admin/careers/jobs/edit 200
+/admin/careers/applications/* /admin/careers/applications/view 200
