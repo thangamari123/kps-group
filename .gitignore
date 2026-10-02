@@ -16,6 +16,7 @@ dist-ssr
 .next/
 out/
 next-env.d.ts
+*.tsbuildinfo
 
 # Legacy backup
 _legacy_src/

@@ -1,6 +1,20 @@
 'use client';
 
-export default function PageHero({ title, description, bgImage, badge }) {
+import React from 'react';
+
+export interface PageHeroProps {
+  title: string;
+  description?: string;
+  bgImage?: string;
+  badge?: string | null;
+}
+
+export default function PageHero({
+  title,
+  description = '',
+  bgImage = '',
+  badge = null,
+}: PageHeroProps) {
   return (
     <section className="relative min-h-[190px] sm:min-h-[220px] md:min-h-[250px] flex items-center justify-center bg-brand-green-dark text-white overflow-hidden pt-28 pb-8 sm:pt-32 sm:pb-9 md:pt-36 md:pb-11 text-center">
       {/* Background Image with Deep Gradient Overlay */}

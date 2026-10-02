@@ -15,7 +15,7 @@ import ODCCargoView from '@/components/services/ODCCargoView';
 import CustomsBrokerageView from '@/components/services/CustomsBrokerageView';
 import WarehousingView from '@/components/services/WarehousingView';
 
-export function getServiceData(slug: string) {
+function getServiceData(slug: string) {
   if (slug === 'containerized-cargo') {
     return {
       service: servicesData.containerizedCargo,
