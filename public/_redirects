@@ -1,6 +1,11 @@
 # Cloudflare Pages 301 Permanent Redirects
 /corporate /about-us 301
-/awards /corporate/awards 301
+/corporate/awards /awards 301
+/corporate/awards/* /awards 301
+/corporate/csr /csr 301
+/corporate/csr/* /csr 301
+/corporate/privacy-policy /privacy-policy 301
+/corporate/privacy-policy/* /privacy-policy 301
 /blog /blogs 301
 /blog/* /blogs/:splat 301
 /lead-form /quote 301
