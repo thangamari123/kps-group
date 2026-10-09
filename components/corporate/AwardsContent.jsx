@@ -1,12 +1,14 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import PageHero from '@/components/common/PageHero';
 import { awardsData } from '@/data/awards';
+import { awardsCms } from '@/lib/cms-firestore';
+import { cmsApi } from '@/lib/cms-api';
 import { 
   Award, Calendar, Landmark, Check, ZoomIn, X, Trophy, 
-  ArrowRight, ChevronLeft, ChevronRight, ShieldCheck, Sparkles, Filter, ArrowUpDown
+  ArrowRight, ChevronLeft, ChevronRight, ShieldCheck, Sparkles, Filter, ArrowUpDown, FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -14,14 +16,54 @@ export default function AwardsContent() {
   const [selectedAwardIndex, setSelectedAwardIndex] = useState(null);
   const [selectedYear, setSelectedYear] = useState('ALL');
   const [sortOrder, setSortOrder] = useState('desc');
+  const [cmsAwards, setCmsAwards] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const availableYears = useMemo(() => {
-    const years = Array.from(new Set(awardsData.map((item) => item.year))).sort().reverse();
-    return ['ALL', ...years];
+  useEffect(() => {
+    let isMounted = true;
+    async function loadAwards() {
+      try {
+        const list = await awardsCms.getPublished();
+        if (isMounted) {
+          if (list && list.length > 0) {
+            setCmsAwards(list);
+          }
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Failed to load awards from Firestore:', err);
+        if (isMounted) setLoading(false);
+      }
+    }
+    loadAwards();
+    return () => { isMounted = false; };
   }, []);
 
+  const activeData = useMemo(() => {
+    if (cmsAwards.length > 0) {
+      return cmsAwards.map(a => ({
+        id: a.id,
+        title: a.title,
+        organization: a.organization,
+        year: a.year ? String(a.year) : '2026',
+        category: a.category,
+        description: a.description || a.content,
+        content: a.content,
+        image: cmsApi.resolveMediaUrl(a.imageUrl) || 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=800&q=80',
+        documentUrl: a.documentUrl ? cmsApi.resolveMediaUrl(a.documentUrl) : null,
+        date: a.year ? String(a.year) : 'Annual Award'
+      }));
+    }
+    return awardsData;
+  }, [cmsAwards]);
+
+  const availableYears = useMemo(() => {
+    const years = Array.from(new Set(activeData.map((item) => item.year))).sort().reverse();
+    return ['ALL', ...years];
+  }, [activeData]);
+
   const processedAwards = useMemo(() => {
-    let list = [...awardsData];
+    let list = [...activeData];
     if (selectedYear !== 'ALL') {
       list = list.filter((item) => item.year === selectedYear);
     }
@@ -29,7 +71,7 @@ export default function AwardsContent() {
       list.reverse();
     }
     return list;
-  }, [selectedYear, sortOrder]);
+  }, [activeData, selectedYear, sortOrder]);
 
   const activeAward = selectedAwardIndex !== null ? processedAwards[selectedAwardIndex] : null;
 
@@ -78,11 +120,11 @@ export default function AwardsContent() {
                       onClick={() => setSelectedYear(year)}
                       className={`px-2.5 sm:px-3.5 py-1.5 rounded-lg font-bold transition-all text-[11px] sm:text-xs ${
                         selectedYear === year
-                          ? 'bg-[#072419] text-brand-yellow shadow-xs'
+                          ? 'bg-[#004D3A] text-brand-yellow shadow-xs'
                           : 'text-gray-600 hover:text-brand-green'
                       }`}
                     >
-                      {year === 'ALL' ? `All (${awardsData.length})` : year}
+                      {year === 'ALL' ? `All (${activeData.length})` : year}
                     </button>
                   ))}
                 </div>
@@ -106,7 +148,7 @@ export default function AwardsContent() {
 
               return (
                 <div 
-                  key={award.id}
+                  key={award.id || index}
                   onClick={() => setSelectedAwardIndex(index)}
                   className="bg-[#fafcfb] border border-[#e2e8e5] hover:border-brand-green/60 rounded-2xl overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between group hover:-translate-y-1 relative cursor-pointer"
                 >
@@ -120,7 +162,7 @@ export default function AwardsContent() {
 
                     <div className="absolute top-2.5 sm:top-3 left-2.5 sm:left-3 right-2.5 sm:right-3 flex items-center justify-between pointer-events-none">
                       <div className="flex items-center space-x-1.5">
-                        <span className="inline-flex items-center space-x-1 bg-[#072419]/90 backdrop-blur-md text-brand-yellow font-mono font-bold text-[9px] sm:text-xs px-2.5 py-1 rounded-lg border border-brand-yellow/30 shadow-xs">
+                        <span className="inline-flex items-center space-x-1 bg-[#004D3A]/90 backdrop-blur-md text-brand-yellow font-mono font-bold text-[9px] sm:text-xs px-2.5 py-1 rounded-lg border border-brand-yellow/30 shadow-xs">
                           <Calendar className="w-3 h-3 text-brand-yellow" />
                           <span>{award.year}</span>
                         </span>
@@ -134,10 +176,10 @@ export default function AwardsContent() {
                       </div>
                     </div>
 
-                    <div className="absolute inset-0 bg-[#072419]/25 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                      <span className="bg-[#072419]/90 text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-lg border border-white/20 flex items-center space-x-1.5">
+                    <div className="absolute inset-0 bg-[#004D3A]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <span className="bg-[#004D3A]/95 text-white text-xs font-semibold px-3.5 py-1.5 rounded-full shadow-lg border border-white/20 flex items-center space-x-1.5">
                         <ZoomIn className="w-3.5 h-3.5 text-brand-yellow" />
-                        <span>View Certificate / Plaque</span>
+                        <span>View Award Details</span>
                       </span>
                     </div>
                   </div>
@@ -235,7 +277,7 @@ export default function AwardsContent() {
 
                 <div className="w-full sm:w-1/2 space-y-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center space-x-1 bg-[#072419] text-brand-yellow font-bold text-xs px-2.5 py-1 rounded-md border border-brand-yellow/30">
+                    <span className="inline-flex items-center space-x-1 bg-[#004D3A] text-brand-yellow font-bold text-xs px-2.5 py-1 rounded-md border border-brand-yellow/30">
                       <Calendar className="w-3 h-3 text-brand-yellow" />
                       <span>{activeAward.year}</span>
                     </span>
@@ -247,7 +289,7 @@ export default function AwardsContent() {
                     )}
                   </div>
 
-                  <h3 className="text-base sm:text-lg font-extrabold text-[#072419] leading-snug">
+                  <h3 className="text-base sm:text-lg font-extrabold text-[#004D3A] leading-snug">
                     {activeAward.title}
                   </h3>
 
@@ -260,6 +302,20 @@ export default function AwardsContent() {
                       <Landmark className="w-4 h-4 text-brand-yellow-dark flex-shrink-0" />
                       <span>Awarded by: {activeAward.organization}</span>
                     </div>
+
+                    {activeAward.documentUrl && (
+                      <div className="pt-2">
+                        <a
+                          href={activeAward.documentUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center space-x-1.5 bg-emerald-50 text-emerald-800 font-bold px-3 py-1.5 rounded-lg border border-emerald-200 hover:bg-emerald-100 transition-colors text-xs"
+                        >
+                          <FileText className="w-3.5 h-3.5 text-emerald-700" />
+                          <span>View Official Certificate / PDF</span>
+                        </a>
+                      </div>
+                    )}
                   </div>
 
                   <div className="pt-4 border-t border-gray-100 flex items-center justify-between">

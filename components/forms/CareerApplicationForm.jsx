@@ -1,35 +1,79 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Upload, FileText, CheckCircle, Trash2, Edit, AlertCircle } from 'lucide-react';
-import { applicationsApi } from '@/lib/api';
+import Link from 'next/link';
+import {
+  Upload,
+  FileText,
+  CheckCircle,
+  Trash2,
+  AlertCircle,
+  Clock,
+  ArrowRight,
+  ShieldCheck,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Briefcase,
+  GraduationCap,
+  DollarSign,
+  Globe,
+} from 'lucide-react';
+import { applicationsCms } from '@/lib/careers-firestore';
+import { resumeApi } from '@/lib/resume-api';
+
+const ALLOWED_EXTENSIONS = ['.pdf', '.doc', '.docx'];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 export default function CareerApplicationForm({
   jobId = '',
   jobTitle = '',
   jobSlug = '',
+  isClosed = false,
+  deadline = '',
 } = {}) {
   const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
+    candidateName: '',
     email: '',
-    designation: jobTitle || '',
+    phone: '',
+    alternatePhone: '',
     location: '',
+    city: '',
+    state: '',
     experience: '',
     currentCompany: '',
+    currentJobTitle: '',
+    expectedSalary: '',
+    noticePeriod: 'Immediate',
+    qualification: 'Bachelor\'s Degree',
+    linkedinUrl: '',
+    portfolioUrl: '',
     coverLetter: '',
   });
 
   const [resume, setResume] = useState(null);
   const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState('idle'); // idle | loading | success | error
+  const [status, setStatus] = useState('idle'); // idle | uploading | saving | success | error
   const [apiError, setApiError] = useState('');
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef(null);
 
   const validate = () => {
     const tempErrors = {};
-    if (!formData.name.trim()) tempErrors.name = 'Full name is required';
+
+    if (!formData.candidateName.trim()) {
+      tempErrors.candidateName = 'Full candidate name is required';
+    }
+
+    if (!formData.email.trim()) {
+      tempErrors.email = 'Email address is required';
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email.trim())) {
+        tempErrors.email = 'Please enter a valid email address';
+      }
+    }
 
     if (!formData.phone.trim()) {
       tempErrors.phone = 'Phone number is required';
@@ -40,26 +84,14 @@ export default function CareerApplicationForm({
       }
     }
 
-    if (!formData.email.trim()) {
-      tempErrors.email = 'Email address is required';
-    } else {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.email)) {
-        tempErrors.email = 'Please enter a valid email address';
-      }
-    }
-
-    if (!formData.designation.trim() && !jobTitle) {
-      tempErrors.designation = 'Position / Designation is required';
-    }
-
     if (!resume) {
-      tempErrors.resume = 'Please upload your resume (PDF format only, max 5MB)';
+      tempErrors.resume = 'Resume document is required (PDF, DOC, DOCX up to 10MB)';
     } else {
-      if (!resume.name.toLowerCase().endsWith('.pdf')) {
-        tempErrors.resume = 'Only PDF format (.pdf) is accepted';
-      } else if (resume.size > 5 * 1024 * 1024) {
-        tempErrors.resume = 'File size exceeds maximum 5MB limit';
+      const ext = resume.name.substring(resume.name.lastIndexOf('.')).toLowerCase();
+      if (!ALLOWED_EXTENSIONS.includes(ext)) {
+        tempErrors.resume = 'Allowed formats: PDF (.pdf), DOC (.doc), DOCX (.docx)';
+      } else if (resume.size > MAX_FILE_SIZE) {
+        tempErrors.resume = 'File size exceeds maximum 10MB limit';
       }
     }
 
@@ -92,15 +124,14 @@ export default function CareerApplicationForm({
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const file = e.dataTransfer.files[0];
-      if (file.name.toLowerCase().endsWith('.pdf')) {
-        if (file.size <= 5 * 1024 * 1024) {
-          setResume(file);
-          if (errors.resume) setErrors((prev) => ({ ...prev, resume: '' }));
-        } else {
-          setErrors((prev) => ({ ...prev, resume: 'File size exceeds maximum 5MB limit' }));
-        }
+      const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      if (!ALLOWED_EXTENSIONS.includes(ext)) {
+        setErrors((prev) => ({ ...prev, resume: 'Only PDF, DOC, or DOCX formats are supported' }));
+      } else if (file.size > MAX_FILE_SIZE) {
+        setErrors((prev) => ({ ...prev, resume: 'File size exceeds maximum 10MB limit' }));
       } else {
-        setErrors((prev) => ({ ...prev, resume: 'Only PDF documents (.pdf) are allowed' }));
+        setResume(file);
+        if (errors.resume) setErrors((prev) => ({ ...prev, resume: '' }));
       }
     }
   };
@@ -108,15 +139,14 @@ export default function CareerApplicationForm({
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      if (file.name.toLowerCase().endsWith('.pdf')) {
-        if (file.size <= 5 * 1024 * 1024) {
-          setResume(file);
-          if (errors.resume) setErrors((prev) => ({ ...prev, resume: '' }));
-        } else {
-          setErrors((prev) => ({ ...prev, resume: 'File size exceeds maximum 5MB limit' }));
-        }
+      const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      if (!ALLOWED_EXTENSIONS.includes(ext)) {
+        setErrors((prev) => ({ ...prev, resume: 'Only PDF, DOC, or DOCX formats are supported' }));
+      } else if (file.size > MAX_FILE_SIZE) {
+        setErrors((prev) => ({ ...prev, resume: 'File size exceeds maximum 10MB limit' }));
       } else {
-        setErrors((prev) => ({ ...prev, resume: 'Only PDF documents (.pdf) are allowed' }));
+        setResume(file);
+        if (errors.resume) setErrors((prev) => ({ ...prev, resume: '' }));
       }
     }
   };
@@ -126,309 +156,541 @@ export default function CareerApplicationForm({
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const handleTriggerFileInput = () => {
-    if (fileInputRef.current) fileInputRef.current.click();
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setApiError('');
+
+    if (isClosed) {
+      setApiError('Applications for this position are currently closed.');
+      return;
+    }
+
     if (!validate() || !resume) return;
 
-    setStatus('loading');
+    // 1. Duplicate application check
+    if (jobId) {
+      try {
+        const isDuplicate = await applicationsCms.checkDuplicate(formData.email, jobId);
+        if (isDuplicate) {
+          setApiError('You have already applied for this position with this email address.');
+          return;
+        }
+      } catch (dupErr) {
+        console.warn('Duplicate check warning:', dupErr);
+      }
+    }
 
+    let uploadResult = null;
     try {
-      const data = new FormData();
-      data.append('name', formData.name.trim());
-      data.append('email', formData.email.trim());
-      data.append('phone', formData.phone.trim());
-      if (formData.location) data.append('location', formData.location.trim());
-      if (formData.experience) data.append('experience', formData.experience.trim());
-      if (formData.currentCompany) data.append('current_company', formData.currentCompany.trim());
-      if (formData.coverLetter) data.append('cover_letter', formData.coverLetter.trim());
-      if (jobId) data.append('job_id', jobId);
-      if (jobSlug) data.append('job_slug', jobSlug);
+      setStatus('uploading');
 
-      data.append('resume', resume);
+      // 2. Upload resume securely to Cloudflare R2
+      uploadResult = await resumeApi.uploadResume(
+        resume,
+        jobId || 'general',
+        formData.candidateName.trim(),
+        formData.email.trim()
+      );
 
-      await applicationsApi.submitApplication(data);
+      setStatus('saving');
+
+      // 3. Construct clean application payload (omitting empty optional fields)
+      const applicationPayload = {
+        jobId: jobId || 'general-application',
+        jobTitle: jobTitle || 'General Application',
+        jobSlug: jobSlug || '',
+        candidateName: formData.candidateName.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phone: formData.phone.trim(),
+        resumeFileName: uploadResult.filename || resume.name,
+        resumeR2Key: uploadResult.key,
+        resumeUrl: uploadResult.url,
+        resumeFileSize: uploadResult.size || resume.size,
+        resumeFileType: uploadResult.contentType || resume.type,
+      };
+
+      if (formData.alternatePhone?.trim()) applicationPayload.alternatePhone = formData.alternatePhone.trim();
+      if (formData.location?.trim()) applicationPayload.location = formData.location.trim();
+      if (formData.city?.trim()) applicationPayload.city = formData.city.trim();
+      if (formData.state?.trim()) applicationPayload.state = formData.state.trim();
+      if (formData.experience?.trim()) applicationPayload.experience = formData.experience.trim();
+      if (formData.currentCompany?.trim()) applicationPayload.currentCompany = formData.currentCompany.trim();
+      if (formData.currentJobTitle?.trim()) applicationPayload.currentJobTitle = formData.currentJobTitle.trim();
+      if (formData.expectedSalary?.trim()) applicationPayload.expectedSalary = formData.expectedSalary.trim();
+      if (formData.noticePeriod?.trim()) applicationPayload.noticePeriod = formData.noticePeriod.trim();
+      if (formData.qualification?.trim()) applicationPayload.qualification = formData.qualification.trim();
+      if (formData.linkedinUrl?.trim()) applicationPayload.linkedinUrl = formData.linkedinUrl.trim();
+      if (formData.portfolioUrl?.trim()) applicationPayload.portfolioUrl = formData.portfolioUrl.trim();
+      if (formData.coverLetter?.trim()) applicationPayload.coverLetter = formData.coverLetter.trim();
+
+      // Create Application record in Firestore
+      await applicationsCms.create(applicationPayload);
+
       setStatus('success');
       setFormData({
-        name: '',
-        phone: '',
+        candidateName: '',
         email: '',
-        designation: jobTitle || '',
+        phone: '',
+        alternatePhone: '',
         location: '',
+        city: '',
+        state: '',
         experience: '',
         currentCompany: '',
+        currentJobTitle: '',
+        expectedSalary: '',
+        noticePeriod: 'Immediate',
+        qualification: 'Bachelor\'s Degree',
+        linkedinUrl: '',
+        portfolioUrl: '',
         coverLetter: '',
       });
       setResume(null);
     } catch (err) {
+      console.error('Application submission error:', err);
+      // Clean up orphaned R2 file if Firestore creation failed
+      if (uploadResult && uploadResult.key) {
+        resumeApi.deleteResume(uploadResult.key).catch(() => {});
+      }
       setStatus('error');
-      setApiError(err?.message || 'Failed to submit application. Please try again.');
+      setApiError(err?.message || 'Failed to submit application. Please check your connection and try again.');
     }
   };
 
+  if (isClosed) {
+    return (
+      <div className="bg-red-50/70 border border-red-200 rounded-2xl p-8 text-center space-y-3">
+        <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto">
+          <Clock className="w-6 h-6" />
+        </div>
+        <h3 className="text-lg font-bold text-red-900">Applications Closed</h3>
+        <p className="text-xs sm:text-sm text-red-700 max-w-md mx-auto leading-relaxed">
+          Applications for <span className="font-bold">{jobTitle || 'this position'}</span> are currently closed. You may browse other openings or submit a general application for future roles.
+        </p>
+        <div className="pt-2">
+          <Link
+            href="/career"
+            className="inline-flex items-center space-x-1.5 text-xs font-bold text-brand-green hover:underline"
+          >
+            <span>Explore other careers</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-xl shadow-xl p-6 md:p-8 border border-brand-green/10">
-      <h3 className="text-xl font-bold text-brand-green-dark mb-1 uppercase tracking-wide">
-        {jobTitle ? `Apply for ${jobTitle}` : 'Submit Your Application'}
-      </h3>
-      <p className="text-brand-gray text-xs sm:text-sm mb-6">
-        Submit your resume and candidate details. Our HR team reviews every submission.
-      </p>
+    <div className="bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-gray-100">
+      <div className="border-b border-gray-100 pb-5 mb-8">
+        <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-widest block mb-1">
+          {jobTitle ? 'Direct Application' : 'Candidate Portal'}
+        </span>
+        <h3 className="text-2xl font-black text-brand-green-dark">
+          {jobTitle ? `Apply for ${jobTitle}` : 'Submit Your Application'}
+        </h3>
+        <p className="text-brand-gray text-xs sm:text-sm mt-1 font-light">
+          Fill in your credentials and upload your resume. Our HR recruitment team reviews every profile.
+        </p>
+      </div>
 
       {status === 'success' ? (
-        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6 sm:p-8 text-center">
-          <div className="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-7 h-7" />
+        <div className="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-8 sm:p-10 text-center space-y-4">
+          <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto shadow-inner">
+            <CheckCircle className="w-8 h-8" />
           </div>
-          <h4 className="text-lg font-bold text-emerald-800 mb-2">Application Received!</h4>
-          <p className="text-sm text-emerald-700 max-w-md mx-auto leading-relaxed">
-            Thank you for applying to KPS Worldwide Logistics. Your resume has been secured and our HR team will contact shortlisted candidates shortly.
+          <h4 className="text-xl font-extrabold text-emerald-900">
+            Application Submitted Successfully!
+          </h4>
+          <p className="text-sm text-emerald-800 max-w-lg mx-auto leading-relaxed font-light">
+            Thank you for applying to KPS Worldwide Logistics. Your application for{' '}
+            <span className="font-bold text-emerald-950">{jobTitle || 'this position'}</span> has been received and securely stored in our recruitment pipeline.
           </p>
-          <button
-            onClick={() => setStatus('idle')}
-            className="mt-6 text-xs font-bold text-brand-green hover:text-brand-green-light underline"
-          >
-            Submit another application
-          </button>
+
+          <div className="pt-4 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/career"
+              className="px-5 py-2.5 bg-brand-green text-white font-bold text-xs rounded-xl shadow-xs hover:bg-brand-green-dark transition-colors"
+            >
+              Back to All Careers
+            </Link>
+            <button
+              type="button"
+              onClick={() => setStatus('idle')}
+              className="px-5 py-2.5 bg-white text-emerald-900 border border-emerald-300 font-semibold text-xs rounded-xl hover:bg-emerald-50 transition-colors"
+            >
+              Submit Another Application
+            </button>
+          </div>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-8">
           {apiError && (
-            <div className="p-3.5 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700 flex items-start space-x-2">
-              <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
-              <span>{apiError}</span>
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start space-x-3 text-red-700 text-xs">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold block">Submission Error</span>
+                <span>{apiError}</span>
+              </div>
             </div>
           )}
 
-          {/* Full Name */}
-          <div>
-            <label htmlFor="career-name" className="block text-xs font-bold text-brand-gray-dark uppercase tracking-wider mb-1.5">
-              Full Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="career-name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              disabled={status === 'loading'}
-              className={`w-full px-4 py-3 rounded-lg text-sm border focus:ring-2 focus:ring-offset-1 transition-all ${
-                errors.name
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-brand-gray-muted focus:ring-brand-green focus:border-brand-green'
-              }`}
-              placeholder="Your Full Name"
-            />
-            {errors.name && <p className="mt-1 text-xs text-red-500 font-medium">{errors.name}</p>}
+          {/* Section 1: Personal Information */}
+          <div className="space-y-4">
+            <h4 className="text-xs font-extrabold uppercase tracking-wider text-[#004D3A] flex items-center space-x-2 border-b border-gray-100 pb-2">
+              <User className="w-4 h-4 text-brand-yellow-dark" />
+              <span>Personal Information</span>
+            </h4>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  Full Name <span className="text-emerald-700">*</span>
+                </label>
+                <input
+                  type="text"
+                  name="candidateName"
+                  value={formData.candidateName}
+                  onChange={handleChange}
+                  placeholder="e.g. Anandha Krishnan"
+                  className={`w-full px-3.5 py-2.5 text-xs bg-[#fafcfb] border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 ${
+                    errors.candidateName ? 'border-red-400 bg-red-50/30' : 'border-gray-200'
+                  }`}
+                />
+                {errors.candidateName && (
+                  <p className="text-[11px] text-red-600 mt-1 font-medium">{errors.candidateName}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  Email Address <span className="text-emerald-700">*</span>
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="name@example.com"
+                  className={`w-full px-3.5 py-2.5 text-xs bg-[#fafcfb] border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 ${
+                    errors.email ? 'border-red-400 bg-red-50/30' : 'border-gray-200'
+                  }`}
+                />
+                {errors.email && (
+                  <p className="text-[11px] text-red-600 mt-1 font-medium">{errors.email}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  Primary Phone <span className="text-emerald-700">*</span>
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="+91 98765 43210"
+                  className={`w-full px-3.5 py-2.5 text-xs bg-[#fafcfb] border rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 ${
+                    errors.phone ? 'border-red-400 bg-red-50/30' : 'border-gray-200'
+                  }`}
+                />
+                {errors.phone && (
+                  <p className="text-[11px] text-red-600 mt-1 font-medium">{errors.phone}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  Alternate Phone <span className="text-gray-400 font-normal">(optional)</span>
+                </label>
+                <input
+                  type="tel"
+                  name="alternatePhone"
+                  value={formData.alternatePhone}
+                  onChange={handleChange}
+                  placeholder="+91 XXXXX XXXXX"
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#fafcfb] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  Current City
+                </label>
+                <input
+                  type="text"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  placeholder="e.g. Chennai"
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#fafcfb] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  Current State / Region
+                </label>
+                <input
+                  type="text"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleChange}
+                  placeholder="e.g. Tamil Nadu"
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#fafcfb] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Phone */}
-            <div>
-              <label htmlFor="career-phone" className="block text-xs font-bold text-brand-gray-dark uppercase tracking-wider mb-1.5">
-                Phone Number <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="tel"
-                id="career-phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                disabled={status === 'loading'}
-                className={`w-full px-4 py-3 rounded-lg text-sm border focus:ring-2 focus:ring-offset-1 transition-all ${
-                  errors.phone
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-brand-gray-muted focus:ring-brand-green focus:border-brand-green'
-                }`}
-                placeholder="e.g. +91 98843 88099"
-              />
-              {errors.phone && <p className="mt-1 text-xs text-red-500 font-medium">{errors.phone}</p>}
-            </div>
+          {/* Section 2: Professional & Experience */}
+          <div className="space-y-4">
+            <h4 className="text-xs font-extrabold uppercase tracking-wider text-[#004D3A] flex items-center space-x-2 border-b border-gray-100 pb-2">
+              <Briefcase className="w-4 h-4 text-brand-yellow-dark" />
+              <span>Professional Experience</span>
+            </h4>
 
-            {/* Email */}
-            <div>
-              <label htmlFor="career-email" className="block text-xs font-bold text-brand-gray-dark uppercase tracking-wider mb-1.5">
-                Email Address <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                id="career-email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                disabled={status === 'loading'}
-                className={`w-full px-4 py-3 rounded-lg text-sm border focus:ring-2 focus:ring-offset-1 transition-all ${
-                  errors.email
-                    ? 'border-red-500 focus:ring-red-500'
-                    : 'border-brand-gray-muted focus:ring-brand-green focus:border-brand-green'
-                }`}
-                placeholder="candidate@example.com"
-              />
-              {errors.email && <p className="mt-1 text-xs text-red-500 font-medium">{errors.email}</p>}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  Total Experience
+                </label>
+                <select
+                  name="experience"
+                  value={formData.experience}
+                  onChange={handleChange}
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#fafcfb] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                >
+                  <option value="">Select Experience Level</option>
+                  <option value="Fresher / Entry Level">Fresher / Entry Level</option>
+                  <option value="1 - 2 Years">1 - 2 Years</option>
+                  <option value="3 - 5 Years">3 - 5 Years</option>
+                  <option value="5 - 8 Years">5 - 8 Years</option>
+                  <option value="8+ Years">8+ Years (Senior)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  Highest Qualification
+                </label>
+                <select
+                  name="qualification"
+                  value={formData.qualification}
+                  onChange={handleChange}
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#fafcfb] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                >
+                  <option value="Bachelor's Degree">Bachelor's Degree (B.Com / B.Sc / B.E / BBA)</option>
+                  <option value="Master's / MBA">Master's Degree (MBA / M.Com / MS)</option>
+                  <option value="Diploma in Logistics / Customs">Diploma in Logistics / Customs Brokerage</option>
+                  <option value="Higher Secondary (12th)">Higher Secondary / 12th Standard</option>
+                  <option value="Other">Other Specialized Certification</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  Current Company <span className="text-gray-400 font-normal">(if currently employed)</span>
+                </label>
+                <input
+                  type="text"
+                  name="currentCompany"
+                  value={formData.currentCompany}
+                  onChange={handleChange}
+                  placeholder="e.g. ABC Shipping Pvt Ltd"
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#fafcfb] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  Current Job Title
+                </label>
+                <input
+                  type="text"
+                  name="currentJobTitle"
+                  value={formData.currentJobTitle}
+                  onChange={handleChange}
+                  placeholder="e.g. Documentation Assistant"
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#fafcfb] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  Expected Compensation <span className="text-gray-400 font-normal">(CTC / Month)</span>
+                </label>
+                <input
+                  type="text"
+                  name="expectedSalary"
+                  value={formData.expectedSalary}
+                  onChange={handleChange}
+                  placeholder="e.g. ₹ 35,000 / Month or As per industry standards"
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#fafcfb] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  Notice Period
+                </label>
+                <select
+                  name="noticePeriod"
+                  value={formData.noticePeriod}
+                  onChange={handleChange}
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#fafcfb] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                >
+                  <option value="Immediate">Immediate / Available Now</option>
+                  <option value="15 Days">15 Days</option>
+                  <option value="30 Days">30 Days</option>
+                  <option value="60 Days">60 Days</option>
+                  <option value="90 Days">90 Days</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  LinkedIn Profile URL <span className="text-gray-400 font-normal">(optional)</span>
+                </label>
+                <input
+                  type="url"
+                  name="linkedinUrl"
+                  value={formData.linkedinUrl}
+                  onChange={handleChange}
+                  placeholder="https://linkedin.com/in/username"
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#fafcfb] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-1.5">
+                  Portfolio / Website URL <span className="text-gray-400 font-normal">(optional)</span>
+                </label>
+                <input
+                  type="url"
+                  name="portfolioUrl"
+                  value={formData.portfolioUrl}
+                  onChange={handleChange}
+                  placeholder="https://yourportfolio.com"
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#fafcfb] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Current Location */}
-            <div>
-              <label htmlFor="career-location" className="block text-xs font-bold text-brand-gray-dark uppercase tracking-wider mb-1.5">
-                Current Location
-              </label>
-              <input
-                type="text"
-                id="career-location"
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                disabled={status === 'loading'}
-                className="w-full px-4 py-3 rounded-lg text-sm border border-brand-gray-muted focus:ring-2 focus:ring-brand-green focus:border-brand-green transition-all"
-                placeholder="e.g. Chennai, Tamil Nadu"
-              />
-            </div>
-
-            {/* Total Experience */}
-            <div>
-              <label htmlFor="career-experience" className="block text-xs font-bold text-brand-gray-dark uppercase tracking-wider mb-1.5">
-                Total Relevant Experience
-              </label>
-              <input
-                type="text"
-                id="career-experience"
-                name="experience"
-                value={formData.experience}
-                onChange={handleChange}
-                disabled={status === 'loading'}
-                className="w-full px-4 py-3 rounded-lg text-sm border border-brand-gray-muted focus:ring-2 focus:ring-brand-green focus:border-brand-green transition-all"
-                placeholder="e.g. 3.5 Years"
-              />
-            </div>
-          </div>
-
-          {/* Current / Last Company */}
-          <div>
-            <label htmlFor="career-company" className="block text-xs font-bold text-brand-gray-dark uppercase tracking-wider mb-1.5">
-              Current or Previous Organization
-            </label>
-            <input
-              type="text"
-              id="career-company"
-              name="currentCompany"
-              value={formData.currentCompany}
-              onChange={handleChange}
-              disabled={status === 'loading'}
-              className="w-full px-4 py-3 rounded-lg text-sm border border-brand-gray-muted focus:ring-2 focus:ring-brand-green focus:border-brand-green transition-all"
-              placeholder="e.g. Global Freight Logistics Ltd."
-            />
-          </div>
-
-          {/* Cover Letter */}
-          <div>
-            <label htmlFor="career-cover" className="block text-xs font-bold text-brand-gray-dark uppercase tracking-wider mb-1.5">
-              Cover Note / Professional Summary
+          {/* Section 3: Cover Letter */}
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+              Cover Letter / Statement of Interest <span className="text-gray-400 font-normal normal-case">(optional)</span>
             </label>
             <textarea
-              id="career-cover"
               name="coverLetter"
-              rows={3}
               value={formData.coverLetter}
               onChange={handleChange}
-              disabled={status === 'loading'}
-              className="w-full px-4 py-3 rounded-lg text-sm border border-brand-gray-muted focus:ring-2 focus:ring-brand-green focus:border-brand-green transition-all resize-y"
-              placeholder="Brief summary of your background and why you are interested in this position..."
+              rows={4}
+              placeholder="Tell our HR team about your domain experience, key achievements in shipping/customs, and why you would like to join KPS..."
+              className="w-full px-4 py-3 text-xs bg-[#fafcfb] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 resize-y font-light leading-relaxed"
             />
           </div>
 
-          {/* Drag & Drop Resume Upload (PDF Only, Max 5MB) */}
-          <div>
-            <label className="block text-xs font-bold text-brand-gray-dark uppercase tracking-wider mb-1.5">
-              Upload Resume / CV (PDF Only, Max 5MB) <span className="text-red-500">*</span>
+          {/* Section 4: Resume Dropzone */}
+          <div className="space-y-3">
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+              Resume / Curriculum Vitae (CV) <span className="text-emerald-700">*</span>
             </label>
-
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept=".pdf,application/pdf"
-              className="hidden"
-            />
 
             {!resume ? (
               <div
                 onDragEnter={handleDrag}
-                onDragOver={handleDrag}
                 onDragLeave={handleDrag}
+                onDragOver={handleDrag}
                 onDrop={handleDrop}
-                onClick={handleTriggerFileInput}
-                className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
+                onClick={() => fileInputRef.current?.click()}
+                className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
                   dragActive
-                    ? 'border-brand-yellow bg-brand-yellow/5'
-                    : 'border-brand-gray-muted hover:border-brand-green hover:bg-brand-gray-light'
+                    ? 'border-emerald-600 bg-emerald-50/60 scale-[1.01]'
+                    : errors.resume
+                    ? 'border-red-300 bg-red-50/20 hover:border-red-400'
+                    : 'border-gray-300 bg-[#fafcfb] hover:border-emerald-600 hover:bg-emerald-50/20'
                 }`}
               >
-                <div className="mx-auto w-10 h-10 bg-brand-green/10 text-brand-green rounded-full flex items-center justify-center mb-3">
-                  <Upload className="w-5 h-5" />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <div className="w-12 h-12 rounded-full bg-emerald-100/70 text-emerald-800 flex items-center justify-center mx-auto mb-3">
+                  <Upload className="w-6 h-6" />
                 </div>
-                <p className="text-sm font-semibold text-brand-gray-dark">
-                  Drag and drop your PDF resume here, or <span className="text-brand-green underline hover:text-brand-green-light">browse file</span>
+                <p className="text-xs sm:text-sm font-bold text-gray-800">
+                  Click to select or drag & drop your resume
                 </p>
-                <p className="text-xs text-brand-gray mt-1 font-medium">
-                  Strictly PDF documents up to 5 MB
+                <p className="text-[11px] text-gray-500 mt-1">
+                  Supported formats: PDF, DOC, DOCX (Max size: 10 MB)
                 </p>
               </div>
             ) : (
-              <div className="border border-brand-green bg-brand-green-bg/30 rounded-xl p-4 flex items-center justify-between">
+              <div className="bg-[#eef6f2] border border-emerald-300 rounded-2xl p-4 flex items-center justify-between">
                 <div className="flex items-center space-x-3 overflow-hidden">
-                  <div className="p-2.5 bg-brand-green text-white rounded-lg">
+                  <div className="w-10 h-10 rounded-xl bg-white border border-emerald-200 text-emerald-800 flex items-center justify-center shrink-0 shadow-2xs">
                     <FileText className="w-5 h-5" />
                   </div>
                   <div className="overflow-hidden">
-                    <p className="text-sm font-semibold text-brand-gray-dark truncate">{resume.name}</p>
-                    <p className="text-xs text-brand-gray font-medium">{(resume.size / 1024 / 1024).toFixed(2)} MB</p>
+                    <p className="text-xs font-bold text-gray-900 truncate">{resume.name}</p>
+                    <p className="text-[11px] text-gray-600">
+                      {(resume.size / (1024 * 1024)).toFixed(2)} MB • Ready to upload
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    type="button"
-                    onClick={handleTriggerFileInput}
-                    className="p-1.5 text-brand-gray hover:text-brand-green transition-colors"
-                    title="Change PDF"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleRemoveFile}
-                    className="p-1.5 text-brand-gray hover:text-red-500 transition-colors"
-                    title="Remove PDF"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={handleRemoveFile}
+                  className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors cursor-pointer"
+                  title="Remove file"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
             )}
 
-            {errors.resume && <p className="mt-1 text-xs text-red-500 font-medium">{errors.resume}</p>}
+            {errors.resume && (
+              <p className="text-[11px] text-red-600 font-medium">{errors.resume}</p>
+            )}
+
+            <div className="flex items-center space-x-1.5 text-[11px] text-gray-500 font-light">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+              <span>Resumes are encrypted and stored securely in Cloudflare R2.</span>
+            </div>
           </div>
 
           {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={status === 'loading'}
-            className="w-full bg-brand-green hover:bg-brand-green-light text-white font-bold py-3.5 px-6 rounded-lg text-sm shadow-md transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-brand-green focus:ring-offset-2 flex items-center justify-center space-x-2 disabled:opacity-50"
-          >
-            {status === 'loading' ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>Uploading Resume & Submitting...</span>
-              </>
-            ) : (
-              <span>Submit Application</span>
-            )}
-          </button>
+          <div className="pt-4 border-t border-gray-100">
+            <button
+              type="submit"
+              disabled={status === 'uploading' || status === 'saving'}
+              className="w-full sm:w-auto min-w-[220px] bg-brand-green hover:bg-[#004D3A] text-white font-extrabold text-xs sm:text-sm py-3.5 px-8 rounded-xl shadow-md transition-all disabled:opacity-50 flex items-center justify-center space-x-2 cursor-pointer"
+            >
+              {status === 'uploading' ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Uploading Resume to R2...</span>
+                </>
+              ) : status === 'saving' ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Submitting Application...</span>
+                </>
+              ) : (
+                <>
+                  <span>Submit Candidate Application</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </div>
         </form>
       )}
     </div>

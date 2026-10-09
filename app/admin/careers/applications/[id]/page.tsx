@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import ApplicationDetailView from '@/components/admin/ApplicationDetailView';
 
 export const dynamic = 'force-static';
 
 export function generateStaticParams() {
-  return [{ id: 'view' }];
+  return [
+    { id: 'view' },
+    { id: 'default' },
+  ];
 }
 
 interface PageProps {
@@ -13,5 +16,16 @@ interface PageProps {
 
 export default async function AdminApplicationDetailPage({ params }: PageProps) {
   const { id } = await params;
-  return <ApplicationDetailView appId={id} />;
+  return (
+    <Suspense
+      fallback={
+        <div className="py-20 flex flex-col items-center justify-center space-y-3 text-[#66736E] text-xs">
+          <div className="w-8 h-8 border-2 border-[#006B4F] border-t-transparent rounded-full animate-spin" />
+          <span className="font-semibold">Loading Candidate Dossier...</span>
+        </div>
+      }
+    >
+      <ApplicationDetailView appId={id} />
+    </Suspense>
+  );
 }

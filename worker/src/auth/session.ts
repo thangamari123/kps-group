@@ -103,7 +103,7 @@ export async function validateSession(
   const row = await env.DB.prepare(
     `SELECT 
         s.id as session_id, s.admin_id, s.expires_at, s.created_at as session_created_at,
-        a.id as admin_id, a.email, a.name, a.role, a.created_at as admin_created_at, a.updated_at as admin_updated_at
+        a.id as admin_id, a.firebase_uid, a.email, a.name, a.role, a.created_at as admin_created_at, a.updated_at as admin_updated_at
      FROM sessions s
      JOIN admins a ON s.admin_id = a.id
      WHERE s.id = ? AND s.expires_at > ?`
@@ -116,6 +116,7 @@ export async function validateSession(
   return {
     admin: {
       id: row.admin_id,
+      firebase_uid: row.firebase_uid || '',
       email: row.email,
       name: row.name,
       role: row.role,

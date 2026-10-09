@@ -1,16 +1,130 @@
-# React + Vite
+# KPS Worldwide Logistics - HR Admin Panel & Website Architecture
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Enterprise freight forwarding, customs clearance, and global supply chain portal with Next.js static export frontend, Firebase Authentication & Cloud Firestore admin authorization.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🏛️ Authentication & Authorization Architecture
 
-## React Compiler
+```
+User (Email + Password)
+                 ↓
+      Firebase Authentication
+                 ↓
+     Authenticated Firebase User
+                 ↓
+              user.uid
+                 ↓
+   Cloud Firestore `/admins/{user.uid}`
+                 │
+          ┌──────┴──────┐
+          ↓             ↓
+    isActive=true   isActive=false or non-admin
+    role="admin"        ↓
+          ↓         Access Denied (Sign Out)
+       /admin           ↓
+                   /admin/login
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend**: Next.js 16 (`output: 'export'`), React 19, TailwindCSS, Firebase Web SDK (v12+).
+- **Authentication**: Firebase Authentication (Email/Password).
+- **Admin Authorization**: Cloud Firestore (`/admins/{firebaseUid}`).
+- **Static Compatibility**: Full client-side session hydration and route protection with `onAuthStateChanged()`.
 
-## Expanding the Oxlint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## 🔐 Firebase Console Configuration
+
+### 1. Enable Sign-In Providers
+1. Navigate to the **[Firebase Console](https://console.firebase.google.com/)**.
+2. Select your project: **KPS Website HR Panel**.
+3. In the left navigation, go to **Build** → **Authentication**.
+4. Click the **Sign-in method** tab.
+5. Under **Native providers**:
+   - **Email/Password**: Click **Email/Password** → **Enable** → Click **Save**.
+6. **Leave `Anonymous` and other authentication providers DISABLED**.
+
+### 2. Configure Cloud Firestore
+1. In the left navigation, go to **Build** → **Firestore Database**.
+2. If not created yet, click **Create database** (start in production mode).
+3. In the **Rules** tab, apply the rules from `firestore.rules`:
+   ```javascript
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       // Admins Collection: Authenticated users can only read their own authorization doc
+       match /admins/{adminUid} {
+         allow read: if request.auth != null && request.auth.uid == adminUid;
+         allow write: if false;
+       }
+       match /{document=**} {
+         allow read, write: if false;
+       }
+     }
+   }
+   ```
+
+---
+
+## 👤 Admin User Provisioning
+
+To authorize an administrator:
+
+### Step 1: Create Account in Firebase Authentication
+1. In Firebase Console, go to **Authentication** → **Users** tab.
+2. Click **Add user** (or have the user sign in via Google once).
+3. Copy the user's **User UID** (Firebase UID).
+
+### Step 2: Create Admin Record in Cloud Firestore
+1. In Firebase Console, go to **Firestore Database** → **Data** tab.
+2. Click **Start collection**:
+   - **Collection ID**: `admins`
+   - **Document ID**: Paste the exact **User UID** copied from Step 1.
+3. Add the following fields:
+
+| Field Name | Type | Value | Note |
+| :--- | :--- | :--- | :--- |
+| `email` | `string` | `user@company.com` | User's registered email |
+| `name` | `string` | `Administrator Name` | Display name |
+| `role` | `string` | `admin` | Must be `"admin"` (or `"super_admin"`) |
+| `isActive` | `boolean` | `true` | Must be `true` |
+| `createdAt` | `timestamp` | Current timestamp | Creation date |
+| `updatedAt` | `timestamp` | Current timestamp | Last update |
+
+4. Click **Save**. The user can now immediately sign in and access `/admin`.
+
+---
+
+## ⚙️ Environment Variables Reference
+
+### Frontend (`.env.local` / Cloudflare Pages)
+
+| Variable | Description |
+| :--- | :--- |
+| `NEXT_PUBLIC_API_URL` | Worker API URL (defaults to `http://localhost:8787` in dev) |
+| `NEXT_PUBLIC_FIREBASE_API_KEY` | Firebase Web API Key |
+| `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` | Firebase Auth Domain |
+| `NEXT_PUBLIC_FIREBASE_PROJECT_ID` | Firebase Project ID (`kps-website-hr-panel`) |
+| `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` | Firebase Storage Bucket |
+| `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | Firebase Sender ID |
+| `NEXT_PUBLIC_FIREBASE_APP_ID` | Firebase App ID |
+
+---
+
+## 🚀 Local Development & Build
+
+### 1. Install Dependencies
+```bash
+npm install
+```
+
+### 2. Start Development Server
+```bash
+npm run dev
+```
+
+### 3. Production Static Build
+```bash
+npm run build
+```
+Deploy the generated `out/` directory to Cloudflare Pages or any static host.

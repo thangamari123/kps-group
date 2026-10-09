@@ -1,20 +1,32 @@
 // Cloudflare Worker Environment Bindings & Global Types
 
 export interface Env {
-  DB: D1Database;
   RESUMES_BUCKET: R2Bucket;
+  MEDIA_BUCKET?: R2Bucket;
+  DB: D1Database;
+  FIREBASE_PROJECT_ID?: string;
   ALLOWED_ORIGINS?: string;
   SESSION_SECRET?: string;
   SETUP_SECRET?: string;
   ENVIRONMENT?: string;
 }
 
+export interface MediaUploadResponse {
+  success: boolean;
+  key: string;
+  url: string;
+  filename: string;
+  contentType: string;
+  size: number;
+  uploadedAt: string;
+}
+
 export interface AdminUser {
   id: string;
+  firebase_uid: string;
   email: string;
-  password_hash?: string;
   name: string;
-  role: string;
+  role: 'admin' | 'super_admin' | string;
   created_at: string;
   updated_at: string;
 }

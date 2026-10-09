@@ -72,23 +72,15 @@ export default function ContactContent() {
                   </div>
                   <div className="space-y-1">
                     <span className="block text-[10px] text-brand-gray uppercase font-bold tracking-wider">Direct Email Inquiries</span>
-                    <div className="space-y-0.5">
+                    <div className="space-y-1 pt-0.5">
                       <div className="text-xs">
-                        <span className="text-gray-400 font-medium">Executive: </span>
-                        <a href="mailto:bsp@kpsgroups.net" className="text-brand-green-dark hover:text-brand-green font-bold transition-colors">
-                          bsp@kpsgroups.net
+                        <a href="mailto:Rajeswari.s@kpsgroups.net" className="text-brand-green-dark hover:text-brand-green font-bold transition-colors block">
+                          Rajeswari.s@kpsgroups.net
                         </a>
                       </div>
                       <div className="text-xs">
-                        <span className="text-gray-400 font-medium">Operations: </span>
-                        <a href="mailto:pricing@kpsgroups.net" className="text-brand-green-dark hover:text-brand-green font-bold transition-colors">
-                          pricing@kpsgroups.net
-                        </a>
-                      </div>
-                      <div className="text-xs">
-                        <span className="text-gray-400 font-medium">Corporate: </span>
-                        <a href="mailto:info@kpsgroups.net" className="text-brand-green-dark hover:text-brand-green font-bold transition-colors">
-                          info@kpsgroups.net
+                        <a href="mailto:Jaikumar@kpsgroups.net" className="text-brand-green-dark hover:text-brand-green font-bold transition-colors block">
+                          Jaikumar@kpsgroups.net
                         </a>
                       </div>
                     </div>

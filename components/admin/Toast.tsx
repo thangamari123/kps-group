@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import { CheckCircle2, AlertCircle, Info, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export type ToastType = 'success' | 'error' | 'info';
+export type ToastType = 'success' | 'error' | 'info' | 'warning';
 
 interface ToastItem {
   id: string;
@@ -17,6 +17,7 @@ interface ToastContextType {
   success: (message: string) => void;
   error: (message: string) => void;
   info: (message: string) => void;
+  warning?: (message: string) => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -40,37 +41,33 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const success = useCallback((msg: string) => addToast(msg, 'success'), [addToast]);
   const error = useCallback((msg: string) => addToast(msg, 'error'), [addToast]);
   const info = useCallback((msg: string) => addToast(msg, 'info'), [addToast]);
+  const warning = useCallback((msg: string) => addToast(msg, 'warning'), [addToast]);
 
   return (
-    <ToastContext.Provider value={{ toast: addToast, success, error, info }}>
+    <ToastContext.Provider value={{ toast: addToast, success, error, info, warning }}>
       {children}
-      <div className="fixed bottom-5 right-5 z-50 flex flex-col space-y-3 pointer-events-none max-w-sm w-full">
+      <div className="fixed bottom-5 right-5 z-50 flex flex-col space-y-2.5 pointer-events-none max-w-sm w-full">
         <AnimatePresence>
           {toasts.map((t) => (
             <motion.div
               key={t.id}
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              initial={{ opacity: 0, y: 16, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.15 } }}
-              className={`pointer-events-auto flex items-start p-4 rounded-xl shadow-xl border backdrop-blur-md text-sm transition-all ${
-                t.type === 'success'
-                  ? 'bg-emerald-900/90 border-emerald-700 text-white shadow-emerald-950/20'
-                  : t.type === 'error'
-                  ? 'bg-red-900/90 border-red-700 text-white shadow-red-950/20'
-                  : 'bg-slate-900/90 border-slate-700 text-white shadow-slate-950/20'
-              }`}
+              exit={{ opacity: 0, scale: 0.92, transition: { duration: 0.15 } }}
+              className="pointer-events-auto flex items-start p-4 rounded-xl shadow-lg border bg-white border-[#E2E9E5] text-[#17211E] text-xs transition-all"
             >
               <div className="mr-3 mt-0.5 shrink-0">
-                {t.type === 'success' && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
-                {t.type === 'error' && <AlertCircle className="w-5 h-5 text-red-400" />}
-                {t.type === 'info' && <Info className="w-5 h-5 text-sky-400" />}
+                {t.type === 'success' && <CheckCircle2 className="w-4 h-4 text-[#006B4F]" />}
+                {t.type === 'error' && <AlertCircle className="w-4 h-4 text-[#DC2626]" />}
+                {t.type === 'warning' && <AlertCircle className="w-4 h-4 text-[#D97706]" />}
+                {t.type === 'info' && <Info className="w-4 h-4 text-[#2563EB]" />}
               </div>
-              <p className="flex-1 font-medium leading-relaxed">{t.message}</p>
+              <p className="flex-1 font-medium leading-relaxed text-[#17211E]">{t.message}</p>
               <button
                 onClick={() => removeToast(t.id)}
-                className="ml-3 text-white/70 hover:text-white transition-colors shrink-0"
+                className="ml-3 text-[#66736E] hover:text-[#17211E] transition-colors shrink-0 p-0.5 rounded"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </button>
             </motion.div>
           ))}

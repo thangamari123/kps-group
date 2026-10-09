@@ -1,15 +1,15 @@
 -- Optional Seed Data for Local Testing
 -- 0002_seed.sql
 
--- Initial Admin (Password: "Admin@123456")
--- Hash generated with PBKDF2-SHA256 (100000 iterations)
-INSERT OR IGNORE INTO admins (id, email, password_hash, name, role, created_at, updated_at)
+-- Initial Admin Seed (Replace firebase_uid with actual Firebase Authentication UID)
+INSERT OR IGNORE INTO admins (id, firebase_uid, email, password_hash, name, role, created_at, updated_at)
 VALUES (
   'admin-seed-001',
+  'firebase-seed-superadmin-uid',
   'admin@kpsgroups.net',
-  'pbkdf2_sha256$100000$a94f6c5f7c3272d1f93f6c8d76a59b20$40f3532c25d81b37b6c507c805a415fffa7d8ae4345cb571fa088ef391eb8f12',
+  NULL,
   'KPS Super Admin',
-  'admin',
+  'super_admin',
   datetime('now'),
   datetime('now')
 );

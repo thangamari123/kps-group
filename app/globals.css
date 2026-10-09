@@ -15,6 +15,16 @@
   --color-brand-gray: #6c757d;
   --color-brand-gray-dark: #212529;
 
+  --color-admin-primary: #006B4F;
+  --color-admin-deep: #004D3A;
+  --color-admin-hover: #005A43;
+  --color-admin-bg: #F7F9F8;
+  --color-admin-card: #FFFFFF;
+  --color-admin-text: #17211E;
+  --color-admin-secondary: #66736E;
+  --color-admin-border: #E2E9E5;
+  --color-admin-light-green: #EAF5F1;
+
   --font-sans: 'Inter', system-ui, sans-serif;
 }
 

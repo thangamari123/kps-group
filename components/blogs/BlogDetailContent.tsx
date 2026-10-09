@@ -1,0 +1,241 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { Calendar, ChevronLeft, User, Folder, Tag, Share2, Sparkles, ArrowRight } from 'lucide-react';
+import PageHero from '@/components/common/PageHero';
+import { blogsCms } from '@/lib/cms-firestore';
+import { cmsApi } from '@/lib/cms-api';
+
+interface BlogDetailProps {
+  blogId: string;
+}
+
+export default function BlogDetailContent({ blogId }: BlogDetailProps) {
+  const [article, setArticle] = useState<any>(null);
+  const [relatedBlogs, setRelatedBlogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fallback data if viewing template or offline
+  const fallbackArticles: Record<string, any> = {
+    'template-customs-rules': {
+      title: "Upcoming Customs Regulations Update",
+      category: "Customs Brokerage",
+      author: "KPS Compliance Desk",
+      publishedAt: { toDate: () => new Date('2026-08-26') },
+      featuredImageUrl: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80",
+      excerpt: "Future regulatory updates, HSN modifications, and custom compliance rules in India.",
+      content: `The logistics infrastructure in India continues to adapt to newer digital tracking standards, customs ICEGATE portal updates, and BS6 freight mandates.
+
+### Key Highlights for 2026
+1. **ICEGATE Direct API Connectivity**: Real-time declaration syncing reduces documentation turnover from 24 hours to 90 minutes.
+2. **Standardized HSN Classification**: Updated Harmonized System tariff codes for high-tech and renewable energy components.
+3. **Green Corridor Clearance**: Expedited routing for bonded FTWZ cargo transiting to major ports.
+
+K.P.S updates this news archive periodically to keep our logistics partners and clients aware of trade developments.`,
+      tags: ["Customs", "Compliance", "Tariffs"]
+    },
+    'template-fleet-logistics': {
+      title: "Operational Logistics & Transit Innovations",
+      category: "Logistics",
+      author: "Fleet Operations Team",
+      publishedAt: { toDate: () => new Date('2026-08-20') },
+      featuredImageUrl: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1200&q=80",
+      excerpt: "National transit networks, BS6 fleet updates, and tracking technology in India.",
+      content: `National multimodal freight operations in India have achieved unprecedented reliability through GPS telemetry integration and optimized route scheduling.
+
+### Fleet Modernization Focus
+- Full transition of prime movers to BS6 emission compliance.
+- 24/7 temperature-controlled reefers for pharmaceuticals and perishable shipments.
+- Direct connectivity between Free Trade Warehousing Zones and key container depots.`,
+      tags: ["Fleet", "BS6", "Operations"]
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchArticle() {
+      try {
+        // Try get by slug first
+        let found = await blogsCms.getBySlug(blogId);
+        if (!found) {
+          found = await blogsCms.getById(blogId);
+        }
+
+        if (isMounted) {
+          if (found) {
+            setArticle(found);
+          } else if (fallbackArticles[blogId]) {
+            setArticle(fallbackArticles[blogId]);
+          } else {
+            // Default fallback
+            setArticle(fallbackArticles['template-customs-rules']);
+          }
+
+          // Fetch related
+          const published = await blogsCms.getPublished();
+          if (isMounted && published) {
+            setRelatedBlogs(published.filter(b => b.slug !== blogId && b.id !== blogId).slice(0, 3));
+          }
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Failed to load article detail:', err);
+        if (isMounted) {
+          setArticle(fallbackArticles[blogId] || fallbackArticles['template-customs-rules']);
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchArticle();
+    return () => { isMounted = false; };
+  }, [blogId]);
+
+  const formatDate = (dateVal: any) => {
+    if (!dateVal) return 'Recent';
+    if (typeof dateVal === 'string') return dateVal;
+    if (dateVal.toDate) {
+      return dateVal.toDate().toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    }
+    return new Date(dateVal).toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  if (!article) {
+    return (
+      <div className="min-h-[50vh] flex items-center justify-center bg-white">
+        <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const heroImage = cmsApi.resolveMediaUrl(article.featuredImageUrl) || 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80';
+
+  return (
+    <div className="bg-white">
+      <PageHero
+        title={article.title}
+        description={article.excerpt || "Logistics & Corporate Updates from KPS Worldwide Logistics"}
+        bgImage={heroImage}
+      />
+
+      <section className="py-16 text-brand-gray-dark bg-white">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <Link
+              href="/blogs"
+              className="inline-flex items-center space-x-1.5 text-xs font-bold text-brand-green hover:text-brand-green-light mb-8 group"
+            >
+              <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+              <span>Back to All Updates</span>
+            </Link>
+
+            <div className="rounded-2xl overflow-hidden shadow-xl aspect-[21/9] bg-brand-green-dark mb-8 border border-gray-100">
+              <img
+                src={heroImage}
+                alt={article.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-4 text-xs text-brand-gray border-y border-brand-gray-muted py-4 mb-8">
+              <div className="flex flex-wrap items-center gap-6">
+                <div className="flex items-center space-x-1.5 font-medium">
+                  <Calendar className="w-4 h-4 text-brand-yellow-dark" />
+                  <span>{formatDate(article.publishedAt)}</span>
+                </div>
+                {article.category && (
+                  <div className="flex items-center space-x-1.5 font-medium">
+                    <Folder className="w-4 h-4 text-brand-yellow-dark" />
+                    <span>Category: {article.category}</span>
+                  </div>
+                )}
+                {article.author && (
+                  <div className="flex items-center space-x-1.5 font-medium">
+                    <User className="w-4 h-4 text-brand-yellow-dark" />
+                    <span>Written by: {article.author}</span>
+                  </div>
+                )}
+              </div>
+
+              {article.tags && article.tags.length > 0 && (
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <Tag className="w-3.5 h-3.5 text-gray-400" />
+                  {article.tags.map((tag: string, idx: number) => (
+                    <span key={idx} className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[10px] font-semibold">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Article Content */}
+            <div className="prose max-w-none text-sm text-brand-gray leading-relaxed space-y-6 font-light">
+              {article.excerpt && (
+                <p className="font-semibold text-brand-green-dark text-base border-l-4 border-emerald-600 pl-4 py-1 bg-emerald-50/50 rounded-r-lg">
+                  {article.excerpt}
+                </p>
+              )}
+
+              <div className="whitespace-pre-line text-sm text-gray-700 leading-relaxed space-y-4">
+                {article.content}
+              </div>
+            </div>
+
+            {/* Related Articles */}
+            {relatedBlogs.length > 0 && (
+              <div className="mt-16 pt-12 border-t border-brand-gray-muted">
+                <h3 className="text-xl font-extrabold text-brand-green-dark mb-6">
+                  Related Insights & Updates
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {relatedBlogs.map((rel) => {
+                    const relImg = cmsApi.resolveMediaUrl(rel.featuredImageUrl) || 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80';
+                    return (
+                      <Link
+                        key={rel.id}
+                        href={`/blogs/${rel.slug || rel.id}`}
+                        className="group bg-[#fafcfb] border border-gray-200 hover:border-emerald-500 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+                      >
+                        <div className="aspect-[16/9] overflow-hidden bg-gray-100">
+                          <img
+                            src={relImg}
+                            alt={rel.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        </div>
+                        <div className="p-4 space-y-2 flex-grow flex flex-col justify-between">
+                          <div>
+                            <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider">
+                              {rel.category || 'Logistics'}
+                            </span>
+                            <h4 className="text-xs font-bold text-gray-900 group-hover:text-emerald-700 line-clamp-2 mt-1">
+                              {rel.title}
+                            </h4>
+                          </div>
+                          <span className="inline-flex items-center space-x-1 text-[11px] font-bold text-emerald-700 pt-2">
+                            <span>Read article</span>
+                            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                          </span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

@@ -1,13 +1,14 @@
 -- Cloudflare D1 Initial Migration for KPS Worldwide Logistics
 -- 0001_initial_schema.sql
 
--- 1. Admins Table
+-- 1. Admins Table (Firebase Authentication Allowlist)
 CREATE TABLE IF NOT EXISTS admins (
   id TEXT PRIMARY KEY,
+  firebase_uid TEXT UNIQUE,
   email TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
+  password_hash TEXT,
   name TEXT NOT NULL,
-  role TEXT NOT NULL DEFAULT 'admin',
+  role TEXT NOT NULL DEFAULT 'admin', -- 'admin', 'super_admin'
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
@@ -96,6 +97,7 @@ CREATE TABLE IF NOT EXISTS contact_messages (
 
 -- Indexes for fast lookups and high throughput
 CREATE INDEX IF NOT EXISTS idx_admins_email ON admins(email);
+CREATE INDEX IF NOT EXISTS idx_admins_firebase_uid ON admins(firebase_uid);
 CREATE INDEX IF NOT EXISTS idx_sessions_admin_id ON sessions(admin_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions(expires_at);
 

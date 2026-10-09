@@ -12,11 +12,9 @@ import {
   handleDeleteJob,
 } from './routes/jobs';
 import {
-  handleSubmitApplication,
-  handleGetAdminApplications,
-  handleGetAdminApplicationById,
-  handleUpdateApplication,
-  handleGetResumePdf,
+  handleCreateApplication,
+  handleUploadResume,
+  handleStreamResume,
 } from './routes/applications';
 import {
   handleSubmitQuote,
@@ -33,6 +31,11 @@ import {
   handleDeleteContact,
 } from './routes/contacts';
 import { handleGetDashboardStats } from './routes/dashboard';
+import {
+  handleUploadMedia,
+  handleDeleteMedia,
+  handleGetPublicMedia,
+} from './routes/media';
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -107,32 +110,30 @@ export default {
       }
 
       // -------------------------------------------------------------
-      // 4. Job Applications Routes
+      // 4. Job Applications & Resume Routes
       // -------------------------------------------------------------
-      // Public apply
-      if (path === '/api/applications' && method === 'POST') {
-        return await handleSubmitApplication(request, env);
+      // Public complete candidate application submission: POST /api/careers/applications
+      if (
+        (path === '/api/careers/applications' || path === '/api/applications') &&
+        method === 'POST'
+      ) {
+        return await handleCreateApplication(request, env);
       }
-      // Admin list applications
-      if (path === '/api/admin/applications' && method === 'GET') {
-        return await handleGetAdminApplications(request, env);
+      // Public standalone resume upload: POST /api/careers/resume/upload or /api/applications/resume
+      if (
+        (path === '/api/careers/resume/upload' || path === '/api/applications/resume') &&
+        method === 'POST'
+      ) {
+        return await handleUploadResume(request, env);
       }
-      // Admin resume download / stream: /api/admin/applications/:id/resume
-      if (path.startsWith('/api/admin/applications/') && path.endsWith('/resume') && method === 'GET') {
-        const parts = path.split('/');
-        // format: ['', 'api', 'admin', 'applications', ':id', 'resume']
-        const id = parts[4];
-        if (id) {
-          return await handleGetResumePdf(request, env, id);
-        }
-      }
-      // Admin single application: /api/admin/applications/:id
-      if (path.startsWith('/api/admin/applications/')) {
-        const id = path.substring('/api/admin/applications/'.length);
-        if (id) {
-          if (method === 'GET') return await handleGetAdminApplicationById(request, env, id);
-          if (method === 'PUT') return await handleUpdateApplication(request, env, id);
-        }
+      // Admin secure resume streaming / download: GET /api/admin/resumes/stream or GET /api/admin/applications/:id/resume
+      if (
+        (path === '/api/admin/resumes/stream' ||
+          path.startsWith('/api/admin/resumes/') ||
+          path.startsWith('/api/admin/applications/') && (path.includes('/resume') || path.endsWith('/download'))) &&
+        method === 'GET'
+      ) {
+        return await handleStreamResume(request, env);
       }
 
       // -------------------------------------------------------------
@@ -174,6 +175,31 @@ export default {
           if (method === 'GET') return await handleGetAdminContactById(request, env, id);
           if (method === 'PUT') return await handleUpdateContact(request, env, id);
           if (method === 'DELETE') return await handleDeleteContact(request, env, id);
+        }
+      }
+
+      // -------------------------------------------------------------
+      // 7. CMS Media Asset Routes (R2 Storage)
+      // -------------------------------------------------------------
+      // Admin media upload: POST /api/admin/media/upload
+      if (path === '/api/admin/media/upload' && method === 'POST') {
+        return await handleUploadMedia(request, env);
+      }
+      // Admin media delete: DELETE /api/admin/media/delete or POST /api/admin/media/delete
+      if (path === '/api/admin/media/delete' && (method === 'DELETE' || method === 'POST')) {
+        return await handleDeleteMedia(request, env);
+      }
+      // Public media delivery: GET /api/media/* or GET /media/*
+      if (path.startsWith('/api/media/') && method === 'GET') {
+        const rawKey = path.substring('/api/media/'.length);
+        if (rawKey) {
+          return await handleGetPublicMedia(request, env, rawKey);
+        }
+      }
+      if (path.startsWith('/media/') && method === 'GET') {
+        const rawKey = path.substring('/media/'.length);
+        if (rawKey) {
+          return await handleGetPublicMedia(request, env, rawKey);
         }
       }
 

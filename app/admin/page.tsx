@@ -3,38 +3,55 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { dashboardApi } from '@/lib/api';
+import { getCmsDashboardStats } from '@/lib/cms-firestore';
+import { jobsCms, applicationsCms } from '@/lib/careers-firestore';
+import type { CMSStats } from '@/lib/cms-types';
+import type { JobItem, CandidateApplication } from '@/lib/careers-types';
+import { useAuth } from '@/lib/AuthContext';
 import { useToast } from '@/components/admin/Toast';
 import {
   Briefcase,
   Users,
-  FileText,
-  Mail,
   ArrowUpRight,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
   PlusCircle,
   RefreshCw,
-  Sparkles,
+  ChevronRight,
+  TrendingUp,
+  Clock,
+  CheckCircle2,
+  Camera,
+  BookOpen,
+  HeartHandshake,
+  Trophy,
+  ExternalLink,
+  ShieldCheck,
+  FileText,
 } from 'lucide-react';
 
 export default function AdminDashboardPage() {
+  const { user, loading: authLoading } = useAuth();
   const { error: toastError } = useToast();
-  const [data, setData] = useState<{
-    stats: {
-      totalJobs: number;
-      activeJobs: number;
-      totalApplications: number;
-      newApplications: number;
-      totalQuotes: number;
-      newQuotes: number;
-      totalContacts: number;
-      newContacts: number;
-    };
-    recentApplications: any[];
-    recentQuotes: any[];
-    recentContacts: any[];
-  } | null>(null);
+
+  const [stats, setStats] = useState({
+    totalJobs: 0,
+    activeJobs: 0,
+    totalApplications: 0,
+    newApplications: 0,
+  });
+
+  const [recentApplications, setRecentApplications] = useState<CandidateApplication[]>([]);
+  const [recentJobs, setRecentJobs] = useState<JobItem[]>([]);
+
+  const [cmsStats, setCmsStats] = useState<CMSStats>({
+    galleryCount: 0,
+    publishedGalleryCount: 0,
+    blogsCount: 0,
+    publishedBlogsCount: 0,
+    csrCount: 0,
+    publishedCsrCount: 0,
+    awardsCount: 0,
+    publishedAwardsCount: 0,
+  });
 
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -42,8 +59,25 @@ export default function AdminDashboardPage() {
   const loadData = async (isManual = false) => {
     if (isManual) setRefreshing(true);
     try {
-      const res = await dashboardApi.getStats();
-      setData(res);
+      const [allJobs, allApps, appStats, cmsRes] = await Promise.all([
+        jobsCms.getAll().catch(() => []),
+        applicationsCms.getAll().catch(() => []),
+        applicationsCms.getStats().catch(() => ({ total: 0, new: 0 })),
+        getCmsDashboardStats().catch(() => null),
+      ]);
+
+      const publishedCount = allJobs.filter((j) => j.status === 'published').length;
+
+      setStats({
+        totalJobs: allJobs.length,
+        activeJobs: publishedCount,
+        totalApplications: appStats.total || allApps.length,
+        newApplications: appStats.new || 0,
+      });
+
+      setRecentJobs(allJobs.slice(0, 5));
+      setRecentApplications(allApps.slice(0, 5));
+      if (cmsRes) setCmsStats(cmsRes);
     } catch (err: any) {
       toastError(err?.message || 'Failed to load dashboard statistics.');
     } finally {
@@ -53,56 +87,91 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
-    loadData();
-  }, []);
-
-  const stats = data?.stats || {
-    totalJobs: 0,
-    activeJobs: 0,
-    totalApplications: 0,
-    newApplications: 0,
-    totalQuotes: 0,
-    newQuotes: 0,
-    totalContacts: 0,
-    newContacts: 0,
-  };
+    if (!authLoading && user) {
+      loadData();
+    } else if (!authLoading && !user) {
+      setLoading(false);
+    }
+  }, [authLoading, user]);
 
   const statCards = [
     {
-      title: 'Job Posts',
+      title: 'Career Positions',
       mainCount: stats.totalJobs,
       subCount: `${stats.activeJobs} Published`,
       icon: Briefcase,
-      color: 'from-emerald-500/20 to-emerald-700/10 border-emerald-500/30 text-emerald-400',
-      badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+      badgeColor: 'bg-[#EAF5F1] text-[#006B4F] border-[#006B4F]/20',
       href: '/admin/careers/jobs',
+      meta: 'Careers Portal',
     },
     {
-      title: 'Job Applications',
+      title: 'Candidate Applications',
       mainCount: stats.totalApplications,
-      subCount: `${stats.newApplications} New`,
+      subCount: `${stats.newApplications} New Candidates`,
       icon: Users,
-      color: 'from-blue-500/20 to-blue-700/10 border-blue-500/30 text-blue-400',
-      badgeColor: stats.newApplications > 0 ? 'bg-blue-500/20 text-blue-300 border-blue-500/30 animate-pulse' : 'bg-slate-800 text-slate-400',
+      badgeColor:
+        stats.newApplications > 0
+          ? 'bg-blue-50 text-[#2563EB] border-blue-200 font-bold'
+          : 'bg-slate-100 text-[#66736E] border-slate-200',
       href: '/admin/careers/applications',
+      meta: 'Recruitment Pipeline',
     },
     {
-      title: 'Quote Requests',
-      mainCount: stats.totalQuotes,
-      subCount: `${stats.newQuotes} New Requests`,
-      icon: FileText,
-      color: 'from-amber-500/20 to-amber-700/10 border-amber-500/30 text-amber-400',
-      badgeColor: stats.newQuotes > 0 ? 'bg-amber-500/20 text-amber-300 border-amber-500/30 animate-pulse' : 'bg-slate-800 text-slate-400',
-      href: '/admin/enquiries/quotes',
+      title: 'Active Job Openings',
+      mainCount: stats.activeJobs,
+      subCount: 'Accepting Resumes',
+      icon: TrendingUp,
+      badgeColor: 'bg-emerald-50 text-[#059669] border-emerald-200 font-bold',
+      href: '/admin/careers/jobs',
+      meta: 'Public Careers Page',
     },
     {
-      title: 'Contact Messages',
-      mainCount: stats.totalContacts,
-      subCount: `${stats.newContacts} Unread`,
-      icon: Mail,
-      color: 'from-purple-500/20 to-purple-700/10 border-purple-500/30 text-purple-400',
-      badgeColor: stats.newContacts > 0 ? 'bg-purple-500/20 text-purple-300 border-purple-500/30' : 'bg-slate-800 text-slate-400',
-      href: '/admin/enquiries/contacts',
+      title: 'Live CMS Sections',
+      mainCount: cmsStats.publishedGalleryCount + cmsStats.publishedBlogsCount + cmsStats.publishedCsrCount + cmsStats.publishedAwardsCount,
+      subCount: 'Published Across Site',
+      icon: CheckCircle2,
+      badgeColor: 'bg-[#EAF5F1] text-[#006B4F] border-[#006B4F]/20 font-bold',
+      href: '/admin/gallery',
+      meta: 'Firestore Content',
+    },
+  ];
+
+  const cmsCards = [
+    {
+      title: 'Gallery Assets',
+      mainCount: cmsStats.galleryCount,
+      subCount: `${cmsStats.publishedGalleryCount} Published`,
+      icon: Camera,
+      badgeColor: 'bg-[#EAF5F1] text-[#006B4F] border-[#006B4F]/20',
+      href: '/admin/gallery',
+      meta: 'Photos & Videos',
+    },
+    {
+      title: 'Blog Articles',
+      mainCount: cmsStats.blogsCount,
+      subCount: `${cmsStats.publishedBlogsCount} Published`,
+      icon: BookOpen,
+      badgeColor: 'bg-blue-50 text-[#2563EB] border-blue-200',
+      href: '/admin/blogs',
+      meta: 'News & Insights',
+    },
+    {
+      title: 'CSR Initiatives',
+      mainCount: cmsStats.csrCount,
+      subCount: `${cmsStats.publishedCsrCount} Published`,
+      icon: HeartHandshake,
+      badgeColor: 'bg-purple-50 text-[#7C3AED] border-purple-200',
+      href: '/admin/csr',
+      meta: 'Community Impact',
+    },
+    {
+      title: 'Awards & Honors',
+      mainCount: cmsStats.awardsCount,
+      subCount: `${cmsStats.publishedAwardsCount} Published`,
+      icon: Trophy,
+      badgeColor: 'bg-amber-50 text-[#D97706] border-amber-200',
+      href: '/admin/awards',
+      meta: 'Industry Accolades',
     },
   ];
 
@@ -111,247 +180,282 @@ export default function AdminDashboardPage() {
       {/* ------------------------------------------------------------- */}
       {/* 1. Header & Quick Actions */}
       {/* ------------------------------------------------------------- */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E2E9E5] pb-6">
         <div>
-          <div className="flex items-center space-x-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">Live D1 Database</span>
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mt-1">Management Overview</h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Real-time operations, career applicant pipeline, and inbound customer enquiries.
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#006B4F] block mb-1">
+            Enterprise Management Overview
+          </span>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#17211E]">
+            Welcome back, {user?.name ? user.name.split(' ')[0] : 'KPS Logistics'}
+          </h1>
+          <p className="text-xs sm:text-sm text-[#66736E] mt-1 font-medium">
+            Monitor recruitment pipeline, candidate dossiers, and website CMS content in real-time.
           </p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-3 shrink-0">
           <button
             onClick={() => loadData(true)}
             disabled={refreshing}
-            className="flex items-center space-x-2 px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors disabled:opacity-50"
+            className="flex items-center space-x-2 px-3.5 py-2.5 rounded-xl bg-white border border-[#E2E9E5] text-xs font-semibold text-[#17211E] hover:bg-[#F7F9F8] transition-colors disabled:opacity-50 cursor-pointer shadow-2xs"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-emerald-400' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-[#006B4F] ${refreshing ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
           </button>
 
           <Link
             href="/admin/careers/jobs/new"
-            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-500 shadow-md shadow-emerald-950/40 transition-colors"
+            className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#006B4F] hover:bg-[#005A43] text-white text-xs font-bold shadow-sm shadow-[#006B4F]/20 transition-all duration-200"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>Post New Job</span>
+            <span>+ Add Job Post</span>
           </Link>
         </div>
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* 2. 8 KPI Metric Cards */}
+      {/* 2. Recruitment & Pipeline KPIs */}
       {/* ------------------------------------------------------------- */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {statCards.map((card) => {
-          const Icon = card.icon;
-          return (
-            <Link
-              key={card.title}
-              href={card.href}
-              className="group relative bg-slate-900/90 border border-slate-800 hover:border-slate-700 rounded-2xl p-5 sm:p-6 transition-all duration-300 hover:shadow-xl hover:translate-y-[-2px] overflow-hidden"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <div className={`p-3 rounded-xl bg-gradient-to-br border ${card.color}`}>
-                  <Icon className="w-5 h-5" />
-                </div>
-                <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${card.badgeColor}`}>
-                  {card.subCount}
-                </span>
-              </div>
-
-              <div>
-                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{card.title}</span>
-                <div className="flex items-baseline justify-between mt-1">
-                  <span className="text-3xl font-extrabold text-white tracking-tight">
-                    {loading ? (
-                      <span className="inline-block w-12 h-8 bg-slate-800 animate-pulse rounded-lg" />
-                    ) : (
-                      card.mainCount
-                    )}
+      <div>
+        <h2 className="text-xs font-bold text-[#66736E] uppercase tracking-wider mb-3">
+          Recruitment & Careers Overview
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {statCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <Link
+                key={card.title}
+                href={card.href}
+                className="group bg-white border border-[#E2E9E5] hover:border-[#006B4F]/40 rounded-2xl p-5 sm:p-6 transition-all duration-200 hover:shadow-md hover:translate-y-[-2px] flex flex-col justify-between shadow-2xs"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs font-bold text-[#66736E] uppercase tracking-wider">
+                    {card.title}
                   </span>
-                  <div className="text-slate-500 group-hover:text-emerald-400 transition-colors flex items-center text-xs font-medium">
-                    <span>Manage</span>
-                    <ArrowUpRight className="w-4 h-4 ml-0.5" />
+                  <div className="w-10 h-10 rounded-xl bg-[#EAF5F1] text-[#006B4F] flex items-center justify-center border border-[#006B4F]/20 group-hover:bg-[#006B4F] group-hover:text-white transition-colors">
+                    <Icon className="w-5 h-5" />
                   </div>
                 </div>
-              </div>
-            </Link>
-          );
-        })}
+
+                <div>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-3xl font-extrabold text-[#17211E] tracking-tight">
+                      {loading ? (
+                        <span className="inline-block w-14 h-8 bg-slate-100 animate-pulse rounded-lg" />
+                      ) : (
+                        card.mainCount
+                      )}
+                    </span>
+                    <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${card.badgeColor}`}>
+                      {card.subCount}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 pt-3 border-t border-[#E2E9E5]/60 flex items-center justify-between text-xs text-[#66736E]">
+                    <span className="text-[11px]">{card.meta}</span>
+                    <div className="text-[#006B4F] font-semibold flex items-center space-x-0.5 group-hover:translate-x-0.5 transition-transform">
+                      <span>Manage</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       {/* ------------------------------------------------------------- */}
-      {/* 3. Recent Activity Lists (3 Columns on Large Screens) */}
+      {/* 3. Dynamic CMS Content KPIs */}
       {/* ------------------------------------------------------------- */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-xs font-bold text-[#66736E] uppercase tracking-wider">
+            Dynamic Website Content Management (Firestore + R2)
+          </h2>
+          <span className="text-[11px] font-bold text-[#006B4F] bg-[#EAF5F1] px-2.5 py-0.5 rounded-md border border-[#006B4F]/20">
+            Live CMS Active
+          </span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {cmsCards.map((card) => {
+            const Icon = card.icon;
+            return (
+              <Link
+                key={card.title}
+                href={card.href}
+                className="group bg-white border border-[#E2E9E5] hover:border-[#006B4F]/40 rounded-2xl p-5 sm:p-6 transition-all duration-200 hover:shadow-md hover:translate-y-[-2px] flex flex-col justify-between shadow-2xs"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-xs font-bold text-[#17211E] uppercase tracking-wider">
+                    {card.title}
+                  </span>
+                  <div className="w-10 h-10 rounded-xl bg-[#EAF5F1] text-[#006B4F] flex items-center justify-center border border-[#006B4F]/20 group-hover:bg-[#006B4F] group-hover:text-white transition-colors">
+                    <Icon className="w-5 h-5" />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-3xl font-extrabold text-[#17211E] tracking-tight">
+                      {loading ? (
+                        <span className="inline-block w-14 h-8 bg-slate-100 animate-pulse rounded-lg" />
+                      ) : (
+                        card.mainCount
+                      )}
+                    </span>
+                    <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${card.badgeColor}`}>
+                      {card.subCount}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 pt-3 border-t border-[#E2E9E5]/60 flex items-center justify-between text-xs text-[#66736E]">
+                    <span className="text-[11px]">{card.meta}</span>
+                    <div className="text-[#006B4F] font-semibold flex items-center space-x-0.5 group-hover:translate-x-0.5 transition-transform">
+                      <span>Edit CMS</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ------------------------------------------------------------- */}
+      {/* 4. Recent Activity Lists (2 Columns) */}
+      {/* ------------------------------------------------------------- */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Column 1: Recent Applications */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col">
-          <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-            <div className="flex items-center space-x-2">
-              <Users className="w-4 h-4 text-blue-400" />
-              <h2 className="text-sm font-bold text-white">Recent Applications</h2>
+        <div className="bg-white border border-[#E2E9E5] rounded-2xl p-5 flex flex-col shadow-2xs">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#E2E9E5]">
+            <div className="flex items-center space-x-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#EAF5F1] text-[#006B4F] flex items-center justify-center">
+                <Users className="w-4 h-4" />
+              </div>
+              <h2 className="text-sm font-bold text-[#17211E]">Recent Candidate Applications</h2>
             </div>
             <Link
               href="/admin/careers/applications"
-              className="text-[11px] font-semibold text-blue-400 hover:text-blue-300"
+              className="text-xs font-semibold text-[#006B4F] hover:text-[#005A43] flex items-center space-x-0.5"
             >
-              View All
+              <span>View Pipeline</span>
+              <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          <div className="flex-1 space-y-3">
+          <div className="flex-1 space-y-2.5">
             {loading ? (
-              <div className="space-y-2 py-4">
+              <div className="space-y-2.5 py-2">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-14 bg-slate-800/60 rounded-xl animate-pulse" />
+                  <div key={i} className="h-16 bg-slate-100 rounded-xl animate-pulse" />
                 ))}
               </div>
-            ) : data?.recentApplications && data.recentApplications.length > 0 ? (
-              data.recentApplications.map((app: any) => (
+            ) : recentApplications && recentApplications.length > 0 ? (
+              recentApplications.map((app) => (
                 <Link
                   key={app.id}
-                  href={`/admin/careers/applications/${app.id}`}
-                  className="block p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 transition-colors"
+                  href={`/admin/careers/applications/view?id=${app.id}`}
+                  className="block p-3.5 rounded-xl bg-[#F7F9F8] border border-[#E2E9E5] hover:border-[#006B4F]/40 hover:bg-white transition-all"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-200 truncate">{app.name}</span>
+                    <span className="text-xs font-bold text-[#17211E] truncate">{app.candidateName}</span>
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                         app.status === 'New'
-                          ? 'bg-blue-500/20 text-blue-400'
+                          ? 'bg-[#EAF5F1] text-[#006B4F] border border-[#006B4F]/30'
                           : app.status === 'Selected'
-                          ? 'bg-emerald-500/20 text-emerald-400'
-                          : 'bg-slate-800 text-slate-400'
+                          ? 'bg-[#004D3A]/10 text-[#004D3A] border border-[#004D3A]/20'
+                          : 'bg-slate-100 text-[#66736E] border border-slate-200'
                       }`}
                     >
                       {app.status}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 truncate mt-0.5">{app.job_title || 'General Application'}</p>
-                  <span className="text-[10px] text-slate-500 mt-1 block">
-                    {new Date(app.created_at).toLocaleDateString()}
-                  </span>
-                </Link>
-              ))
-            ) : (
-              <div className="py-8 text-center text-xs text-slate-500">No applications received yet.</div>
-            )}
-          </div>
-        </div>
-
-        {/* Column 2: Recent Quote Requests */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col">
-          <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-            <div className="flex items-center space-x-2">
-              <FileText className="w-4 h-4 text-amber-400" />
-              <h2 className="text-sm font-bold text-white">Recent Quote Requests</h2>
-            </div>
-            <Link
-              href="/admin/enquiries/quotes"
-              className="text-[11px] font-semibold text-amber-400 hover:text-amber-300"
-            >
-              View All
-            </Link>
-          </div>
-
-          <div className="flex-1 space-y-3">
-            {loading ? (
-              <div className="space-y-2 py-4">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-14 bg-slate-800/60 rounded-xl animate-pulse" />
-                ))}
-              </div>
-            ) : data?.recentQuotes && data.recentQuotes.length > 0 ? (
-              data.recentQuotes.map((q: any) => (
-                <Link
-                  key={q.id}
-                  href={`/admin/enquiries/quotes`}
-                  className="block p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-200 truncate">{q.name}</span>
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
-                        q.status === 'New'
-                          ? 'bg-amber-500/20 text-amber-400'
-                          : q.status === 'Quoted'
-                          ? 'bg-emerald-500/20 text-emerald-400'
-                          : 'bg-slate-800 text-slate-400'
-                      }`}
-                    >
-                      {q.status}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                    {q.origin} → {q.destination} ({q.service})
+                  <p className="text-[11px] text-[#66736E] truncate mt-0.5 font-medium">
+                    {app.jobTitle} • {app.email}
                   </p>
-                  <span className="text-[10px] text-slate-500 mt-1 block">
-                    {new Date(q.created_at).toLocaleDateString()}
+                  <span className="text-[10px] text-[#66736E]/70 mt-1 block">
+                    {app.appliedAt?.toDate
+                      ? app.appliedAt.toDate().toLocaleDateString()
+                      : new Date(app.appliedAt).toLocaleDateString()}
                   </span>
                 </Link>
               ))
             ) : (
-              <div className="py-8 text-center text-xs text-slate-500">No quote requests recorded yet.</div>
+              <div className="py-12 text-center text-xs text-[#66736E]">
+                <Users className="w-8 h-8 text-[#66736E]/40 mx-auto mb-2" />
+                <p className="font-semibold text-[#17211E]">No candidate applications yet</p>
+                <p className="text-[11px] text-[#66736E] mt-0.5">
+                  Applications submitted through the careers portal will appear here.
+                </p>
+              </div>
             )}
           </div>
         </div>
 
-        {/* Column 3: Recent Contact Messages */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col">
-          <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
-            <div className="flex items-center space-x-2">
-              <Mail className="w-4 h-4 text-purple-400" />
-              <h2 className="text-sm font-bold text-white">Recent Messages</h2>
+        {/* Column 2: Recent Job Postings */}
+        <div className="bg-white border border-[#E2E9E5] rounded-2xl p-5 flex flex-col shadow-2xs">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-[#E2E9E5]">
+            <div className="flex items-center space-x-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#EAF5F1] text-[#006B4F] flex items-center justify-center">
+                <Briefcase className="w-4 h-4" />
+              </div>
+              <h2 className="text-sm font-bold text-[#17211E]">Active Job Positions</h2>
             </div>
             <Link
-              href="/admin/enquiries/contacts"
-              className="text-[11px] font-semibold text-purple-400 hover:text-purple-300"
+              href="/admin/careers/jobs"
+              className="text-xs font-semibold text-[#006B4F] hover:text-[#005A43] flex items-center space-x-0.5"
             >
-              View All
+              <span>Manage All</span>
+              <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          <div className="flex-1 space-y-3">
+          <div className="flex-1 space-y-2.5">
             {loading ? (
-              <div className="space-y-2 py-4">
+              <div className="space-y-2.5 py-2">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-14 bg-slate-800/60 rounded-xl animate-pulse" />
+                  <div key={i} className="h-16 bg-slate-100 rounded-xl animate-pulse" />
                 ))}
               </div>
-            ) : data?.recentContacts && data.recentContacts.length > 0 ? (
-              data.recentContacts.map((c: any) => (
+            ) : recentJobs && recentJobs.length > 0 ? (
+              recentJobs.map((job) => (
                 <Link
-                  key={c.id}
-                  href={`/admin/enquiries/contacts`}
-                  className="block p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 transition-colors"
+                  key={job.id}
+                  href={`/admin/careers/jobs/edit?id=${job.id}`}
+                  className="block p-3.5 rounded-xl bg-[#F7F9F8] border border-[#E2E9E5] hover:border-[#006B4F]/40 hover:bg-white transition-all"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-200 truncate">{c.name}</span>
+                    <span className="text-xs font-bold text-[#17211E] truncate">{job.title}</span>
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
-                        c.status === 'New'
-                          ? 'bg-purple-500/20 text-purple-400'
-                          : c.status === 'Replied'
-                          ? 'bg-emerald-500/20 text-emerald-400'
-                          : 'bg-slate-800 text-slate-400'
+                        job.status === 'published'
+                          ? 'bg-[#EAF5F1] text-[#006B4F] border border-[#006B4F]/30'
+                          : 'bg-amber-50 text-[#D97706] border border-amber-200'
                       }`}
                     >
-                      {c.status}
+                      {job.status}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">{c.message}</p>
-                  <span className="text-[10px] text-slate-500 mt-1 block">
-                    {new Date(c.created_at).toLocaleDateString()}
+                  <p className="text-[11px] text-[#66736E] truncate mt-0.5 font-medium">
+                    {job.department} • {job.location} • {job.applicationCount ?? 0} Applications
+                  </p>
+                  <span className="text-[10px] text-[#006B4F] mt-1 font-mono block">
+                    /career/{job.slug}
                   </span>
                 </Link>
               ))
             ) : (
-              <div className="py-8 text-center text-xs text-slate-500">No contact messages received yet.</div>
+              <div className="py-12 text-center text-xs text-[#66736E]">
+                <Briefcase className="w-8 h-8 text-[#66736E]/40 mx-auto mb-2" />
+                <p className="font-semibold text-[#17211E]">No job positions posted yet</p>
+                <p className="text-[11px] text-[#66736E] mt-0.5">
+                  Click "+ Add Job Post" to publish new positions.
+                </p>
+              </div>
             )}
           </div>
         </div>

@@ -1,5 +1,5 @@
-# Cloudflare Worker Local Environment Secrets (.dev.vars)
-SESSION_SECRET=kps-ultra-secure-session-secret-change-in-production-2026
+# Cloudflare Worker Local Environment Variables & Secrets (.dev.vars)
+FIREBASE_PROJECT_ID=kps-website-hr-panel
 SETUP_SECRET=kps-admin-initial-setup-secret-2026
 ENVIRONMENT=development
 ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://www.kpsgroups.net,https://kpsgroups.net

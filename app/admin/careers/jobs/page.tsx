@@ -2,30 +2,31 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { jobsApi } from '@/lib/api';
+import { jobsCms } from '@/lib/careers-firestore';
+import { useAuth } from '@/lib/AuthContext';
 import { useToast } from '@/components/admin/Toast';
 import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
+import type { JobItem, JobStatus } from '@/lib/careers-types';
 import {
   Briefcase,
   Plus,
   Search,
-  Filter,
   ExternalLink,
   Edit,
   Trash2,
-  CheckCircle2,
-  AlertCircle,
-  Eye,
   MapPin,
   Calendar,
-  Clock,
   ChevronRight,
   RefreshCw,
+  Users,
+  Archive,
+  Sparkles,
 } from 'lucide-react';
 
 export default function AdminJobsPage() {
+  const { user, loading: authLoading } = useAuth();
   const { success: toastSuccess, error: toastError } = useToast();
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<JobItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -33,17 +34,17 @@ export default function AdminJobsPage() {
 
   // Deletion State
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [jobToDelete, setJobToDelete] = useState<any | null>(null);
+  const [jobToDelete, setJobToDelete] = useState<JobItem | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   const fetchJobs = async () => {
     setLoading(true);
     try {
-      const data = await jobsApi.getAdminJobs({
-        search: search.trim() || undefined,
-        status: statusFilter !== 'all' ? statusFilter : undefined,
-        department: departmentFilter !== 'all' ? departmentFilter : undefined,
-      });
+      const data = await jobsCms.getAll(
+        statusFilter !== 'all' ? statusFilter : undefined,
+        departmentFilter !== 'all' ? departmentFilter : undefined,
+        search.trim() || undefined
+      );
       setJobs(data || []);
     } catch (err: any) {
       toastError(err?.message || 'Failed to load jobs list.');
@@ -53,18 +54,24 @@ export default function AdminJobsPage() {
   };
 
   useEffect(() => {
-    fetchJobs();
-  }, [statusFilter, departmentFilter]);
+    if (!authLoading && user) {
+      fetchJobs();
+    } else if (!authLoading && !user) {
+      setLoading(false);
+    }
+  }, [statusFilter, departmentFilter, authLoading, user]);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchJobs();
+    if (!authLoading && user) {
+      fetchJobs();
+    }
   };
 
-  const handleToggleStatus = async (job: any, nextStatus: string) => {
+  const handleToggleStatus = async (job: JobItem, nextStatus: JobStatus) => {
     try {
-      await jobsApi.updateJob(job.id, { status: nextStatus });
-      toastSuccess(`Job "${job.title}" updated to ${nextStatus}.`);
+      await jobsCms.update(job.id, { status: nextStatus });
+      toastSuccess(`Job "${job.title}" status updated to ${nextStatus}.`);
       setJobs((prev) =>
         prev.map((j) => (j.id === job.id ? { ...j, status: nextStatus } : j))
       );
@@ -77,13 +84,31 @@ export default function AdminJobsPage() {
     if (!jobToDelete) return;
     setDeleting(true);
     try {
-      await jobsApi.deleteJob(jobToDelete.id);
-      toastSuccess(`Job "${jobToDelete.title}" deleted.`);
-      setJobs((prev) => prev.filter((j) => j.id !== jobToDelete.id));
+      await jobsCms.delete(jobToDelete.id);
+      toastSuccess(`Job "${jobToDelete.title}" permanently deleted from Cloud Firestore.`);
       setDeleteModalOpen(false);
       setJobToDelete(null);
+      await fetchJobs();
     } catch (err: any) {
-      toastError(err?.message || 'Failed to delete job.');
+      console.error('Failed to delete job from Firestore:', err);
+      toastError(err?.message || 'Failed to delete job from Cloud Firestore.');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const handleConfirmArchive = async () => {
+    if (!jobToDelete) return;
+    setDeleting(true);
+    try {
+      await jobsCms.archive(jobToDelete.id);
+      toastSuccess(`Job "${jobToDelete.title}" archived successfully.`);
+      setDeleteModalOpen(false);
+      setJobToDelete(null);
+      await fetchJobs();
+    } catch (err: any) {
+      console.error('Failed to archive job in Firestore:', err);
+      toastError(err?.message || 'Failed to archive job.');
     } finally {
       setDeleting(false);
     }
@@ -96,33 +121,33 @@ export default function AdminJobsPage() {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E2E9E5] pb-5">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-semibold text-slate-400 mb-1">
-            <Link href="/admin" className="hover:text-emerald-400">Dashboard</Link>
+          <div className="flex items-center space-x-2 text-xs font-semibold text-[#66736E] mb-1">
+            <Link href="/admin" className="hover:text-[#006B4F]">Dashboard</Link>
             <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-slate-200">Careers</span>
+            <span>Careers</span>
             <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-emerald-400">Job Posts</span>
+            <span className="text-[#006B4F] font-bold">Job Posts</span>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Career Job Postings</h1>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Create, edit, publish, or archive career opportunities on the public portal.
+          <h1 className="text-2xl font-bold text-[#17211E] tracking-tight">Career Job Postings</h1>
+          <p className="text-xs text-[#66736E] mt-0.5">
+            Create, manage, publish, and monitor recruitment job openings on the corporate website.
           </p>
         </div>
 
         <div className="flex items-center space-x-3">
           <button
             onClick={fetchJobs}
-            className="p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-2.5 rounded-xl bg-white border border-[#E2E9E5] text-[#17211E] hover:bg-[#F7F9F8] transition-colors cursor-pointer shadow-2xs"
             title="Refresh list"
           >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-emerald-400' : ''}`} />
+            <RefreshCw className={`w-4 h-4 text-[#006B4F] ${loading ? 'animate-spin' : ''}`} />
           </button>
 
           <Link
             href="/admin/careers/jobs/new"
-            className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow-md shadow-emerald-950/40 transition-colors"
+            className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#006B4F] hover:bg-[#004D3A] text-white text-xs font-bold shadow-sm shadow-[#006B4F]/20 transition-all duration-200"
           >
             <Plus className="w-4 h-4" />
             <span>Create Job Post</span>
@@ -131,15 +156,15 @@ export default function AdminJobsPage() {
       </div>
 
       {/* Filter & Search Bar */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+      <div className="bg-white border border-[#E2E9E5] rounded-2xl p-4 flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between shadow-2xs">
         <form onSubmit={handleSearchSubmit} className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#66736E]" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by title, location, or department..."
-            className="w-full pl-10 pr-4 py-2 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#E2E9E5] rounded-xl text-xs text-[#17211E] placeholder-[#66736E]/60 focus:outline-none focus:border-[#006B4F] focus:ring-1 focus:ring-[#006B4F]/20"
           />
         </form>
 
@@ -148,12 +173,13 @@ export default function AdminJobsPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-emerald-500"
+            className="bg-white border border-[#E2E9E5] text-xs font-medium text-[#17211E] rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#006B4F] cursor-pointer"
           >
             <option value="all">All Statuses</option>
             <option value="published">Published</option>
             <option value="draft">Draft</option>
             <option value="closed">Closed</option>
+            <option value="archived">Archived</option>
           </select>
 
           {/* Department Filter */}
@@ -161,7 +187,7 @@ export default function AdminJobsPage() {
             <select
               value={departmentFilter}
               onChange={(e) => setDepartmentFilter(e.target.value)}
-              className="bg-slate-950 border border-slate-700 text-xs text-slate-200 rounded-xl px-3 py-2 focus:outline-none focus:border-emerald-500"
+              className="bg-white border border-[#E2E9E5] text-xs font-medium text-[#17211E] rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#006B4F] cursor-pointer"
             >
               <option value="all">All Departments</option>
               {departments.map((dept) => (
@@ -175,10 +201,10 @@ export default function AdminJobsPage() {
       </div>
 
       {/* Jobs Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+      <div className="bg-white border border-[#E2E9E5] rounded-2xl overflow-hidden shadow-2xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-950/80 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider text-[11px]">
+            <thead className="bg-[#F7F9F8] border-b border-[#E2E9E5] text-[#66736E] font-bold uppercase tracking-wider text-[11px]">
               <tr>
                 <th className="px-5 py-4">Job Title</th>
                 <th className="px-4 py-4">Department</th>
@@ -190,72 +216,82 @@ export default function AdminJobsPage() {
                 <th className="px-5 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-[#E2E9E5]">
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="px-5 py-12 text-center text-slate-500">
+                  <td colSpan={8} className="px-5 py-12 text-center text-[#66736E]">
                     <div className="flex flex-col items-center space-y-2">
-                      <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-                      <span>Loading job postings...</span>
+                      <div className="w-6 h-6 border-2 border-[#006B4F] border-t-transparent rounded-full animate-spin" />
+                      <span className="font-medium">Loading job postings from Firestore...</span>
                     </div>
                   </td>
                 </tr>
               ) : jobs.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-5 py-12 text-center text-slate-500">
-                    <Briefcase className="w-8 h-8 text-slate-600 mx-auto mb-2" />
-                    <p className="font-semibold text-slate-400">No job postings found.</p>
+                  <td colSpan={8} className="px-5 py-12 text-center text-[#66736E]">
+                    <Briefcase className="w-8 h-8 text-[#66736E]/40 mx-auto mb-2" />
+                    <p className="font-semibold text-[#17211E]">No job postings found</p>
                     <p className="text-[11px] mt-1">
-                      {search || statusFilter !== 'all' ? 'Try adjusting your filters.' : 'Click "Create Job Post" to post your first position.'}
+                      {search || statusFilter !== 'all'
+                        ? 'Try adjusting your filters.'
+                        : 'Click "Create Job Post" to post your first position.'}
                     </p>
                   </td>
                 </tr>
               ) : (
                 jobs.map((job) => (
-                  <tr key={job.id} className="hover:bg-slate-800/40 transition-colors">
+                  <tr key={job.id} className="hover:bg-[#F7F9F8] transition-colors">
                     {/* Job Title & Slug */}
                     <td className="px-5 py-4">
                       <div>
-                        <span className="font-bold text-white text-sm block leading-tight">{job.title}</span>
-                        <span className="text-[11px] text-slate-400 font-mono">/career/{job.slug}</span>
+                        <Link
+                          href={`/admin/careers/jobs/edit?id=${job.id}`}
+                          className="font-bold text-[#17211E] text-sm hover:text-[#006B4F] block leading-tight"
+                        >
+                          {job.title}
+                        </Link>
+                        <span className="text-[11px] text-[#66736E] font-mono">/career/{job.slug}</span>
                       </div>
                     </td>
 
                     {/* Department */}
-                    <td className="px-4 py-4 text-slate-300 font-medium">
+                    <td className="px-4 py-4 text-[#17211E] font-medium">
                       {job.department || '—'}
                     </td>
 
                     {/* Location */}
-                    <td className="px-4 py-4 text-slate-300">
+                    <td className="px-4 py-4 text-[#66736E]">
                       <div className="flex items-center space-x-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                        <span className="truncate max-w-[140px]">{job.location}</span>
+                        <MapPin className="w-3.5 h-3.5 text-[#006B4F] shrink-0" />
+                        <span className="truncate max-w-[140px] text-[#17211E] font-medium">{job.location}</span>
                       </div>
                     </td>
 
                     {/* Employment Type & Exp */}
                     <td className="px-4 py-4">
-                      <span className="font-semibold text-slate-200 block">{job.employment_type}</span>
-                      <span className="text-[11px] text-slate-500">{job.experience || 'Any Exp'}</span>
+                      <span className="font-semibold text-[#17211E] block">{job.employmentType}</span>
+                      <span className="text-[11px] text-[#66736E]">{job.experience || 'Any Exp'}</span>
                     </td>
 
                     {/* Status Badge & Toggle */}
                     <td className="px-4 py-4">
                       <select
                         value={job.status}
-                        onChange={(e) => handleToggleStatus(job, e.target.value)}
+                        onChange={(e) => handleToggleStatus(job, e.target.value as JobStatus)}
                         className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border focus:outline-none cursor-pointer ${
                           job.status === 'published'
-                            ? 'bg-emerald-950/80 text-emerald-300 border-emerald-700/80'
+                            ? 'bg-[#EAF5F1] text-[#006B4F] border-[#006B4F]/30'
                             : job.status === 'draft'
-                            ? 'bg-amber-950/80 text-amber-300 border-amber-700/80'
-                            : 'bg-slate-800 text-slate-400 border-slate-700'
+                            ? 'bg-amber-50 text-[#D97706] border-amber-200'
+                            : job.status === 'closed'
+                            ? 'bg-red-50 text-[#DC2626] border-red-200'
+                            : 'bg-slate-100 text-[#66736E] border-slate-200'
                         }`}
                       >
                         <option value="published">Published</option>
                         <option value="draft">Draft</option>
                         <option value="closed">Closed</option>
+                        <option value="archived">Archived</option>
                       </select>
                     </td>
 
@@ -263,38 +299,49 @@ export default function AdminJobsPage() {
                     <td className="px-4 py-4">
                       <Link
                         href={`/admin/careers/applications?job_id=${job.id}`}
-                        className="inline-flex items-center space-x-1 text-slate-300 hover:text-emerald-400 font-semibold"
+                        className="inline-flex items-center space-x-1 text-[#17211E] hover:text-[#006B4F] font-semibold"
+                        title="View applications for this position"
                       >
-                        <span>{job.application_count ?? 0}</span>
-                        {job.new_application_count > 0 && (
-                          <span className="ml-1 text-[10px] bg-blue-500/20 text-blue-300 px-1.5 py-0.2 rounded-full border border-blue-500/30">
-                            {job.new_application_count} new
+                        <Users className="w-3.5 h-3.5 text-[#66736E]" />
+                        <span className="font-bold">{job.applicationCount ?? 0}</span>
+                        {job.newApplicationCount && job.newApplicationCount > 0 ? (
+                          <span className="ml-1 text-[10px] bg-blue-50 text-[#2563EB] px-1.5 py-0.5 rounded-full border border-blue-200 font-bold">
+                            {job.newApplicationCount} new
                           </span>
-                        )}
+                        ) : null}
                       </Link>
                     </td>
 
                     {/* Deadline */}
-                    <td className="px-4 py-4 text-slate-400">
+                    <td className="px-4 py-4 text-[#66736E]">
                       {job.deadline ? (
                         <div className="flex items-center space-x-1">
-                          <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                          <Calendar className="w-3.5 h-3.5 text-[#66736E]" />
                           <span>{job.deadline}</span>
                         </div>
                       ) : (
-                        'Open'
+                        <span className="text-emerald-700 font-medium">Open</span>
                       )}
                     </td>
 
                     {/* Actions */}
                     <td className="px-5 py-4 text-right">
-                      <div className="flex items-center justify-end space-x-2">
+                      <div className="flex items-center justify-end space-x-1.5">
+                        {/* Applications Action */}
+                        <Link
+                          href={`/admin/careers/applications?job_id=${job.id}`}
+                          className="px-2.5 py-1 rounded-lg text-[11px] font-bold text-[#006B4F] bg-[#EAF5F1] hover:bg-[#006B4F] hover:text-white transition-colors"
+                          title="View Applications"
+                        >
+                          Applications ({job.applicationCount ?? 0})
+                        </Link>
+
                         {/* Public Link */}
                         {job.status === 'published' && (
                           <Link
-                            href={`/career/${job.slug}`}
+                            href={`/career/view?slug=${encodeURIComponent(job.slug || job.id)}`}
                             target="_blank"
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-400 hover:bg-slate-800 transition-colors"
+                            className="p-1.5 rounded-lg text-[#66736E] hover:text-[#006B4F] hover:bg-[#EAF5F1] transition-colors"
                             title="View on public site"
                           >
                             <ExternalLink className="w-4 h-4" />
@@ -303,8 +350,8 @@ export default function AdminJobsPage() {
 
                         {/* Edit Button */}
                         <Link
-                          href={`/admin/careers/jobs/${job.id}`}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-blue-400 hover:bg-slate-800 transition-colors"
+                          href={`/admin/careers/jobs/edit?id=${job.id}`}
+                          className="p-1.5 rounded-lg text-[#66736E] hover:text-[#006B4F] hover:bg-[#EAF5F1] transition-colors"
                           title="Edit Job"
                         >
                           <Edit className="w-4 h-4" />
@@ -316,7 +363,7 @@ export default function AdminJobsPage() {
                             setJobToDelete(job);
                             setDeleteModalOpen(true);
                           }}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors"
+                          className="p-1.5 rounded-lg text-[#66736E] hover:text-[#DC2626] hover:bg-red-50 transition-colors cursor-pointer"
                           title="Delete Job"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -331,18 +378,55 @@ export default function AdminJobsPage() {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete / Archive Confirmation Modal */}
       <DeleteConfirmModal
         isOpen={deleteModalOpen}
-        title="Delete Job Posting?"
-        message={`Are you sure you want to permanently delete the job listing "${jobToDelete?.title}"? Applications linked to this position will be preserved.`}
-        confirmLabel="Delete Job"
+        title={
+          jobToDelete && jobToDelete.applicationCount && jobToDelete.applicationCount > 0
+            ? 'Delete Job with Linked Applications?'
+            : 'Delete Job Posting Permanently?'
+        }
+        message={
+          jobToDelete ? (
+            <div className="space-y-2.5">
+              <p>
+                Are you sure you want to permanently delete the job listing{' '}
+                <strong className="text-[#17211E]">"{jobToDelete.title}"</strong> (Document ID:{' '}
+                <span className="font-mono text-[#006B4F]">{jobToDelete.id}</span>) from Cloud Firestore?
+              </p>
+              {jobToDelete.applicationCount && jobToDelete.applicationCount > 0 ? (
+                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs">
+                  <p className="font-bold flex items-center space-x-1 mb-1">
+                    <span>⚠️ {jobToDelete.applicationCount} Candidate Application(s) Linked</span>
+                  </p>
+                  <p className="text-[11px] leading-relaxed">
+                    Candidate records and submitted resumes in Cloudflare R2 will remain safely preserved. However, to preserve role metadata, we recommend{' '}
+                    <strong>archiving</strong> the position instead of permanently deleting it.
+                  </p>
+                </div>
+              ) : (
+                <p className="text-[11px] text-[#66736E]">
+                  This operation executes a Firestore <code className="text-[#006B4F]">deleteDoc()</code> and removes the document permanently from the <code className="text-[#006B4F]">jobs</code> collection.
+                </p>
+              )}
+            </div>
+          ) : (
+            ''
+          )
+        }
+        confirmLabel="Permanently Delete"
+        secondaryActionLabel={
+          jobToDelete && jobToDelete.applicationCount && jobToDelete.applicationCount > 0
+            ? 'Archive Position (Recommended)'
+            : undefined
+        }
         loading={deleting}
         onClose={() => {
           setDeleteModalOpen(false);
           setJobToDelete(null);
         }}
         onConfirm={handleConfirmDelete}
+        onSecondaryAction={handleConfirmArchive}
       />
     </div>
   );

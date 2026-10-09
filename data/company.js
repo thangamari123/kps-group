@@ -27,6 +27,10 @@ export const companyDetails = {
     email: "info@kpsgroups.net",
     inquiryEmail: "selvamani.c@kpsgroups.net",
     generalEmail: "info@kpsgroups.net",
+    directEmails: [
+      "Rajeswari.s@kpsgroups.net",
+      "Jaikumar@kpsgroups.net"
+    ],
     website: "www.kpsgroups.net",
     
     // 21. Corporate Office
