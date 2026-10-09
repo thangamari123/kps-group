@@ -15,3 +15,5 @@
 /careers/* /career/view 200
 /admin/careers/jobs/* /admin/careers/jobs/edit 200
 /admin/careers/applications/* /admin/careers/applications/view 200
+/blogs/* /blogs/view 200
+/blog/* /blogs/view 200

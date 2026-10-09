@@ -15,35 +15,21 @@ export default function GalleryContent() {
   const [cmsItems, setCmsItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fallbackPhotos = [
-    { id: 'fb-p1', title: 'Container Terminal Operations', mediaUrl: 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=800&q=80', mediaType: 'image', category: 'Port Operations', location: 'Chennai Port', altText: 'Container Terminal' },
-    { id: 'fb-p2', title: 'Air Freight Cargo Loading', mediaUrl: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80', mediaType: 'image', category: 'Air Freight', location: 'Airport Cargo Terminal', altText: 'Air cargo loading' },
-    { id: 'fb-p3', title: 'FTWZ Strategic Storage Facility', mediaUrl: 'https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&w=800&q=80', mediaType: 'image', category: 'Warehousing', location: 'FTWZ Hub', altText: 'FTWZ Warehousing' },
-    { id: 'fb-p4', title: 'Ocean Freight Cargo Vessel', mediaUrl: 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=800&q=80', mediaType: 'image', category: 'Ocean Freight', location: 'Kattupalli Port', altText: 'Ocean Freight' },
-    { id: 'fb-p5', title: 'Specialized Project Logistics Crane', mediaUrl: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=800&q=80', mediaType: 'image', category: 'Heavy Lift', location: 'Project Site', altText: 'Project Logistics' },
-    { id: 'fb-p6', title: 'BS6 Transport Fleet Network', mediaUrl: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=800&q=80', mediaType: 'image', category: 'Transportation', location: 'National Highway', altText: 'Fleet network' }
-  ];
-
-  const fallbackVideos = [
-    { id: 'fb-v1', title: 'K.P.S Corporate Showcase', posterUrl: 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=800&q=80', mediaUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', mediaType: 'video', category: 'Corporate', isEmbed: true },
-    { id: 'fb-v2', title: 'End-to-End Customs & Transport Fleet', posterUrl: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=800&q=80', mediaUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', mediaType: 'video', category: 'Fleet', isEmbed: true },
-    { id: 'fb-v3', title: 'Free Trade Warehousing Operations', posterUrl: 'https://images.unsplash.com/photo-1587293852726-70cdb56c2866?auto=format&fit=crop&w=800&q=80', mediaUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ', mediaType: 'video', category: 'Warehousing', isEmbed: true }
-  ];
-
   useEffect(() => {
     let isMounted = true;
     async function loadGallery() {
       try {
         const items = await galleryCms.getPublished();
         if (isMounted) {
-          if (items && items.length > 0) {
-            setCmsItems(items);
-          }
+          setCmsItems(items || []);
           setLoading(false);
         }
       } catch (err) {
         console.error('Failed to load gallery items from CMS:', err);
-        if (isMounted) setLoading(false);
+        if (isMounted) {
+          setCmsItems([]);
+          setLoading(false);
+        }
       }
     }
     loadGallery();
@@ -51,13 +37,11 @@ export default function GalleryContent() {
   }, []);
 
   const photos = useMemo(() => {
-    const list = cmsItems.filter(item => item.mediaType === 'image');
-    return list.length > 0 ? list : fallbackPhotos;
+    return cmsItems.filter(item => item.mediaType === 'image');
   }, [cmsItems]);
 
   const videos = useMemo(() => {
-    const list = cmsItems.filter(item => item.mediaType === 'video');
-    return list.length > 0 ? list : fallbackVideos;
+    return cmsItems.filter(item => item.mediaType === 'video');
   }, [cmsItems]);
 
   const currentItems = activeTab === 'photos' ? photos : videos;
@@ -84,12 +68,12 @@ export default function GalleryContent() {
       />
 
       <section className="py-20 text-brand-gray-dark bg-white">
-        <div className="container mx-auto px-4 md:px-6">
+        <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           {/* Photos vs Videos Tabs */}
           <div className="flex justify-center space-x-4 mb-8">
             <button
               onClick={() => { setActiveTab('photos'); setSelectedCategory('All'); }}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-full text-sm font-semibold shadow transition-all duration-300 focus:outline-none ${
+              className={`flex items-center space-x-2 px-6 py-3 rounded-full text-sm font-semibold shadow-xs transition-all duration-300 focus:outline-none cursor-pointer ${
                 activeTab === 'photos'
                   ? 'bg-brand-green text-white ring-2 ring-brand-green ring-offset-2'
                   : 'bg-brand-gray-light text-brand-gray-dark hover:bg-brand-gray-muted'
@@ -100,7 +84,7 @@ export default function GalleryContent() {
             </button>
             <button
               onClick={() => { setActiveTab('videos'); setSelectedCategory('All'); }}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-full text-sm font-semibold shadow transition-all duration-300 focus:outline-none ${
+              className={`flex items-center space-x-2 px-6 py-3 rounded-full text-sm font-semibold shadow-xs transition-all duration-300 focus:outline-none cursor-pointer ${
                 activeTab === 'videos'
                   ? 'bg-brand-green text-white ring-2 ring-brand-green ring-offset-2'
                   : 'bg-brand-gray-light text-brand-gray-dark hover:bg-brand-gray-muted'
@@ -118,7 +102,7 @@ export default function GalleryContent() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                     selectedCategory === cat
                       ? 'bg-[#006B4F] text-white shadow-xs'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -130,89 +114,130 @@ export default function GalleryContent() {
             </div>
           )}
 
-          <AnimatePresence mode="wait">
-            {activeTab === 'photos' ? (
-              <motion.div
-                key="photos-grid"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 15 }}
-                transition={{ duration: 0.3 }}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-              >
-                {filteredItems.map((photo) => {
-                  const mediaSrc = cmsApi.resolveMediaUrl(photo.mediaUrl);
-                  return (
-                    <div
-                      key={photo.id}
-                      className="relative bg-brand-gray-light rounded-xl overflow-hidden shadow-md aspect-[4/3] group cursor-pointer border border-brand-gray-muted"
-                      onClick={() => setLightboxItem(photo)}
-                    >
-                      <img
-                        src={mediaSrc}
-                        alt={photo.altText || photo.title}
-                        loading="lazy"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-brand-green-dark/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-4 text-center">
-                        <div className="p-3 bg-brand-yellow text-brand-green-dark rounded-full mb-3 transform scale-90 group-hover:scale-100 transition-transform">
-                          <ZoomIn className="w-5 h-5" />
+          {/* Loading State */}
+          {loading ? (
+            <div className="py-20 text-center">
+              <div className="w-10 h-10 border-3 border-brand-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <p className="text-xs text-brand-gray font-medium">Loading gallery media...</p>
+            </div>
+          ) : currentItems.length === 0 ? (
+            /* Empty State for current tab */
+            <div className="text-center py-20 border-2 border-dashed border-brand-gray-muted rounded-2xl bg-brand-gray-light max-w-2xl mx-auto">
+              {activeTab === 'photos' ? (
+                <Camera className="w-12 h-12 text-brand-gray mx-auto mb-4" />
+              ) : (
+                <Video className="w-12 h-12 text-brand-gray mx-auto mb-4" />
+              )}
+              <h3 className="text-lg font-bold text-brand-green-dark">
+                {activeTab === 'photos' ? 'No photos available yet.' : 'No videos available yet.'}
+              </h3>
+              <p className="text-sm text-brand-gray mt-1 max-w-sm mx-auto font-light">
+                {activeTab === 'photos'
+                  ? 'Check back soon for high-resolution operational photographs.'
+                  : 'Check back soon for video briefings and showcase recordings.'}
+              </p>
+            </div>
+          ) : filteredItems.length > 0 ? (
+            /* Photos / Videos Grid */
+            <AnimatePresence mode="wait">
+              {activeTab === 'photos' ? (
+                <motion.div
+                  key="photos-grid"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 15 }}
+                  transition={{ duration: 0.3 }}
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                  {filteredItems.map((photo) => {
+                    const mediaSrc = cmsApi.resolveMediaUrl(photo.mediaUrl);
+                    return (
+                      <div
+                        key={photo.id}
+                        className="relative bg-brand-gray-light rounded-xl overflow-hidden shadow-md aspect-[4/3] group cursor-pointer border border-brand-gray-muted"
+                        onClick={() => setLightboxItem(photo)}
+                      >
+                        <img
+                          src={mediaSrc}
+                          alt={photo.altText || photo.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-brand-green-dark/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-4 text-center">
+                          <div className="p-3 bg-brand-yellow text-brand-green-dark rounded-full mb-3 transform scale-90 group-hover:scale-100 transition-transform">
+                            <ZoomIn className="w-5 h-5" />
+                          </div>
+                          <h4 className="text-white font-bold text-sm drop-shadow">{photo.title}</h4>
+                          {photo.category && (
+                            <span className="text-[11px] text-brand-yellow font-medium mt-1">
+                              {photo.category}
+                            </span>
+                          )}
+                          {photo.location && (
+                            <div className="flex items-center space-x-1 text-[10.5px] text-gray-200 mt-1">
+                              <MapPin className="w-3 h-3 text-brand-yellow" />
+                              <span>{photo.location}</span>
+                            </div>
+                          )}
                         </div>
-                        <h4 className="text-white font-bold text-sm drop-shadow">{photo.title}</h4>
-                        {photo.category && (
-                          <span className="text-[11px] text-brand-yellow font-medium mt-1">
-                            {photo.category}
-                          </span>
-                        )}
-                        {photo.location && (
-                          <div className="flex items-center space-x-1 text-[10.5px] text-gray-200 mt-1">
-                            <MapPin className="w-3 h-3 text-brand-yellow" />
-                            <span>{photo.location}</span>
+                      </div>
+                    );
+                  })}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="videos-grid"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 15 }}
+                  transition={{ duration: 0.3 }}
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                  {filteredItems.map((video) => {
+                    const posterSrc = cmsApi.resolveMediaUrl(video.posterUrl) || cmsApi.resolveMediaUrl(video.mediaUrl);
+                    return (
+                      <div
+                        key={video.id}
+                        className="relative bg-brand-gray-light rounded-xl overflow-hidden shadow-md aspect-video group cursor-pointer border border-brand-gray-muted"
+                        onClick={() => setActiveVideo(video)}
+                      >
+                        {posterSrc ? (
+                          <img
+                            src={posterSrc}
+                            alt={video.title}
+                            loading="lazy"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-brand-green-dark/80 flex items-center justify-center">
+                            <Video className="w-10 h-10 text-white/50" />
                           </div>
                         )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="videos-grid"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 15 }}
-                transition={{ duration: 0.3 }}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-              >
-                {filteredItems.map((video) => {
-                  const posterSrc = cmsApi.resolveMediaUrl(video.posterUrl) || 'https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=800&q=80';
-                  return (
-                    <div
-                      key={video.id}
-                      className="relative bg-brand-gray-light rounded-xl overflow-hidden shadow-md aspect-video group cursor-pointer border border-brand-gray-muted"
-                      onClick={() => setActiveVideo(video)}
-                    >
-                      <img
-                        src={posterSrc}
-                        alt={video.title}
-                        loading="lazy"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-brand-green-dark/50 flex flex-col items-center justify-center p-4 text-center group-hover:bg-brand-green-dark/40 transition-colors">
-                        <div className="w-12 h-12 rounded-full bg-brand-yellow text-brand-green-dark flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform mb-3">
-                          <Play className="w-5 h-5 ml-1 fill-current" />
+                        <div className="absolute inset-0 bg-brand-green-dark/50 flex flex-col items-center justify-center p-4 text-center group-hover:bg-brand-green-dark/40 transition-colors">
+                          <div className="w-12 h-12 rounded-full bg-brand-yellow text-brand-green-dark flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform mb-3">
+                            <Play className="w-5 h-5 ml-1 fill-current" />
+                          </div>
+                          <h4 className="text-white font-bold text-sm drop-shadow">{video.title}</h4>
+                          {video.category && (
+                            <span className="text-[10.5px] text-brand-yellow mt-1">{video.category}</span>
+                          )}
                         </div>
-                        <h4 className="text-white font-bold text-sm drop-shadow">{video.title}</h4>
-                        {video.category && (
-                          <span className="text-[10.5px] text-brand-yellow mt-1">{video.category}</span>
-                        )}
                       </div>
-                    </div>
-                  );
-                })}
-              </motion.div>
-            )}
-          </AnimatePresence>
+                    );
+                  })}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          ) : (
+            /* Category Filter yielded no results */
+            <div className="text-center py-20 border-2 border-dashed border-brand-gray-muted rounded-2xl bg-brand-gray-light max-w-2xl mx-auto">
+              <Tag className="w-12 h-12 text-brand-gray mx-auto mb-4" />
+              <h3 className="text-lg font-bold text-brand-green-dark">No Matching Items Found</h3>
+              <p className="text-sm text-brand-gray mt-1 max-w-sm mx-auto font-light">
+                Try selecting a different category filter.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -228,7 +253,7 @@ export default function GalleryContent() {
             >
               <button
                 onClick={() => setLightboxItem(null)}
-                className="absolute top-4 right-4 p-2 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors z-10"
+                className="absolute top-4 right-4 p-2 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors z-10 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -286,7 +311,7 @@ export default function GalleryContent() {
             >
               <button
                 onClick={() => setActiveVideo(null)}
-                className="absolute top-4 right-4 p-2 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors z-20"
+                className="absolute top-4 right-4 p-2 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors z-20 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>

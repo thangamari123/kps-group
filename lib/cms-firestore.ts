@@ -47,10 +47,14 @@ export const galleryCms = {
     try {
       const colRef = collection(db, 'gallery');
       const constraints: QueryConstraint[] = [];
+      const currentUser = auth?.currentUser;
 
-      if (statusFilter && statusFilter !== 'all') {
+      if (!currentUser) {
+        constraints.push(where('status', '==', 'published'));
+      } else if (statusFilter && statusFilter !== 'all') {
         constraints.push(where('status', '==', statusFilter));
       }
+
       if (categoryFilter && categoryFilter !== 'all' && categoryFilter !== 'All') {
         constraints.push(where('category', '==', categoryFilter));
       }
@@ -83,6 +87,24 @@ export const galleryCms = {
 
   async getPublished(): Promise<GalleryItem[]> {
     return this.getAll('published');
+  },
+
+  async getById(id: string): Promise<GalleryItem | null> {
+    if (!id) return null;
+    try {
+      const docSnap = await getDoc(doc(db, 'gallery', id));
+      if (docSnap.exists()) {
+        const data = docSnap.data() as GalleryItem;
+        const currentUser = auth?.currentUser;
+        if (currentUser || data.status === 'published') {
+          return { id: docSnap.id, ...data } as GalleryItem;
+        }
+      }
+      return null;
+    } catch (err) {
+      console.error(`Error fetching gallery item ${id}:`, err);
+      return null;
+    }
   },
 
   async create(data: Omit<GalleryItem, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'>): Promise<string> {
@@ -151,10 +173,14 @@ export const blogsCms = {
     try {
       const colRef = collection(db, 'blogs');
       const constraints: QueryConstraint[] = [];
+      const currentUser = auth?.currentUser;
 
-      if (statusFilter && statusFilter !== 'all') {
+      if (!currentUser) {
+        constraints.push(where('status', '==', 'published'));
+      } else if (statusFilter && statusFilter !== 'all') {
         constraints.push(where('status', '==', statusFilter));
       }
+
       if (categoryFilter && categoryFilter !== 'all' && categoryFilter !== 'All') {
         constraints.push(where('category', '==', categoryFilter));
       }
@@ -190,11 +216,18 @@ export const blogsCms = {
   },
 
   async getBySlug(slug: string): Promise<BlogItem | null> {
+    if (!slug) return null;
+    const cleanSlug = slug.trim().toLowerCase();
     try {
       const colRef = collection(db, 'blogs');
-      const q = query(colRef, where('slug', '==', slug.trim()));
-      const snapshot = await getDocs(q);
+      const currentUser = auth?.currentUser;
 
+      let q = query(colRef, where('slug', '==', cleanSlug));
+      if (!currentUser) {
+        q = query(colRef, where('slug', '==', cleanSlug), where('status', '==', 'published'));
+      }
+
+      const snapshot = await getDocs(q);
       if (!snapshot.empty) {
         const docSnap = snapshot.docs[0];
         return { id: docSnap.id, ...docSnap.data() } as BlogItem;
@@ -203,21 +236,42 @@ export const blogsCms = {
       // Also allow direct lookup by document ID
       const directDoc = await getDoc(doc(db, 'blogs', slug));
       if (directDoc.exists()) {
-        return { id: directDoc.id, ...directDoc.data() } as BlogItem;
+        const data = directDoc.data() as BlogItem;
+        if (currentUser || data.status === 'published') {
+          return { id: directDoc.id, ...data } as BlogItem;
+        }
       }
 
       return null;
     } catch (err) {
       console.error(`Error finding blog with slug "${slug}":`, err);
+      try {
+        const qPub = query(collection(db, 'blogs'), where('status', '==', 'published'));
+        const snapPub = await getDocs(qPub);
+        const match = snapPub.docs.find((d) => {
+          const item = d.data();
+          return item.slug === cleanSlug || d.id === slug;
+        });
+        if (match) {
+          return { id: match.id, ...match.data() } as BlogItem;
+        }
+      } catch (fallbackErr) {
+        console.error('Fallback slug lookup also failed:', fallbackErr);
+      }
       return null;
     }
   },
 
   async getById(id: string): Promise<BlogItem | null> {
+    if (!id) return null;
     try {
       const docSnap = await getDoc(doc(db, 'blogs', id));
       if (docSnap.exists()) {
-        return { id: docSnap.id, ...docSnap.data() } as BlogItem;
+        const data = docSnap.data() as BlogItem;
+        const currentUser = auth?.currentUser;
+        if (currentUser || data.status === 'published') {
+          return { id: docSnap.id, ...data } as BlogItem;
+        }
       }
       return null;
     } catch (err) {
@@ -231,13 +285,33 @@ export const blogsCms = {
     const docRef = doc(colRef);
     const auditUser = getCurrentAuditUser();
 
+    // Clean slug
+    let cleanSlug = (data.slug || data.title || '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '');
+    if (!cleanSlug) cleanSlug = `blog-${Date.now()}`;
+
+    // Ensure slug uniqueness where possible
+    try {
+      const existingSnap = await getDocs(query(colRef, where('slug', '==', cleanSlug)));
+      if (!existingSnap.empty) {
+        cleanSlug = `${cleanSlug}-${Date.now().toString(36).slice(-4)}`;
+      }
+    } catch {
+      // Non-fatal if index query not available
+    }
+
     await setDoc(
       docRef,
       sanitizeFirestorePayload({
         ...data,
+        slug: cleanSlug,
         sortOrder: Number(data.sortOrder) || 0,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
+        publishedAt: data.publishedAt || (data.status === 'published' ? new Date().toISOString() : null),
         createdBy: auditUser,
         updatedBy: auditUser,
       })
@@ -247,11 +321,32 @@ export const blogsCms = {
   },
 
   async update(id: string, data: Partial<BlogItem>): Promise<void> {
+    if (!id || typeof id !== 'string') {
+      throw new Error('Invalid blog ID. Cannot update blog without a document ID.');
+    }
     const docRef = doc(db, 'blogs', id);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      throw new Error(`This blog post (ID: ${id}) no longer exists in Firestore. Please refresh the list.`);
+    }
+
     const auditUser = getCurrentAuditUser();
+
+    let cleanSlug = data.slug;
+    if (cleanSlug !== undefined) {
+      cleanSlug = cleanSlug
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+      if (!cleanSlug && data.title) {
+        cleanSlug = data.title.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+      }
+    }
 
     const cleanData: any = {
       ...data,
+      ...(cleanSlug !== undefined ? { slug: cleanSlug } : {}),
       updatedAt: serverTimestamp(),
       updatedBy: auditUser,
     };
@@ -264,6 +359,9 @@ export const blogsCms = {
   },
 
   async delete(id: string): Promise<void> {
+    if (!id || typeof id !== 'string') {
+      throw new Error('Invalid blog ID. Cannot delete blog without a document ID.');
+    }
     const docRef = doc(db, 'blogs', id);
     await deleteDoc(docRef);
   },

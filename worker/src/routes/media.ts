@@ -236,6 +236,10 @@ export async function handleGetPublicMedia(request: Request, env: Env, rawKey: s
     }
 
     const key = decodeURIComponent(rawKey.trim().replace(/^\/+/, ''));
+    if (key.startsWith('resumes/') || key.startsWith('resumes_dev/') || key.startsWith('private/')) {
+      return errorResponse('Forbidden: Private asset', 403, request, allowedOrigins);
+    }
+
     const bucket = env.MEDIA_BUCKET || env.RESUMES_BUCKET;
     if (!bucket) {
       return errorResponse('Storage bucket is unavailable', 500, request, allowedOrigins);

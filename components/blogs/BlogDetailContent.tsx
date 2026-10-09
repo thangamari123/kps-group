@@ -1,88 +1,91 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { Calendar, ChevronLeft, User, Folder, Tag, Share2, Sparkles, ArrowRight } from 'lucide-react';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { Calendar, ChevronLeft, User, Folder, Tag, ArrowRight, AlertCircle } from 'lucide-react';
 import PageHero from '@/components/common/PageHero';
 import { blogsCms } from '@/lib/cms-firestore';
 import { cmsApi } from '@/lib/cms-api';
 
 interface BlogDetailProps {
-  blogId: string;
+  blogId?: string;
 }
 
 export default function BlogDetailContent({ blogId }: BlogDetailProps) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [article, setArticle] = useState<any>(null);
   const [relatedBlogs, setRelatedBlogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fallback data if viewing template or offline
-  const fallbackArticles: Record<string, any> = {
-    'template-customs-rules': {
-      title: "Upcoming Customs Regulations Update",
-      category: "Customs Brokerage",
-      author: "KPS Compliance Desk",
-      publishedAt: { toDate: () => new Date('2026-08-26') },
-      featuredImageUrl: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80",
-      excerpt: "Future regulatory updates, HSN modifications, and custom compliance rules in India.",
-      content: `The logistics infrastructure in India continues to adapt to newer digital tracking standards, customs ICEGATE portal updates, and BS6 freight mandates.
+  // Determine effective slug from search params, props, or pathname
+  const effectiveSlug = useMemo(() => {
+    // 1. Query parameters: ?slug=..., ?id=..., ?blog=...
+    const q = searchParams?.get('slug') || searchParams?.get('id') || searchParams?.get('blog');
+    if (q && q.trim() && q.trim() !== 'view' && q.trim() !== 'default') return q.trim();
 
-### Key Highlights for 2026
-1. **ICEGATE Direct API Connectivity**: Real-time declaration syncing reduces documentation turnover from 24 hours to 90 minutes.
-2. **Standardized HSN Classification**: Updated Harmonized System tariff codes for high-tech and renewable energy components.
-3. **Green Corridor Clearance**: Expedited routing for bonded FTWZ cargo transiting to major ports.
+    // 2. Props if passed
+    if (blogId && blogId.trim() && blogId.trim() !== 'view' && blogId.trim() !== 'default') return blogId.trim();
 
-K.P.S updates this news archive periodically to keep our logistics partners and clients aware of trade developments.`,
-      tags: ["Customs", "Compliance", "Tariffs"]
-    },
-    'template-fleet-logistics': {
-      title: "Operational Logistics & Transit Innovations",
-      category: "Logistics",
-      author: "Fleet Operations Team",
-      publishedAt: { toDate: () => new Date('2026-08-20') },
-      featuredImageUrl: "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1200&q=80",
-      excerpt: "National transit networks, BS6 fleet updates, and tracking technology in India.",
-      content: `National multimodal freight operations in India have achieved unprecedented reliability through GPS telemetry integration and optimized route scheduling.
-
-### Fleet Modernization Focus
-- Full transition of prime movers to BS6 emission compliance.
-- 24/7 temperature-controlled reefers for pharmaceuticals and perishable shipments.
-- Direct connectivity between Free Trade Warehousing Zones and key container depots.`,
-      tags: ["Fleet", "BS6", "Operations"]
+    // 3. Pathname segments (e.g. /blogs/customs-update on Cloudflare Pages)
+    if (pathname) {
+      const parts = pathname.split('/').filter(Boolean);
+      if (parts.length >= 2 && (parts[0] === 'blogs' || parts[0] === 'blog') && parts[1] !== 'view' && parts[1] !== 'default') {
+        return decodeURIComponent(parts[1].trim());
+      }
     }
-  };
+
+    // 4. Browser window location fallback
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlSlug = urlParams.get('slug') || urlParams.get('id') || urlParams.get('blog');
+      if (urlSlug && urlSlug.trim() && urlSlug.trim() !== 'view' && urlSlug.trim() !== 'default') {
+        return urlSlug.trim();
+      }
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      if (parts.length >= 2 && (parts[0] === 'blogs' || parts[0] === 'blog') && parts[1] !== 'view' && parts[1] !== 'default') {
+        return decodeURIComponent(parts[1].trim());
+      }
+    }
+
+    return '';
+  }, [blogId, pathname, searchParams]);
 
   useEffect(() => {
     let isMounted = true;
     async function fetchArticle() {
+      if (!effectiveSlug) {
+        setArticle(null);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
       try {
-        // Try get by slug first
-        let found = await blogsCms.getBySlug(blogId);
+        let found = await blogsCms.getBySlug(effectiveSlug);
         if (!found) {
-          found = await blogsCms.getById(blogId);
+          found = await blogsCms.getById(effectiveSlug);
         }
 
         if (isMounted) {
           if (found) {
             setArticle(found);
-          } else if (fallbackArticles[blogId]) {
-            setArticle(fallbackArticles[blogId]);
+            // Fetch related published blogs
+            const published = await blogsCms.getPublished();
+            if (isMounted && published) {
+              setRelatedBlogs(published.filter((b) => b.slug !== effectiveSlug && b.id !== effectiveSlug).slice(0, 3));
+            }
           } else {
-            // Default fallback
-            setArticle(fallbackArticles['template-customs-rules']);
-          }
-
-          // Fetch related
-          const published = await blogsCms.getPublished();
-          if (isMounted && published) {
-            setRelatedBlogs(published.filter(b => b.slug !== blogId && b.id !== blogId).slice(0, 3));
+            setArticle(null);
           }
           setLoading(false);
         }
       } catch (err) {
         console.error('Failed to load article detail:', err);
         if (isMounted) {
-          setArticle(fallbackArticles[blogId] || fallbackArticles['template-customs-rules']);
+          setArticle(null);
           setLoading(false);
         }
       }
@@ -90,34 +93,67 @@ K.P.S updates this news archive periodically to keep our logistics partners and 
 
     fetchArticle();
     return () => { isMounted = false; };
-  }, [blogId]);
+  }, [effectiveSlug]);
 
   const formatDate = (dateVal: any) => {
     if (!dateVal) return 'Recent';
-    if (typeof dateVal === 'string') return dateVal;
-    if (dateVal.toDate) {
-      return dateVal.toDate().toLocaleDateString('en-US', {
+    try {
+      if (typeof dateVal === 'string') return new Date(dateVal).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      if (typeof dateVal.toDate === 'function') {
+        return dateVal.toDate().toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+        });
+      }
+      if (dateVal.seconds) {
+        return new Date(dateVal.seconds * 1000).toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+        });
+      }
+      return new Date(dateVal).toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric'
       });
+    } catch {
+      return 'Recent';
     }
-    return new Date(dateVal).toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric'
-    });
   };
 
-  if (!article) {
+  if (loading) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center bg-white">
+      <div className="min-h-[50vh] flex flex-col items-center justify-center bg-white space-y-3">
         <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs text-brand-gray font-medium">Loading article details...</p>
       </div>
     );
   }
 
-  const heroImage = cmsApi.resolveMediaUrl(article.featuredImageUrl) || 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80';
+  if (!article) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center bg-white px-4 text-center py-20">
+        <div className="p-4 bg-amber-50 rounded-full mb-4">
+          <AlertCircle className="w-10 h-10 text-[#D97706]" />
+        </div>
+        <h2 className="text-xl font-bold text-brand-green-dark mb-2">Article Not Found</h2>
+        <p className="text-xs text-brand-gray max-w-md mb-6 leading-relaxed">
+          The requested blog post could not be found or has not been published yet.
+        </p>
+        <Link
+          href="/blogs"
+          className="inline-flex items-center space-x-2 bg-brand-green hover:bg-brand-green-dark text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-xs transition-all"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          <span>Return to All Updates</span>
+        </Link>
+      </div>
+    );
+  }
+
+  const heroImage = cmsApi.resolveMediaUrl(article.featuredImageUrl || article.featuredImageKey || article.mediaUrl) || 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80';
 
   return (
     <div className="bg-white">
@@ -199,11 +235,11 @@ K.P.S updates this news archive periodically to keep our logistics partners and 
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {relatedBlogs.map((rel) => {
-                    const relImg = cmsApi.resolveMediaUrl(rel.featuredImageUrl) || 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80';
+                    const relImg = cmsApi.resolveMediaUrl(rel.featuredImageUrl || rel.featuredImageKey || rel.mediaUrl) || 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=600&q=80';
                     return (
                       <Link
                         key={rel.id}
-                        href={`/blogs/${rel.slug || rel.id}`}
+                        href={`/blogs/view?slug=${encodeURIComponent(rel.slug || rel.id)}`}
                         className="group bg-[#fafcfb] border border-gray-200 hover:border-emerald-500 rounded-xl overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
                       >
                         <div className="aspect-[16/9] overflow-hidden bg-gray-100">

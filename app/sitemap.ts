@@ -30,8 +30,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/corporate/gallery',
     '/privacy-policy',
     '/blogs',
-    '/blogs/template-customs-rules',
-    '/blogs/template-fleet-logistics',
     '/career',
     '/testimonial',
     '/contact-us',

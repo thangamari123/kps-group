@@ -144,10 +144,41 @@ export default function AdminBlogsPage() {
     setEditorOpen(true);
   };
 
+  const formatDisplayDate = (d: any) => {
+    if (!d) return '—';
+    try {
+      if (typeof d === 'string') return new Date(d).toLocaleDateString();
+      if (typeof d.toDate === 'function') return d.toDate().toLocaleDateString();
+      if (d.seconds) return new Date(d.seconds * 1000).toLocaleDateString();
+      if (d instanceof Date) return d.toLocaleDateString();
+      return new Date(d).toLocaleDateString();
+    } catch {
+      return '—';
+    }
+  };
+
   const handleOpenEdit = (blog: BlogItem) => {
     setEditingBlog(blog);
     setOldImageKey(null);
     setSlugManuallyEdited(true);
+
+    let dateStr = new Date().toISOString().split('T')[0];
+    if (blog.publishedAt) {
+      try {
+        if (typeof blog.publishedAt === 'string') {
+          dateStr = blog.publishedAt.split('T')[0];
+        } else if (typeof blog.publishedAt.toDate === 'function') {
+          dateStr = blog.publishedAt.toDate().toISOString().split('T')[0];
+        } else if (blog.publishedAt.seconds) {
+          dateStr = new Date(blog.publishedAt.seconds * 1000).toISOString().split('T')[0];
+        } else if (blog.publishedAt instanceof Date) {
+          dateStr = blog.publishedAt.toISOString().split('T')[0];
+        }
+      } catch {
+        dateStr = new Date().toISOString().split('T')[0];
+      }
+    }
+
     setFormData({
       title: blog.title || '',
       slug: blog.slug || '',
@@ -159,7 +190,7 @@ export default function AdminBlogsPage() {
       tags: Array.isArray(blog.tags) ? blog.tags : [],
       author: blog.author || 'KPS Editorial Team',
       status: blog.status || 'published',
-      publishedAt: blog.publishedAt ? new Date(blog.publishedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      publishedAt: dateStr,
       seoTitle: blog.seoTitle || '',
       seoDescription: blog.seoDescription || '',
       canonicalUrl: blog.canonicalUrl || '',
@@ -193,6 +224,8 @@ export default function AdminBlogsPage() {
     try {
       if (editingBlog?.featuredImageKey && !oldImageKey) {
         setOldImageKey(editingBlog.featuredImageKey);
+      } else if (formData.featuredImageKey && !oldImageKey) {
+        setOldImageKey(formData.featuredImageKey);
       }
 
       const result = await cmsApi.uploadMedia(file, 'blogs/images', (percent) => {
@@ -212,6 +245,17 @@ export default function AdminBlogsPage() {
     } finally {
       setUploadingImage(false);
     }
+  };
+
+  const handleRemoveImage = () => {
+    if (formData.featuredImageKey && !oldImageKey) {
+      setOldImageKey(formData.featuredImageKey);
+    }
+    setFormData((prev) => ({
+      ...prev,
+      featuredImageUrl: '',
+      featuredImageKey: '',
+    }));
   };
 
   const handleAddTag = (e: React.KeyboardEvent) => {
@@ -256,18 +300,39 @@ export default function AdminBlogsPage() {
       return;
     }
 
+    let cleanSlug = formData.slug
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)+/g, '');
+    if (!cleanSlug) {
+      cleanSlug = formData.title
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)+/g, '');
+    }
+    if (!cleanSlug) {
+      cleanSlug = `blog-${Date.now()}`;
+    }
+
+    const payload = {
+      ...formData,
+      slug: cleanSlug,
+    };
+
     setSaving(true);
     try {
       if (editingBlog) {
-        await blogsCms.update(editingBlog.id, formData);
+        await blogsCms.update(editingBlog.id, payload);
         toastSuccess('Blog post updated successfully.');
 
         // Clean up old R2 image if replaced
-        if (oldImageKey && oldImageKey !== formData.featuredImageKey) {
+        if (oldImageKey && oldImageKey !== payload.featuredImageKey) {
           cmsApi.deleteMedia(oldImageKey).catch(() => {});
         }
       } else {
-        await blogsCms.create(formData);
+        await blogsCms.create(payload);
         toastSuccess('Blog post published / created successfully.');
       }
 
@@ -517,7 +582,7 @@ export default function AdminBlogsPage() {
                     <td className="px-4 py-4 text-[#66736E]">
                       <div className="flex items-center space-x-1">
                         <Calendar className="w-3.5 h-3.5 text-[#66736E]" />
-                        <span>{blog.publishedAt ? new Date(blog.publishedAt).toLocaleDateString() : '—'}</span>
+                        <span>{formatDisplayDate(blog.publishedAt)}</span>
                       </div>
                     </td>
 
@@ -526,7 +591,7 @@ export default function AdminBlogsPage() {
                       <div className="flex items-center justify-end space-x-1.5">
                         {blog.status === 'published' && (
                           <Link
-                            href={`/blogs/${blog.slug}`}
+                            href={`/blogs/view?slug=${encodeURIComponent(blog.slug || blog.id)}`}
                             target="_blank"
                             className="p-1.5 rounded-lg text-[#66736E] hover:text-[#006B4F] hover:bg-[#EAF5F1] transition-colors"
                             title="View public blog"
@@ -712,17 +777,29 @@ export default function AdminBlogsPage() {
                     )}
 
                     <div className="flex-1 space-y-2">
-                      <label className="inline-flex items-center space-x-2 px-4 py-2.5 bg-white border border-[#E2E9E5] hover:bg-[#F7F9F8] text-[#17211E] font-semibold rounded-xl text-xs cursor-pointer transition-colors shadow-2xs">
-                        <Upload className="w-4 h-4 text-[#006B4F]" />
-                        <span>{formData.featuredImageUrl ? 'Replace Featured Image' : 'Upload Featured Image to R2'}</span>
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp,image/avif"
-                          onChange={handleImageUpload}
-                          disabled={uploadingImage}
-                          className="hidden"
-                        />
-                      </label>
+                      <div className="flex items-center flex-wrap gap-2">
+                        <label className="inline-flex items-center space-x-2 px-4 py-2.5 bg-white border border-[#E2E9E5] hover:bg-[#F7F9F8] text-[#17211E] font-semibold rounded-xl text-xs cursor-pointer transition-colors shadow-2xs">
+                          <Upload className="w-4 h-4 text-[#006B4F]" />
+                          <span>{formData.featuredImageUrl ? 'Replace Featured Image' : 'Upload Featured Image to R2'}</span>
+                          <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp,image/avif"
+                            onChange={handleImageUpload}
+                            disabled={uploadingImage}
+                            className="hidden"
+                          />
+                        </label>
+                        {formData.featuredImageUrl && (
+                          <button
+                            type="button"
+                            onClick={handleRemoveImage}
+                            className="inline-flex items-center space-x-1.5 px-3 py-2.5 bg-white border border-[#E2E9E5] hover:bg-red-50 text-red-600 font-semibold rounded-xl text-xs cursor-pointer transition-colors shadow-2xs"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Remove Image</span>
+                          </button>
+                        )}
+                      </div>
                       <p className="text-[10px] text-[#66736E]">
                         High resolution landscape image recommended (1200 x 630px, max 20MB).
                       </p>

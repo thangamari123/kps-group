@@ -22,8 +22,6 @@ import {
   Activity,
   Camera,
   BookOpen,
-  HeartHandshake,
-  Trophy,
 } from 'lucide-react';
 import DeleteConfirmModal from './DeleteConfirmModal';
 
@@ -92,8 +90,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       items: [
         { name: 'Gallery', href: '/admin/gallery', icon: Camera },
         { name: 'Blogs', href: '/admin/blogs', icon: BookOpen },
-        { name: 'CSR', href: '/admin/csr', icon: HeartHandshake },
-        { name: 'Awards', href: '/admin/awards', icon: Trophy },
       ],
     },
     {
@@ -114,8 +110,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (pathname === '/admin') return { title: 'Dashboard Overview', section: 'Overview' };
     if (pathname.startsWith('/admin/gallery')) return { title: 'Gallery Management', section: 'Content' };
     if (pathname.startsWith('/admin/blogs')) return { title: 'Blog Management', section: 'Content' };
-    if (pathname.startsWith('/admin/csr')) return { title: 'CSR Management', section: 'Content' };
-    if (pathname.startsWith('/admin/awards')) return { title: 'Awards Management', section: 'Content' };
     if (pathname.startsWith('/admin/careers/jobs/new')) return { title: 'Create Job Post', section: 'Careers' };
     if (pathname.startsWith('/admin/careers/jobs/')) return { title: 'Edit Job Post', section: 'Careers' };
     if (pathname.startsWith('/admin/careers/jobs')) return { title: 'Job Postings', section: 'Careers' };

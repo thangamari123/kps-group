@@ -21,8 +21,6 @@ import {
   CheckCircle2,
   Camera,
   BookOpen,
-  HeartHandshake,
-  Trophy,
   ExternalLink,
   ShieldCheck,
   FileText,
@@ -127,7 +125,7 @@ export default function AdminDashboardPage() {
     },
     {
       title: 'Live CMS Sections',
-      mainCount: cmsStats.publishedGalleryCount + cmsStats.publishedBlogsCount + cmsStats.publishedCsrCount + cmsStats.publishedAwardsCount,
+      mainCount: cmsStats.publishedGalleryCount + cmsStats.publishedBlogsCount,
       subCount: 'Published Across Site',
       icon: CheckCircle2,
       badgeColor: 'bg-[#EAF5F1] text-[#006B4F] border-[#006B4F]/20 font-bold',
@@ -154,24 +152,6 @@ export default function AdminDashboardPage() {
       badgeColor: 'bg-blue-50 text-[#2563EB] border-blue-200',
       href: '/admin/blogs',
       meta: 'News & Insights',
-    },
-    {
-      title: 'CSR Initiatives',
-      mainCount: cmsStats.csrCount,
-      subCount: `${cmsStats.publishedCsrCount} Published`,
-      icon: HeartHandshake,
-      badgeColor: 'bg-purple-50 text-[#7C3AED] border-purple-200',
-      href: '/admin/csr',
-      meta: 'Community Impact',
-    },
-    {
-      title: 'Awards & Honors',
-      mainCount: cmsStats.awardsCount,
-      subCount: `${cmsStats.publishedAwardsCount} Published`,
-      icon: Trophy,
-      badgeColor: 'bg-amber-50 text-[#D97706] border-amber-200',
-      href: '/admin/awards',
-      meta: 'Industry Accolades',
     },
   ];
 
@@ -278,7 +258,7 @@ export default function AdminDashboardPage() {
             Live CMS Active
           </span>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {cmsCards.map((card) => {
             const Icon = card.icon;
             return (
