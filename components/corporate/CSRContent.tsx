@@ -62,7 +62,7 @@ export default function CSRContent() {
               Social Impact & Sustainability
             </span>
             <p className="text-xl md:text-2xl font-semibold text-brand-green-dark leading-relaxed">
-              At K.P.S, we are committed to making a positive impact through our CSR programs that focus on sustainability, community engagement, and responsible business practices.
+              At KPS, we are committed to making a positive impact through our CSR programs that focus on sustainability, community engagement, and responsible business practices.
             </p>
           </div>
         </div>
@@ -110,7 +110,7 @@ export default function CSRContent() {
                         </div>
                       )}
 
-                      <div className="whitespace-pre-line text-sm text-brand-gray leading-relaxed font-light space-y-4">
+                      <div className="whitespace-pre-line text-[15px] sm:text-base text-[#374151] leading-[1.75] font-normal space-y-4">
                         {section.content}
                       </div>
 
@@ -138,32 +138,32 @@ export default function CSRContent() {
                     <h3 className="text-2xl md:text-3xl font-extrabold text-brand-green-dark">
                       Lunch Sponsorship at GOS Bala Vihar, Kilpauk
                     </h3>
-                    <p className="text-sm text-brand-gray leading-relaxed font-light">
-                      As part of our commitment to responsible corporate citizenship, K.P.S sponsored lunch for 50 children at GOS Bala Vihar, Kilpauk. This initiative reflects our deep-rooted belief in giving back to the community and supporting those who need it most.
+                    <p className="text-[15px] sm:text-base text-[#374151] leading-[1.75] font-normal">
+                      As part of our commitment to responsible corporate citizenship, KPS sponsored lunch for <strong className="font-semibold text-brand-green-dark">50 children</strong> at <strong className="font-semibold text-brand-green-dark">GOS Bala Vihar, Kilpauk</strong>. This initiative reflects our deep-rooted belief in giving back to the community and supporting those who need it most.
                     </p>
                   </div>
 
                   <div className="space-y-4 pt-4">
                     <h4 className="text-xl font-bold text-brand-green-dark">
-                      K.P.S's Role in the Community
+                      KPS's Role in the Community
                     </h4>
-                    <p className="text-sm text-brand-gray leading-relaxed font-light">
-                      At K.P.S, our core values extend beyond business. We strongly believe in sustainable and inclusive growth, and through our CSR initiatives, we aim to uplift communities and bring positive change. Our association with GOS Bala Vihar is one such meaningful step in that direction.
+                    <p className="text-[14.5px] sm:text-[15.5px] text-[#4b5563] leading-[1.72] font-normal">
+                      At KPS, our core values extend beyond business. We strongly believe in <strong className="font-semibold text-brand-green-dark">sustainable and inclusive growth</strong>, and through our CSR initiatives, we aim to uplift communities and bring positive change. Our association with GOS Bala Vihar is one such meaningful step in that direction.
                     </p>
-                    <p className="text-sm text-brand-gray leading-relaxed font-light">
+                    <p className="text-[14.5px] sm:text-[15.5px] text-[#4b5563] leading-[1.72] font-normal">
                       Providing nutritious meals may seem simple, but for these children, it was a moment of warmth, care, and joy. Our team was humbled by the smiles and gratitude shared by the children and staff during this special lunch.
                     </p>
                   </div>
 
                   <blockquote className="border-l-4 border-brand-yellow bg-brand-gray-light p-6 rounded-r-xl italic text-gray-700 font-medium text-lg leading-relaxed">
-                    &ldquo;We view CSR not just as a responsibility but as a core part of our identity. From education and healthcare to social welfare and empowerment, K.P.S is committed to making a lasting difference.&rdquo;
+                    &ldquo;We view CSR not just as a responsibility but as a core part of our identity. From education and healthcare to social welfare and empowerment, KPS is committed to making a lasting difference.&rdquo;
                   </blockquote>
 
                   <div className="space-y-4 pt-4">
                     <h4 className="text-xl font-bold text-brand-green-dark">
                       Looking Ahead
                     </h4>
-                    <p className="text-sm text-brand-gray leading-relaxed font-light">
+                    <p className="text-[14.5px] sm:text-[15.5px] text-[#4b5563] leading-[1.72] font-normal">
                       This sponsorship is just one of the many initiatives under our CSR framework. We will continue to engage in impactful activities that strengthen our bond with the society we serve.
                     </p>
                   </div>
@@ -214,7 +214,7 @@ export default function CSRContent() {
               <div className="bg-gradient-to-br from-[#004D3A] to-[#006B4F] text-white rounded-2xl p-6 text-center space-y-3 shadow-md">
                 <span className="text-xs font-bold text-brand-yellow uppercase tracking-wider">Join Hands</span>
                 <h4 className="text-base font-extrabold text-white">Partner With Our Initiatives</h4>
-                <p className="text-xs text-gray-200 leading-relaxed font-light">
+                <p className="text-xs sm:text-[13px] text-gray-100 leading-relaxed font-normal">
                   Interested in collaborating with our community outreach programs? Connect with our team today.
                 </p>
                 <a

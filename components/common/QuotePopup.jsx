@@ -81,10 +81,10 @@ export default function QuotePopup() {
               <button
                 type="button"
                 onClick={closeModal}
-                className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 p-1 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors z-20 cursor-pointer"
+                className="absolute top-2 right-2 sm:top-2.5 sm:right-2.5 p-1 rounded-full text-gray-400 hover:text-[#073B2C] hover:bg-[#ffc107] active:bg-[#e0a800] transition-colors duration-200 z-20 cursor-pointer"
                 aria-label="Close Quote Popup"
               >
-                <X className="w-4 h-4 text-gray-500 hover:text-gray-800" />
+                <X className="w-4 h-4" />
               </button>
 
               {/* Scrollable Container */}

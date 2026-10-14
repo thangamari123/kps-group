@@ -29,7 +29,7 @@ export default function CareersPage() {
                 Work With Us
               </span>
               <h2 className="text-3xl font-bold tracking-tight leading-snug text-brand-green-dark">
-                Join K.P.S Family Logistics
+                Join KPS Family Logistics
               </h2>
               <p className="text-base text-brand-gray leading-relaxed">
                 {companyDetails.careers.intro}

@@ -28,7 +28,7 @@ export default function AeoFaqSection({ faqs = [], serviceTitle = "" }) {
           <h3 className="text-2xl sm:text-3xl font-extrabold text-brand-green-dark tracking-tight">
             Frequently Asked Questions
           </h3>
-          <p className="text-xs sm:text-sm text-brand-gray mt-1 max-w-2xl font-light">
+          <p className="text-sm sm:text-[15px] text-[#4b5563] mt-1 max-w-2xl font-normal leading-relaxed">
             Direct, authoritative answers regarding {serviceTitle.toLowerCase() || "this service"}, structured for fast retrieval and enterprise evaluation.
           </p>
         </div>
@@ -82,7 +82,7 @@ export default function AeoFaqSection({ faqs = [], serviceTitle = "" }) {
                     <div className="p-4 sm:p-5 pt-1 sm:pt-2 border-t border-[#e9ecef]/60 text-xs sm:text-sm text-brand-gray-dark leading-relaxed">
                       <div className="bg-[#f8f9fa] rounded-xl p-4 border border-brand-gray-muted/60 relative">
                         <div className="flex items-start justify-between gap-3">
-                          <p className="font-normal text-brand-green-dark leading-relaxed text-xs sm:text-sm pr-6">
+                          <p className="font-normal text-[#1e293b] leading-relaxed text-[13.5px] sm:text-[15px] pr-6">
                             {faq.answer}
                           </p>
                           <button

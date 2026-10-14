@@ -17,7 +17,7 @@ export default function CookiePolicyPage() {
 
       <section className="py-20 text-brand-gray-dark bg-white">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-4xl mx-auto bg-brand-gray-light border border-brand-gray-muted rounded-xl p-8 md:p-12 shadow-sm space-y-6 font-light text-sm text-brand-gray leading-relaxed">
+          <div className="max-w-4xl mx-auto bg-brand-gray-light border border-brand-gray-muted rounded-xl p-8 md:p-12 shadow-sm space-y-6 font-normal text-[15px] sm:text-base text-[#374151] leading-[1.75]">
             
             <h3 className="text-lg font-bold text-brand-green-dark uppercase tracking-wider border-b border-brand-gray-muted pb-2">
               1. What are Cookies?

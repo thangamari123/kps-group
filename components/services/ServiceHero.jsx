@@ -70,7 +70,7 @@ export default function ServiceHero({
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.05 }}
-              className="text-gray-200 text-xs sm:text-sm md:text-base max-w-3xl font-light leading-relaxed"
+              className="text-gray-100 text-[14.5px] sm:text-base max-w-3xl font-normal leading-relaxed"
             >
               {service.shortDesc || service.description}
             </motion.p>
@@ -113,7 +113,7 @@ export default function ServiceHero({
                 <div className="text-[10px] sm:text-xs font-bold text-white mt-1 leading-tight">
                   {stat.label}
                 </div>
-                <div className="text-[9px] sm:text-[10px] text-gray-300 font-light mt-0.5 truncate">
+                <div className="text-[9.5px] sm:text-[10.5px] text-gray-200 font-normal mt-0.5 truncate">
                   {stat.sub}
                 </div>
               </div>

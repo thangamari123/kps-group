@@ -52,7 +52,7 @@ export default function Footer() {
               </div>
             </Link>
             
-            <p className="text-gray-300 text-xs sm:text-sm leading-relaxed max-w-sm font-light">
+            <p className="text-gray-200 text-xs sm:text-sm leading-relaxed max-w-sm font-normal">
               <strong className="text-white font-semibold block mb-0.5">Global Supply Chains. Engineered to Scale.</strong>
               Your premier partner for containerized freight, global break bulk, RoRo operations, and complex over dimensional cargo.
             </p>
@@ -63,7 +63,7 @@ export default function Footer() {
                 href={companyDetails.social.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-brand-green border border-brand-green-light flex items-center justify-center text-gray-300 hover:text-brand-yellow hover:bg-white transition-all duration-200 shadow-2xs"
+                className="w-8 h-8 rounded-full bg-brand-green border border-brand-green-light flex items-center justify-center text-white hover:text-[#073B2C] hover:bg-[#ffc107] hover:border-[#ffc107] active:bg-[#e0a800] active:text-[#073B2C] transition-all duration-200 shadow-2xs focus-visible:ring-2 focus-visible:ring-[#ffc107]"
                 aria-label="Facebook"
               >
                 <Facebook className="w-3.5 h-3.5" />
@@ -72,7 +72,7 @@ export default function Footer() {
                 href={companyDetails.social.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-brand-green border border-brand-green-light flex items-center justify-center text-gray-300 hover:text-brand-yellow hover:bg-white transition-all duration-200 shadow-2xs"
+                className="w-8 h-8 rounded-full bg-brand-green border border-brand-green-light flex items-center justify-center text-white hover:text-[#073B2C] hover:bg-[#ffc107] hover:border-[#ffc107] active:bg-[#e0a800] active:text-[#073B2C] transition-all duration-200 shadow-2xs focus-visible:ring-2 focus-visible:ring-[#ffc107]"
                 aria-label="Instagram"
               >
                 <Instagram className="w-3.5 h-3.5" />
@@ -81,7 +81,7 @@ export default function Footer() {
                 href={companyDetails.social.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full bg-brand-green border border-brand-green-light flex items-center justify-center text-gray-300 hover:text-brand-yellow hover:bg-white transition-all duration-200 shadow-2xs"
+                className="w-8 h-8 rounded-full bg-brand-green border border-brand-green-light flex items-center justify-center text-white hover:text-[#073B2C] hover:bg-[#ffc107] hover:border-[#ffc107] active:bg-[#e0a800] active:text-[#073B2C] transition-all duration-200 shadow-2xs focus-visible:ring-2 focus-visible:ring-[#ffc107]"
                 aria-label="LinkedIn"
               >
                 <Linkedin className="w-3.5 h-3.5" />
@@ -190,7 +190,7 @@ export default function Footer() {
                 </li>
                 <li className="flex items-start space-x-2.5">
                   <MapPin className="w-4 h-4 text-brand-yellow flex-shrink-0 mt-0.5" />
-                  <p className="text-gray-300 leading-relaxed text-xs">
+                  <p className="text-gray-200 leading-relaxed text-xs font-normal">
                     No:14, 6th Floor, A.K. Nayak Bhavan<br />
                     Jahangir Street, Second Line Beach, Parrys,<br />
                     Chennai - 600 001,<br />

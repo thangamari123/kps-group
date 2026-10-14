@@ -16,7 +16,9 @@ export const metadata: Metadata = {
   title: 'KPS Worldwide Logistics Pvt. Ltd. | Global Supply Chains. Engineered to Scale.',
   description: 'KPS Worldwide Logistics Pvt. Ltd. is a premier logistics and freight forwarding company in Chennai, India, providing containerized cargo (FCL/LCL), project cargo, break bulk, RoRo, ODC heavy transport, licensed customs brokerage, and industrial warehousing.',
   icons: {
-    icon: '/favicon.svg',
+    icon: '/images/kpslogo-tab.webp',
+    shortcut: '/images/kpslogo-tab.webp',
+    apple: '/images/kpslogo-tab.webp',
   },
 };
 
@@ -26,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" className={inter.variable} data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className="font-sans min-h-screen flex flex-col overflow-x-hidden bg-white text-[#212529]" suppressHydrationWarning>
         <Header />
         <main className="flex-grow">

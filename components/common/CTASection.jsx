@@ -52,7 +52,7 @@ export default function CTASection() {
               </h2>
 
               {/* Description */}
-              <p className="text-[11px] xs:text-xs sm:text-sm md:text-base text-gray-200/90 font-light max-w-xl leading-normal sm:leading-relaxed">
+              <p className="text-xs sm:text-sm md:text-base text-gray-100 font-normal max-w-xl leading-normal sm:leading-relaxed">
                 Empowering the future of logistics with speed, efficiency, and eco-conscious practices.
               </p>
 
@@ -61,7 +61,7 @@ export default function CTASection() {
                 {/* Primary CTA: Request A Quote */}
                 <Link
                   href="/quote"
-                  className="group inline-flex items-center justify-center space-x-1.5 bg-[#FFC107] hover:bg-[#FFD54F] text-[#073B2C] font-extrabold px-3.5 py-1.5 xs:px-4 xs:py-2 sm:px-6 sm:py-3 md:px-7 md:py-3.5 rounded-lg sm:rounded-xl shadow-xs hover:shadow-md transition-all duration-300 text-[11px] xs:text-xs sm:text-sm transform hover:-translate-y-0.5 select-none"
+                  className="group inline-flex items-center justify-center space-x-1.5 bg-[#FFC107] hover:bg-[#FFD54F] active:bg-[#e0a800] text-[#073B2C] font-extrabold px-3.5 py-1.5 xs:px-4 xs:py-2 sm:px-6 sm:py-3 md:px-7 md:py-3.5 rounded-lg sm:rounded-xl shadow-xs hover:shadow-md transition-all duration-250 text-[11px] xs:text-xs sm:text-sm transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[#ffc107] select-none"
                 >
                   <span>Request A Quote</span>
                   <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4 text-[#073B2C] transform group-hover:translate-x-1 transition-transform duration-200 stroke-[2.5]" />
@@ -70,7 +70,7 @@ export default function CTASection() {
                 {/* Secondary CTA: Explore Our Services */}
                 <Link
                   href="/services"
-                  className="inline-flex items-center justify-center bg-[#073B2C]/50 hover:bg-[#073B2C]/80 border border-[#FFC107]/40 hover:border-[#FFC107] text-white font-bold px-3 py-1.5 xs:px-3.5 xs:py-2 sm:px-6 sm:py-3 md:px-7 md:py-3.5 rounded-lg sm:rounded-xl transition-all duration-300 text-[11px] xs:text-xs sm:text-sm backdrop-blur-sm transform hover:-translate-y-0.5 select-none"
+                  className="inline-flex items-center justify-center bg-[#073B2C]/50 hover:bg-[#ffc107] hover:border-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] border border-[#FFC107]/40 text-white font-bold px-3 py-1.5 xs:px-3.5 xs:py-2 sm:px-6 sm:py-3 md:px-7 md:py-3.5 rounded-lg sm:rounded-xl transition-all duration-250 text-[11px] xs:text-xs sm:text-sm backdrop-blur-sm transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[#ffc107] select-none"
                 >
                   <span>Explore Services</span>
                 </Link>

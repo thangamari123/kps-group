@@ -109,10 +109,10 @@ export default function BlogListContent() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 rounded-xl text-xs font-semibold shadow-xs transition-all cursor-pointer ${
+                  className={`px-4 py-2 rounded-xl text-xs font-semibold shadow-xs transition-all duration-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107] ${
                     selectedCategory === cat
                       ? 'bg-brand-green text-white'
-                      : 'bg-brand-gray-light text-brand-gray hover:bg-brand-gray-muted'
+                      : 'bg-brand-gray-light text-brand-gray hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C]'
                   }`}
                 >
                   {cat}
@@ -145,7 +145,7 @@ export default function BlogListContent() {
             <div className="text-center py-20 border-2 border-dashed border-brand-gray-muted rounded-2xl bg-brand-gray-light">
               <FolderOpen className="w-12 h-12 text-brand-gray mx-auto mb-4" />
               <h3 className="text-lg font-bold text-brand-green-dark">No blog posts available yet.</h3>
-              <p className="text-sm text-brand-gray mt-1 max-w-sm mx-auto font-light">
+              <p className="text-[14.5px] text-[#4b5563] mt-1 max-w-sm mx-auto font-normal">
                 Check back soon for the latest news, regulatory updates, and industry insights from KPS Worldwide Logistics.
               </p>
             </div>
@@ -209,7 +209,7 @@ export default function BlogListContent() {
 
                         {/* Excerpt */}
                         {article.excerpt && (
-                          <p className="text-xs text-gray-600 leading-relaxed font-normal line-clamp-3">
+                          <p className="text-[13.5px] text-gray-700 leading-relaxed font-normal line-clamp-3">
                             {article.excerpt}
                           </p>
                         )}
@@ -230,7 +230,7 @@ export default function BlogListContent() {
                       <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
                         <Link
                           href={`/blogs/view?slug=${encodeURIComponent(articleSlug)}`}
-                          className="inline-flex items-center space-x-1.5 text-xs font-bold text-[#006B4F] hover:text-[#00523C] transition-colors group/link"
+                          className="inline-flex items-center space-x-1.5 text-xs font-bold text-[#006B4F] hover:text-[#073B2C] hover:bg-[#ffc107] active:bg-[#e0a800] active:text-[#073B2C] px-3 py-1.5 rounded-lg transition-all duration-250 group/link focus-visible:ring-2 focus-visible:ring-[#ffc107]"
                         >
                           <span>Read More</span>
                           <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-1 transition-transform" />
@@ -246,7 +246,7 @@ export default function BlogListContent() {
             <div className="text-center py-20 border-2 border-dashed border-brand-gray-muted rounded-2xl bg-brand-gray-light">
               <Search className="w-12 h-12 text-brand-gray mx-auto mb-4" />
               <h3 className="text-lg font-bold text-brand-green-dark">No Matching Articles Found</h3>
-              <p className="text-sm text-brand-gray mt-1 max-w-sm mx-auto font-light">
+              <p className="text-[14.5px] text-[#4b5563] mt-1 max-w-sm mx-auto font-normal">
                 Try adjusting your search criteria or category filter.
               </p>
             </div>

@@ -82,7 +82,7 @@ export default function OpenJobsList() {
             <h2 className="text-3xl font-extrabold tracking-tight text-brand-green-dark">
               Current Open Positions
             </h2>
-            <p className="text-sm text-brand-gray mt-2 leading-relaxed font-light">
+            <p className="text-[14.5px] sm:text-base text-[#374151] mt-2 leading-relaxed font-normal">
               Explore active openings across our customs brokerage, ocean & air freight forwarding, multimodal logistics, and FTWZ operations in Chennai and Pan-India.
             </p>
           </div>
@@ -109,10 +109,10 @@ export default function OpenJobsList() {
               <button
                 key={dept}
                 onClick={() => setSelectedDept(dept)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107] ${
                   selectedDept === dept
                     ? 'bg-[#004D3A] text-brand-yellow shadow-xs'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C]'
                 }`}
               >
                 {dept}
@@ -143,7 +143,7 @@ export default function OpenJobsList() {
             <h3 className="text-lg font-bold text-brand-green-dark mb-1">
               No Positions Matching Your Filter
             </h3>
-            <p className="text-sm text-brand-gray leading-relaxed max-w-md mx-auto font-light">
+            <p className="text-sm text-[#4b5563] leading-relaxed max-w-md mx-auto font-normal">
               Try adjusting your search criteria or submit a general application below for future openings.
             </p>
           </div>
@@ -209,7 +209,7 @@ export default function OpenJobsList() {
                     </div>
 
                     {/* Short Description */}
-                    <p className="text-xs sm:text-sm text-brand-gray leading-relaxed line-clamp-3 font-light">
+                    <p className="text-[13.5px] sm:text-sm text-[#374151] leading-relaxed line-clamp-3 font-normal">
                       {job.description}
                     </p>
                   </div>
@@ -227,7 +227,7 @@ export default function OpenJobsList() {
 
                     <Link
                       href={`/career/view?slug=${encodeURIComponent(job.slug || job.id)}`}
-                      className="inline-flex items-center space-x-2 bg-brand-green hover:bg-[#004D3A] text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-xs hover:shadow-md transition-all group-hover:translate-x-0.5"
+                      className="inline-flex items-center space-x-2 bg-brand-green hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-xs hover:shadow-md transition-all duration-250 group-hover:translate-x-0.5 focus-visible:ring-2 focus-visible:ring-[#ffc107]"
                     >
                       <span>View Role & Apply</span>
                       <ArrowRight className="w-3.5 h-3.5" />

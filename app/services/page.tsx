@@ -56,7 +56,7 @@ export default function Services() {
             </h1>
 
             {/* Sub-description */}
-            <p className="text-gray-200 text-xs sm:text-sm md:text-base font-light leading-relaxed max-w-2xl">
+            <p className="text-gray-100 text-[14.5px] sm:text-base font-normal leading-relaxed max-w-2xl">
               From containerized freight to project cargo, customs brokerage, and over dimensional transportation, we deliver end-to-end logistics solutions across global trade lanes.
             </p>
 

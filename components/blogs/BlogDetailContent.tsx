@@ -215,14 +215,14 @@ export default function BlogDetailContent({ blogId }: BlogDetailProps) {
             </div>
 
             {/* Article Content */}
-            <div className="prose max-w-none text-sm text-brand-gray leading-relaxed space-y-6 font-light">
+            <div className="prose max-w-none text-[15px] sm:text-[17px] text-[#2c3742] leading-[1.78] space-y-6 font-normal">
               {article.excerpt && (
-                <p className="font-semibold text-brand-green-dark text-base border-l-4 border-emerald-600 pl-4 py-1 bg-emerald-50/50 rounded-r-lg">
+                <p className="font-semibold text-brand-green-dark text-[16px] sm:text-[18px] leading-[1.65] border-l-4 border-emerald-600 pl-4 py-1.5 bg-emerald-50/60 rounded-r-lg">
                   {article.excerpt}
                 </p>
               )}
 
-              <div className="whitespace-pre-line text-sm text-gray-700 leading-relaxed space-y-4">
+              <div className="whitespace-pre-line text-[15px] sm:text-[17px] text-[#2d3748] leading-[1.78] space-y-4 font-normal">
                 {article.content}
               </div>
             </div>

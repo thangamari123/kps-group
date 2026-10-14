@@ -100,7 +100,7 @@ export default function ServiceSidebar({ currentPath, bgImage }) {
             Need Expert Logistics Consultation?
           </h4>
           
-          <p className="text-xs text-gray-300 leading-relaxed font-light">
+          <p className="text-xs sm:text-[13px] text-gray-200 leading-relaxed font-normal">
             Speak directly with our maritime directors, customs clearance brokers, and route survey engineers.
           </p>
           
@@ -128,7 +128,7 @@ export default function ServiceSidebar({ currentPath, bgImage }) {
           <div className="pt-2">
             <Link
               href="/quote"
-              className="w-full inline-flex items-center justify-center space-x-2 text-xs font-bold bg-brand-yellow text-brand-green-dark px-4 py-3 rounded-xl hover:bg-white transition-colors shadow-md"
+              className="w-full inline-flex items-center justify-center space-x-2 text-xs font-bold bg-[#ffc107] hover:bg-[#ffcd39] active:bg-[#e0a800] text-[#073B2C] px-4 py-3 rounded-xl transition-all duration-250 shadow-md focus-visible:ring-2 focus-visible:ring-[#ffc107]"
             >
               <span>Get Quote</span>
               <ArrowRight className="w-3.5 h-3.5" />

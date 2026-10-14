@@ -153,7 +153,7 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
             <Briefcase className="w-8 h-8" />
           </div>
           <h1 className="text-2xl font-bold text-brand-green-dark">Position Not Available</h1>
-          <p className="text-sm text-brand-gray leading-relaxed font-light">
+          <p className="text-[14.5px] sm:text-base text-[#4b5563] leading-relaxed font-normal">
             This job posting may have been filled, archived, deleted, or is no longer accepting public applications.
           </p>
           <div className="pt-4">
@@ -216,7 +216,7 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
             </h1>
 
             {/* Meta Tags Strip */}
-            <div className="flex flex-wrap items-center gap-y-3 gap-x-6 text-xs sm:text-sm text-white/80 pt-2 font-light">
+            <div className="flex flex-wrap items-center gap-y-3 gap-x-6 text-xs sm:text-sm text-white/90 pt-2 font-normal">
               <div className="flex items-center space-x-1.5">
                 <MapPin className="w-4 h-4 text-brand-yellow shrink-0" />
                 <span>{job.location}</span>
@@ -248,7 +248,7 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
               {!isClosed ? (
                 <a
                   href="#apply-section"
-                  className="bg-brand-yellow hover:bg-brand-yellow-light text-brand-green-dark font-extrabold text-xs sm:text-sm py-3 px-6 rounded-xl shadow-lg transition-transform hover:scale-105"
+                  className="bg-brand-yellow hover:bg-[#ffd54f] active:bg-[#e0a800] text-brand-green-dark font-extrabold text-xs sm:text-sm py-3 px-6 rounded-xl shadow-lg transition-all duration-250 hover:scale-105 focus-visible:ring-2 focus-visible:ring-[#ffc107]"
                 >
                   Apply for this Position
                 </a>
@@ -260,7 +260,7 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
 
               <button
                 onClick={handleShare}
-                className="inline-flex items-center space-x-2 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs py-3 px-4 rounded-xl border border-white/20 transition-colors"
+                className="inline-flex items-center space-x-2 bg-white/10 hover:bg-[#ffc107] hover:border-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white font-semibold text-xs py-3 px-4 rounded-xl border border-white/20 transition-all duration-250 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107]"
               >
                 <Share2 className="w-3.5 h-3.5" />
                 <span>{copied ? 'Link Copied!' : 'Share Position'}</span>
@@ -281,7 +281,7 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
                 <h2 className="text-lg sm:text-xl font-bold text-brand-green-dark uppercase tracking-wide border-b border-brand-gray-muted pb-3">
                   About the Role & Responsibilities
                 </h2>
-                <div className="text-sm text-brand-gray-dark leading-relaxed whitespace-pre-wrap font-light">
+                <div className="text-[15px] sm:text-base text-[#374151] leading-[1.72] whitespace-pre-wrap font-normal">
                   {job.description}
                 </div>
               </div>
@@ -294,7 +294,7 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
                   </h2>
                   <ul className="space-y-3">
                     {responsibilities.map((item, idx) => (
-                      <li key={idx} className="flex items-start space-x-3 text-sm text-brand-gray-dark font-light">
+                      <li key={idx} className="flex items-start space-x-3 text-[14px] sm:text-[15px] text-[#374151] font-normal">
                         <CheckCircle2 className="w-4 h-4 text-brand-green mt-0.5 shrink-0" />
                         <span className="leading-relaxed">{item}</span>
                       </li>
@@ -311,7 +311,7 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
                   </h2>
                   <ul className="space-y-3">
                     {requirements.map((item, idx) => (
-                      <li key={idx} className="flex items-start space-x-3 text-sm text-brand-gray-dark font-light">
+                      <li key={idx} className="flex items-start space-x-3 text-[14px] sm:text-[15px] text-[#374151] font-normal">
                         <CheckCircle2 className="w-4 h-4 text-brand-green mt-0.5 shrink-0" />
                         <span className="leading-relaxed">{item}</span>
                       </li>
@@ -328,7 +328,7 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
                   </h2>
                   <ul className="space-y-3">
                     {qualifications.map((item, idx) => (
-                      <li key={idx} className="flex items-start space-x-3 text-sm text-brand-gray-dark font-light">
+                      <li key={idx} className="flex items-start space-x-3 text-[14px] sm:text-[15px] text-[#374151] font-normal">
                         <CheckCircle2 className="w-4 h-4 text-brand-green mt-0.5 shrink-0" />
                         <span className="leading-relaxed">{item}</span>
                       </li>
@@ -364,7 +364,7 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
                   </h2>
                   <ul className="space-y-3">
                     {benefits.map((item, idx) => (
-                      <li key={idx} className="flex items-start space-x-3 text-sm text-brand-gray-dark font-light">
+                      <li key={idx} className="flex items-start space-x-3 text-[14px] sm:text-[15px] text-[#374151] font-normal">
                         <CheckCircle2 className="w-4 h-4 text-brand-green mt-0.5 shrink-0" />
                         <span className="leading-relaxed">{item}</span>
                       </li>
@@ -415,7 +415,7 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
                 {!isClosed ? (
                   <a
                     href="#apply-section"
-                    className="block text-center w-full bg-brand-green hover:bg-[#004D3A] text-white font-bold py-3 rounded-xl text-xs shadow-md transition-colors"
+                    className="block text-center w-full bg-brand-green hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white font-bold py-3 rounded-xl text-xs shadow-md transition-all duration-250 focus-visible:ring-2 focus-visible:ring-[#ffc107]"
                   >
                     Apply Now
                   </a>
@@ -432,7 +432,7 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
                   <Award className="w-6 h-6 text-brand-green" />
                   <h4 className="font-bold text-sm">Join a 40+ Year Logistics Leader</h4>
                 </div>
-                <p className="text-xs text-brand-gray leading-relaxed font-light">
+                <p className="text-xs sm:text-[13px] text-[#4b5563] leading-relaxed font-normal">
                   KPS Worldwide Logistics operates licensed customs brokerage, Pan-India multimodal freight, and industrial warehousing supporting premier multinational brands.
                 </p>
               </div>

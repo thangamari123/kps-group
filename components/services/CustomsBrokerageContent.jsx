@@ -184,7 +184,7 @@ export default function CustomsBrokerage() {
                 Licensed Customs Brokerage & Cross-Border Compliance
               </h1>
 
-              <p className="text-gray-200 text-xs sm:text-sm md:text-base font-light leading-relaxed max-w-3xl">
+              <p className="text-gray-100 text-[14.5px] sm:text-base font-normal leading-relaxed max-w-3xl">
                 Navigating complex cross-border trade requirements, HTS tariff classifications, ICEGATE digital filing, and direct port liaison to ensure compliant, zero-delay customs clearance across all major ports in India.
               </p>
 
@@ -226,7 +226,7 @@ export default function CustomsBrokerage() {
                   <div className="text-[10px] sm:text-xs font-bold text-white mt-1 leading-tight">
                     {item.label}
                   </div>
-                  <div className="text-[9px] sm:text-[10px] text-gray-300 font-light mt-0.5 truncate">
+                  <div className="text-[9.5px] sm:text-[10.5px] text-gray-200 font-normal mt-0.5 truncate">
                     {item.sub}
                   </div>
                 </div>
@@ -314,7 +314,7 @@ export default function CustomsBrokerage() {
                   Need Immediate Customs Clearance Support?
                 </h4>
                 
-                <p className="text-xs text-gray-300 leading-relaxed font-light">
+                <p className="text-xs sm:text-[13px] text-gray-200 leading-relaxed font-normal">
                   Direct liaison with Chennai Custom House, Port Terminals, Air Cargo Complex, and ICDs across India.
                 </p>
 
@@ -544,7 +544,7 @@ export default function CustomsBrokerage() {
                     <div key={wIdx} className="bg-white/10 rounded-xl p-2.5 sm:p-3 border border-white/10 space-y-1">
                       <div className="text-brand-yellow font-black text-xs">{wf.step}</div>
                       <h5 className="font-bold text-xs text-white leading-snug">{wf.title}</h5>
-                      <p className="text-[10px] text-gray-300 font-light leading-relaxed">{wf.desc}</p>
+                      <p className="text-[10.5px] sm:text-[11px] text-gray-200 font-normal leading-relaxed">{wf.desc}</p>
                     </div>
                   ))}
                 </div>
@@ -565,7 +565,7 @@ export default function CustomsBrokerage() {
                         <span className="w-1.5 h-1.5 rounded-full bg-brand-yellow"></span>
                         <span>{agency.name}</span>
                       </div>
-                      <p className="text-[10px] sm:text-[11px] text-brand-gray leading-relaxed font-light">{agency.desc}</p>
+                      <p className="text-[11px] sm:text-xs text-[#4b5563] leading-relaxed font-normal">{agency.desc}</p>
                     </div>
                   ))}
                 </div>

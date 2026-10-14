@@ -50,7 +50,7 @@ export default function PageHero({
 
           {/* Centered Compact Description */}
           {description && (
-            <p className="text-xs sm:text-sm md:text-base text-gray-200/90 font-light leading-relaxed max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base text-gray-100 font-normal leading-relaxed max-w-2xl mx-auto">
               {description}
             </p>
           )}

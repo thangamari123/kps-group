@@ -17,14 +17,14 @@ export default function PrivacyPolicyPage() {
 
       <section className="py-20 text-brand-gray-dark bg-white">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-4xl mx-auto bg-brand-gray-light border border-brand-gray-muted rounded-xl p-8 md:p-12 shadow-sm space-y-8 font-light text-sm text-brand-gray leading-relaxed">
+          <div className="max-w-4xl mx-auto bg-brand-gray-light border border-brand-gray-muted rounded-xl p-8 md:p-12 shadow-sm space-y-8 font-normal text-[15px] sm:text-base text-[#374151] leading-[1.75]">
             
             <div className="space-y-3">
               <h3 className="text-lg font-bold text-brand-green-dark uppercase tracking-wider border-b border-brand-gray-muted pb-2">
                 1. Company Details
               </h3>
               <ul className="space-y-1 pl-1">
-                <li><strong className="text-brand-green-dark">Company Name:</strong> K.P.S</li>
+                <li><strong className="text-brand-green-dark">Company Name:</strong> KPS</li>
                 <li><strong className="text-brand-green-dark">Website:</strong> <a href="http://www.kpsgroups.net" target="_blank" rel="noopener noreferrer" className="text-brand-green hover:underline">www.kpsgroups.net</a></li>
                 <li>
                   <strong className="text-brand-green-dark block mt-1">Address:</strong>

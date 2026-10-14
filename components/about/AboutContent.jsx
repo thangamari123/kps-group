@@ -60,11 +60,11 @@ export default function AboutContent() {
               <p className="text-base sm:text-lg text-brand-green-dark font-semibold leading-relaxed">
                 At KPS Worldwide Logistics Pvt Ltd., we bridge the gap between standard logistics and complex project engineering.
               </p>
-              <p className="text-sm sm:text-base text-brand-gray leading-relaxed font-normal">
+              <p className="text-[15px] sm:text-base text-[#374151] leading-[1.72] font-normal">
                 For four decades, our experienced professionals have planned, executed, and managed freight movements across major international trade lanes, from single LCL cartons to ultra-heavy industrial plants.
               </p>
-              <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
-                We combine logistics expertise, technical planning, regulatory knowledge, and global coordination to deliver reliable cargo movement for both conventional and specialized requirements.
+              <p className="text-sm sm:text-[15px] text-[#4b5563] leading-[1.72] font-normal">
+                We combine <strong className="font-semibold text-brand-green-dark">logistics expertise</strong>, <strong className="font-semibold text-brand-green-dark">technical engineering</strong>, <strong className="font-semibold text-brand-green-dark">regulatory customs knowledge</strong>, and <strong className="font-semibold text-brand-green-dark">global coordination</strong> to deliver reliable cargo movement for both conventional and specialized requirements.
               </p>
             </div>
 
@@ -116,7 +116,7 @@ export default function AboutContent() {
                     <h4 className="font-extrabold text-xs sm:text-sm text-brand-green-dark mb-2 tracking-wide uppercase leading-snug">
                       {pillar.title}
                     </h4>
-                    <p className="text-xs sm:text-[13px] text-brand-gray leading-relaxed font-light">
+                    <p className="text-[12.5px] sm:text-[13.5px] text-[#4b5563] leading-[1.68] font-normal">
                       {pillar.desc}
                     </p>
                   </div>
@@ -143,11 +143,11 @@ export default function AboutContent() {
             </div>
 
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-brand-green-dark">
-              Guiding K.P.S Across Four Decades
+              Guiding KPS Across Four Decades
             </h2>
 
-            <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light max-w-xl mx-auto">
-              Founded on core values of integrity and lasting relationships in 1985, and advanced through next-generation supply chain technology.
+            <p className="text-xs sm:text-sm md:text-[15px] text-[#4b5563] leading-relaxed font-normal max-w-xl mx-auto">
+              Founded on core values of integrity and lasting relationships in <strong className="font-semibold text-brand-green-dark">1985</strong>, and advanced through next-generation supply chain technology.
             </p>
           </div>
 
@@ -178,7 +178,7 @@ export default function AboutContent() {
 
                   <div className="absolute bottom-3 left-3 right-3 text-white">
                     <span className="text-[11px] font-semibold text-brand-yellow tracking-wide block">
-                      K.P.S Founder
+                      KPS Founder
                     </span>
                     <h3 className="text-lg sm:text-xl font-extrabold tracking-tight text-white drop-shadow-sm">
                       Mr. Srinivasa Pragasam
@@ -191,12 +191,12 @@ export default function AboutContent() {
 
                 {/* Card Body */}
                 <div className="p-5 sm:p-7 space-y-3.5">
-                  <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
-                    I began this journey in 1985 at the age of 24 without any industry background — just inspiration from my uncle and an eagerness to learn. Through hard work and independent study, I cleared the required exams and secured my logistics license to build something of my own.
+                  <p className="text-[13.5px] sm:text-[14.5px] text-[#374151] leading-[1.72] font-normal">
+                    I began this journey in <strong className="font-semibold text-brand-green-dark">1985</strong> at the age of 24 without any industry background — just inspiration from my uncle and an eagerness to learn. Through hard work and independent study, I cleared the required examinations and <strong className="font-semibold text-brand-green-dark">secured my logistics license</strong> to build something of my own.
                   </p>
 
-                  <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
-                    One unforgettable moment came during a bank visit when I helped an elderly gentleman struggling to fill a cheque deposit form. A month later, ready to retire, that same gentleman handed me his entire logistics operation — becoming our foundational client.
+                  <p className="text-[13.5px] sm:text-[14.5px] text-[#374151] leading-[1.72] font-normal">
+                    One unforgettable moment came during a bank visit when I helped an elderly gentleman struggling to fill a cheque deposit form. A month later, ready to retire, that same gentleman handed me his entire logistics operation — <strong className="font-semibold text-brand-green-dark">becoming our foundational client</strong>.
                   </p>
 
                   <blockquote className="border-l-3 border-brand-yellow pl-3.5 py-2 italic text-gray-800 font-medium text-xs sm:text-[13px] leading-relaxed bg-[#fffdf0] rounded-r-lg">
@@ -249,12 +249,12 @@ export default function AboutContent() {
 
                 {/* Card Body */}
                 <div className="p-5 sm:p-7 space-y-3.5">
-                  <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
-                    In 2008, at the age of just 20, Mr. B.S. Prassanna stepped into the shipping and logistics industry, taking over the reins of K.P.S after completing his Bachelor’s degree in Computer Engineering. He entered with a clear vision: to modernize traditional logistics through digital automation and simplified client workflows.
+                  <p className="text-[13.5px] sm:text-[14.5px] text-[#374151] leading-[1.72] font-normal">
+                    In <strong className="font-semibold text-brand-green-dark">2008</strong>, at the age of just 20, <strong className="font-semibold text-brand-green-dark">Mr. B.S. Prassanna</strong> stepped into the shipping and logistics industry, taking over the reins of KPS after completing his Bachelor’s degree in <strong className="font-semibold text-brand-green-dark">Computer Engineering</strong>. He entered with a clear vision: to modernize traditional logistics through <strong className="font-semibold text-brand-green-dark">digital automation</strong> and simplified client workflows.
                   </p>
 
-                  <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
-                    Prassanna’s focus has been eliminating supply chain complexity and maximizing transparency. By identifying key industry friction points, he developed tech-enabled tracking and custom clearance protocols that significantly elevated operational velocity, client satisfaction, and corporate trust.
+                  <p className="text-[13.5px] sm:text-[14.5px] text-[#374151] leading-[1.72] font-normal">
+                    Prassanna’s focus has been <strong className="font-semibold text-brand-green-dark">eliminating supply chain complexity</strong> and <strong className="font-semibold text-brand-green-dark">maximizing transparency</strong>. By identifying key industry friction points, he developed tech-enabled tracking and custom clearance protocols that significantly elevated operational velocity, client satisfaction, and corporate trust.
                   </p>
 
                   {/* Highlight Badges */}
@@ -302,10 +302,10 @@ export default function AboutContent() {
             </div>
 
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-brand-green-dark">
-              Experience K.P.S
+              Experience KPS
             </h2>
 
-            <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light max-w-xl mx-auto">
+            <p className="text-xs sm:text-sm md:text-[15px] text-[#4b5563] leading-relaxed font-normal max-w-xl mx-auto">
               Watch our team, heavy-lift fleets, and free trade warehousing technology in motion across India.
             </p>
           </div>
@@ -351,7 +351,7 @@ export default function AboutContent() {
                     <h3 className="font-bold text-brand-green-dark text-xs sm:text-sm md:text-base group-hover:text-brand-green transition-colors truncate">
                       {vid.title}
                     </h3>
-                    <p className="text-[10.5px] sm:text-xs text-brand-gray font-light truncate">
+                    <p className="text-[11px] sm:text-xs text-[#4b5563] font-normal truncate">
                       {vid.subtitle}
                     </p>
                   </div>
@@ -395,8 +395,8 @@ export default function AboutContent() {
                     Mission
                   </h3>
                 </div>
-                <p className="text-xs sm:text-sm text-brand-gray leading-relaxed relative z-10 font-light">
-                  Committed to integrity and service excellence, we empower our employees, strengthen partnerships with our clients and vendors, and harness technology to enhance the well-being of our region and beyond.
+                <p className="text-sm sm:text-[15px] text-[#374151] leading-[1.72] relative z-10 font-normal">
+                  Committed to <strong className="font-semibold text-brand-green-dark">integrity and service excellence</strong>, we empower our employees, strengthen partnerships with our clients and vendors, and <strong className="font-semibold text-brand-green-dark">harness technology</strong> to enhance the well-being of our region and beyond.
                 </p>
               </div>
             </div>
@@ -415,8 +415,8 @@ export default function AboutContent() {
                     Vision
                   </h3>
                 </div>
-                <p className="text-xs sm:text-sm text-brand-gray leading-relaxed relative z-10 font-light">
-                  Our vision is to create an inclusive and dynamic environment where integrity and service guide our every action. We aim to empower our employees, nurture strong partnerships with our clients and vendors, and leverage the latest technological advancements to drive innovation and growth in our region, ensuring a brighter future for our community.
+                <p className="text-sm sm:text-[15px] text-[#374151] leading-[1.72] relative z-10 font-normal">
+                  Our vision is to create an <strong className="font-semibold text-brand-green-dark">inclusive and dynamic environment</strong> where integrity and service guide our every action. We aim to empower our employees, nurture strong partnerships with our clients and vendors, and leverage the <strong className="font-semibold text-brand-green-dark">latest technological advancements</strong> to drive innovation and growth in our region, ensuring a brighter future for our community.
                 </p>
               </div>
             </div>
@@ -441,7 +441,7 @@ export default function AboutContent() {
             >
               <button
                 onClick={() => setActiveVideoUrl(null)}
-                className="absolute top-3 right-3 z-20 p-2 rounded-full bg-black/60 text-white hover:bg-white hover:text-black transition-colors"
+                className="absolute top-3 right-3 z-20 p-2 rounded-full bg-black/60 text-white hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] transition-colors duration-200"
                 aria-label="Close video player"
               >
                 <X className="w-5 h-5" />

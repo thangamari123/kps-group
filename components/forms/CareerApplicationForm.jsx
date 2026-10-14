@@ -289,7 +289,7 @@ export default function CareerApplicationForm({
         <h3 className="text-2xl font-black text-brand-green-dark">
           {jobTitle ? `Apply for ${jobTitle}` : 'Submit Your Application'}
         </h3>
-        <p className="text-brand-gray text-xs sm:text-sm mt-1 font-light">
+        <p className="text-[#4b5563] text-xs sm:text-sm mt-1 font-normal leading-relaxed">
           Fill in your credentials and upload your resume. Our HR recruitment team reviews every profile.
         </p>
       </div>
@@ -302,7 +302,7 @@ export default function CareerApplicationForm({
           <h4 className="text-xl font-extrabold text-emerald-900">
             Application Submitted Successfully!
           </h4>
-          <p className="text-sm text-emerald-800 max-w-lg mx-auto leading-relaxed font-light">
+          <p className="text-sm text-emerald-800 max-w-lg mx-auto leading-relaxed font-normal">
             Thank you for applying to KPS Worldwide Logistics. Your application for{' '}
             <span className="font-bold text-emerald-950">{jobTitle || 'this position'}</span> has been received and securely stored in our recruitment pipeline.
           </p>
@@ -310,14 +310,14 @@ export default function CareerApplicationForm({
           <div className="pt-4 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/career"
-              className="px-5 py-2.5 bg-brand-green text-white font-bold text-xs rounded-xl shadow-xs hover:bg-brand-green-dark transition-colors"
+              className="px-5 py-2.5 bg-brand-green hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white font-bold text-xs rounded-xl shadow-xs transition-all duration-250 focus-visible:ring-2 focus-visible:ring-[#ffc107]"
             >
               Back to All Careers
             </Link>
             <button
               type="button"
               onClick={() => setStatus('idle')}
-              className="px-5 py-2.5 bg-white text-emerald-900 border border-emerald-300 font-semibold text-xs rounded-xl hover:bg-emerald-50 transition-colors"
+              className="px-5 py-2.5 bg-white text-emerald-900 border border-emerald-300 hover:bg-[#ffc107] hover:border-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] font-semibold text-xs rounded-xl transition-all duration-250 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107]"
             >
               Submit Another Application
             </button>
@@ -590,7 +590,7 @@ export default function CareerApplicationForm({
               onChange={handleChange}
               rows={4}
               placeholder="Tell our HR team about your domain experience, key achievements in shipping/customs, and why you would like to join KPS..."
-              className="w-full px-4 py-3 text-xs bg-[#fafcfb] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 resize-y font-light leading-relaxed"
+              className="w-full px-4 py-3 text-xs bg-[#fafcfb] border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600 resize-y font-normal leading-relaxed"
             />
           </div>
 
@@ -660,7 +660,7 @@ export default function CareerApplicationForm({
               <p className="text-[11px] text-red-600 font-medium">{errors.resume}</p>
             )}
 
-            <div className="flex items-center space-x-1.5 text-[11px] text-gray-500 font-light">
+            <div className="flex items-center space-x-1.5 text-[11px] text-gray-500 font-normal">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
               <span>Resumes are encrypted and stored securely in Cloudflare R2.</span>
             </div>
@@ -671,7 +671,7 @@ export default function CareerApplicationForm({
             <button
               type="submit"
               disabled={status === 'uploading' || status === 'saving'}
-              className="w-full sm:w-auto min-w-[220px] bg-brand-green hover:bg-[#004D3A] text-white font-extrabold text-xs sm:text-sm py-3.5 px-8 rounded-xl shadow-md transition-all disabled:opacity-50 flex items-center justify-center space-x-2 cursor-pointer"
+              className="w-full sm:w-auto min-w-[220px] bg-brand-green hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white font-extrabold text-xs sm:text-sm py-3.5 px-8 rounded-xl shadow-md transition-all duration-250 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107]"
             >
               {status === 'uploading' ? (
                 <>

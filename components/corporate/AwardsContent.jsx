@@ -91,7 +91,7 @@ export default function AwardsContent() {
     <div className="bg-white">
       <PageHero 
         title="Awards & Recognitions" 
-        description="At K.P.S, we take pride in being recognized by prominent shipping conclaves, maritime councils, and multinational logistics partners for our four-decade legacy of excellence and dependable service." 
+        description="At KPS, we take pride in being recognized by prominent shipping conclaves, maritime councils, and multinational logistics partners for our four-decade legacy of excellence and dependable service." 
         bgImage="https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1920&q=80"
       />
 
@@ -107,8 +107,8 @@ export default function AwardsContent() {
                 <h2 className="text-xl sm:text-3xl font-black text-brand-green-dark tracking-tight">
                   Recognized by Global & Maritime Leaders
                 </h2>
-                <p className="text-xs sm:text-sm text-brand-gray font-light">
-                  A comprehensive record of prestigious industry awards, customer partner appreciations, and conclave recognitions honoring K.P.S.
+                <p className="text-[13.5px] sm:text-base text-[#4b5563] font-normal leading-relaxed">
+                  A comprehensive record of prestigious industry awards, customer partner appreciations, and conclave recognitions honoring KPS.
                 </p>
               </div>
 
@@ -199,7 +199,7 @@ export default function AwardsContent() {
                         {award.title}
                       </h3>
 
-                      <p className="text-xs text-brand-gray leading-relaxed font-light line-clamp-3">
+                      <p className="text-[13px] sm:text-[13.5px] text-[#374151] leading-relaxed font-normal line-clamp-3">
                         {award.description}
                       </p>
                     </div>
@@ -227,7 +227,7 @@ export default function AwardsContent() {
             <h3 className="text-xl sm:text-3xl font-black text-white">
               Experience Four Decades of Reliable Shipping & Logistics
             </h3>
-            <p className="text-xs sm:text-sm text-gray-300 font-light max-w-2xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base text-gray-200 font-normal max-w-2xl mx-auto leading-relaxed">
               From licensed customs clearance to multimodal freight and FTWZ operations, get tailored supply chain solutions designed for reliability and compliance.
             </p>
             <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
@@ -293,7 +293,7 @@ export default function AwardsContent() {
                     {activeAward.title}
                   </h3>
 
-                  <p className="text-xs text-gray-600 leading-relaxed font-light">
+                  <p className="text-[13.5px] sm:text-sm text-gray-700 leading-relaxed font-normal">
                     {activeAward.description}
                   </p>
 

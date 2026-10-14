@@ -110,10 +110,10 @@ export default function DownloadsContent() {
                 <button
                   key={idx}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107] ${
                     selectedCategory === cat 
                       ? 'bg-brand-green text-white shadow-xs' 
-                      : 'bg-brand-gray-light text-brand-gray-dark hover:bg-brand-gray-muted'
+                      : 'bg-brand-gray-light text-brand-gray-dark hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C]'
                   }`}
                 >
                   {cat}
@@ -146,7 +146,7 @@ export default function DownloadsContent() {
                       <h3 className="font-bold text-sm sm:text-base text-brand-green-dark leading-snug group-hover:text-brand-green transition-colors">
                         {doc.title}
                       </h3>
-                      <p className="text-xs text-brand-gray mt-1 font-light">
+                      <p className="text-[12.5px] sm:text-xs text-[#4b5563] mt-1 font-normal leading-relaxed">
                         {doc.subtext}
                       </p>
                     </div>
@@ -157,7 +157,7 @@ export default function DownloadsContent() {
                       href={doc.file} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="inline-flex items-center space-x-1.5 text-xs text-brand-gray hover:text-brand-green font-medium transition-colors"
+                      className="inline-flex items-center space-x-1.5 text-xs text-brand-gray hover:text-[#073B2C] hover:bg-[#ffc107]/20 px-2 py-1 rounded-md font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-[#ffc107]"
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
                       <span>Preview</span>
@@ -166,7 +166,7 @@ export default function DownloadsContent() {
                     <a 
                       href={doc.file} 
                       download={doc.downloadName}
-                      className="inline-flex items-center space-x-2 bg-brand-yellow hover:bg-brand-yellow-light text-brand-green-dark font-bold text-xs px-4 py-2 rounded-lg transition-all shadow-xs"
+                      className="inline-flex items-center space-x-2 bg-[#ffc107] hover:bg-[#ffd54f] active:bg-[#e0a800] text-[#073B2C] font-bold text-xs px-4 py-2 rounded-lg transition-all duration-200 shadow-xs focus-visible:ring-2 focus-visible:ring-[#ffc107]"
                     >
                       <Download className="w-3.5 h-3.5" />
                       <span>Download</span>
@@ -178,7 +178,7 @@ export default function DownloadsContent() {
               <div className="col-span-full py-12 text-center text-brand-gray">
                 <FolderOpen className="w-12 h-12 mx-auto text-gray-300 mb-3" />
                 <p className="text-base font-semibold text-brand-gray-dark">No documents match your query.</p>
-                <p className="text-xs text-brand-gray mt-1 font-light">Try checking your spelling or choosing a different category filter.</p>
+                <p className="text-[13px] text-[#4b5563] mt-1 font-normal">Try checking your spelling or choosing a different category filter.</p>
               </div>
             )}
           </div>

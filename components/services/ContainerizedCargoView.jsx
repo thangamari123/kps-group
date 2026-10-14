@@ -52,7 +52,7 @@ export default function ContainerizedCargoView({ service }) {
             {service.title}
           </h3>
 
-          <p className="text-gray-200 text-sm sm:text-base font-light leading-relaxed max-w-3xl">
+          <p className="text-gray-100 text-[14.5px] sm:text-base font-normal leading-relaxed max-w-3xl">
             {service.description}
           </p>
 
@@ -171,7 +171,7 @@ export default function ContainerizedCargoView({ service }) {
               </div>
 
               {/* Sub-service Description */}
-              <p className="text-xs sm:text-sm text-brand-gray-dark leading-relaxed font-normal">
+              <p className="text-sm sm:text-[15px] text-[#374151] leading-relaxed font-normal">
                 {sub.description}
               </p>
 

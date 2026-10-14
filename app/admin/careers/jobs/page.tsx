@@ -147,7 +147,7 @@ export default function AdminJobsPage() {
 
           <Link
             href="/admin/careers/jobs/new"
-            className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#006B4F] hover:bg-[#004D3A] text-white text-xs font-bold shadow-sm shadow-[#006B4F]/20 transition-all duration-200"
+            className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#006B4F] hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white text-xs font-bold shadow-sm shadow-[#006B4F]/20 transition-all duration-250 focus-visible:ring-2 focus-visible:ring-[#ffc107]"
           >
             <Plus className="w-4 h-4" />
             <span>Create Job Post</span>

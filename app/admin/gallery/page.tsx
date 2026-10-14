@@ -388,7 +388,7 @@ export default function AdminGalleryPage() {
 
           <button
             onClick={handleOpenCreate}
-            className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#006B4F] hover:bg-[#005A43] text-white text-xs font-bold shadow-sm shadow-[#006B4F]/20 transition-all duration-200 cursor-pointer"
+            className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-[#006B4F] hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white text-xs font-bold shadow-sm shadow-[#006B4F]/20 transition-all duration-250 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107]"
           >
             <Plus className="w-4 h-4" />
             <span>Add Gallery Item</span>
@@ -944,7 +944,7 @@ export default function AdminGalleryPage() {
                   <button
                     type="button"
                     onClick={() => setModalOpen(false)}
-                    className="px-4 py-2 bg-white border border-[#E2E9E5] text-[#17211E] hover:bg-[#F7F9F8] rounded-xl font-semibold cursor-pointer text-xs"
+                    className="px-4 py-2 bg-white border border-[#E2E9E5] text-[#17211E] hover:bg-[#ffc107]/20 hover:border-[#ffc107] active:bg-[#e0a800]/30 rounded-xl font-semibold cursor-pointer text-xs transition-all duration-200 focus-visible:ring-2 focus-visible:ring-[#ffc107]"
                   >
                     Cancel
                   </button>
@@ -952,7 +952,7 @@ export default function AdminGalleryPage() {
                   <button
                     type="submit"
                     disabled={saving || uploading}
-                    className="px-6 py-2 bg-[#006B4F] hover:bg-[#005A43] text-white font-bold rounded-xl text-xs shadow-sm shadow-[#006B4F]/20 disabled:opacity-50 cursor-pointer flex items-center space-x-2"
+                    className="px-6 py-2 bg-[#006B4F] hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white font-bold rounded-xl text-xs shadow-sm shadow-[#006B4F]/20 disabled:opacity-50 cursor-pointer flex items-center space-x-2 transition-all duration-250 focus-visible:ring-2 focus-visible:ring-[#ffc107]"
                   >
                     {saving ? (
                       <>

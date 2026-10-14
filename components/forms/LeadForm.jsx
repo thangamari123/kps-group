@@ -325,14 +325,14 @@ export default function LeadForm({ isModal = false, onClose = null }) {
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
             <button 
               onClick={handleReset}
-              className="inline-flex items-center space-x-1 bg-[#14533d] text-white font-bold text-xs px-4 py-2 rounded-lg hover:bg-[#0e3f2e] transition-all shadow-xs cursor-pointer"
+              className="inline-flex items-center space-x-1 bg-[#14533d] hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white font-bold text-xs px-4 py-2 rounded-lg transition-all duration-250 shadow-xs cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107]"
             >
               <span>Submit Another Quote</span>
             </button>
             {onClose && (
               <button 
                 onClick={onClose}
-                className="inline-flex items-center space-x-1 bg-gray-100 border border-gray-200 text-gray-700 font-semibold text-xs px-3.5 py-2 rounded-lg hover:bg-gray-200 transition-all cursor-pointer"
+                className="inline-flex items-center space-x-1 bg-gray-100 border border-gray-200 text-gray-700 hover:bg-[#ffc107] hover:text-[#073B2C] hover:border-[#ffc107] active:bg-[#e0a800] active:text-[#073B2C] font-semibold text-xs px-3.5 py-2 rounded-lg transition-all duration-250 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107]"
               >
                 <span>Close</span>
               </button>
@@ -493,10 +493,10 @@ export default function LeadForm({ isModal = false, onClose = null }) {
                   <button
                     type="button"
                     onClick={handleNextStep}
-                    className="w-full bg-[#14533d] hover:bg-[#0e3f2e] text-white font-bold py-2.5 sm:py-3 px-4 rounded-lg text-xs sm:text-sm shadow-xs hover:shadow-sm transition-all flex items-center justify-center space-x-1.5 group cursor-pointer"
+                    className="w-full bg-[#14533d] hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white font-bold py-2.5 sm:py-3 px-4 rounded-lg text-xs sm:text-sm shadow-xs hover:shadow-sm transition-all duration-250 flex items-center justify-center space-x-1.5 group cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107]"
                   >
-                    <span>Next: Shipment Details</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    <span className="transition-colors duration-250">Next: Shipment Details</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-white group-hover:text-[#073B2C] group-active:text-[#073B2C] group-hover:translate-x-1 transition-all duration-250" />
                   </button>
 
                   <div className="flex items-center justify-center space-x-1 text-[10px] sm:text-[11px] text-gray-500 mt-2 font-normal">
@@ -684,7 +684,7 @@ export default function LeadForm({ isModal = false, onClose = null }) {
                     type="button"
                     onClick={handlePrevStep}
                     disabled={status === 'loading'}
-                    className="w-1/3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-2.5 sm:py-3 px-3 rounded-lg text-xs sm:text-sm transition-all flex items-center justify-center space-x-1 cursor-pointer"
+                    className="w-1/3 bg-gray-100 hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-gray-700 font-bold py-2.5 sm:py-3 px-3 rounded-lg text-xs sm:text-sm transition-all duration-250 flex items-center justify-center space-x-1 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     <span>Back</span>
@@ -693,7 +693,7 @@ export default function LeadForm({ isModal = false, onClose = null }) {
                   <button
                     type="submit"
                     disabled={status === 'loading'}
-                    className="w-2/3 bg-[#14533d] hover:bg-[#0e3f2e] text-white font-bold py-2.5 sm:py-3 px-3 rounded-lg text-xs sm:text-sm shadow-xs hover:shadow-sm transition-all flex items-center justify-center space-x-1.5 group cursor-pointer"
+                    className="w-2/3 bg-[#14533d] hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white font-bold py-2.5 sm:py-3 px-3 rounded-lg text-xs sm:text-sm shadow-xs hover:shadow-sm transition-all duration-250 flex items-center justify-center space-x-1.5 group cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {status === 'loading' ? (
                       <>
@@ -702,8 +702,8 @@ export default function LeadForm({ isModal = false, onClose = null }) {
                       </>
                     ) : (
                       <>
-                        <span>Get Quote</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        <span className="transition-colors duration-250">Get Quote</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-white group-hover:text-[#073B2C] group-active:text-[#073B2C] group-hover:translate-x-1 transition-all duration-250" />
                       </>
                     )}
                   </button>

@@ -28,7 +28,7 @@ export default function TestimonialsPage() {
             <h2 className="text-2xl sm:text-3xl font-extrabold text-brand-green-dark">
               Trusted Partnerships. Proven Reliability.
             </h2>
-            <p className="text-xs sm:text-sm text-brand-gray mt-2 font-light">
+            <p className="text-sm sm:text-base text-[#4b5563] mt-2 font-normal leading-relaxed">
               We gather feedback from our shipping and brokerage clients periodically to uphold world-class service standards.
             </p>
             <div className="w-12 h-[3px] bg-brand-yellow mx-auto mt-4 rounded-full"></div>
@@ -52,7 +52,7 @@ export default function TestimonialsPage() {
                     <span className="ml-1.5 text-xs font-bold text-gray-500">5.0</span>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-brand-gray-dark italic leading-relaxed font-normal">
+                  <p className="text-[13.5px] sm:text-[15px] text-[#374151] italic leading-relaxed font-normal">
                     &ldquo;{card.text}&rdquo;
                   </p>
                 </div>

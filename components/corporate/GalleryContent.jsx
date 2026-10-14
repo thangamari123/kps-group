@@ -63,7 +63,7 @@ export default function GalleryContent() {
     <div className="bg-white">
       <PageHero 
         title="Our Gallery" 
-        description="A visual journey through our operations, milestones, and the people who make K.P.S a leader in logistics."
+        description="A visual journey through our operations, milestones, and the people who make KPS a leader in logistics."
         bgImage="https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=1920&q=80"
       />
 
@@ -73,10 +73,10 @@ export default function GalleryContent() {
           <div className="flex justify-center space-x-4 mb-8">
             <button
               onClick={() => { setActiveTab('photos'); setSelectedCategory('All'); }}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-full text-sm font-semibold shadow-xs transition-all duration-300 focus:outline-none cursor-pointer ${
+              className={`flex items-center space-x-2 px-6 py-3 rounded-full text-sm font-semibold shadow-xs transition-all duration-250 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffc107] cursor-pointer ${
                 activeTab === 'photos'
                   ? 'bg-brand-green text-white ring-2 ring-brand-green ring-offset-2'
-                  : 'bg-brand-gray-light text-brand-gray-dark hover:bg-brand-gray-muted'
+                  : 'bg-brand-gray-light text-brand-gray-dark hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C]'
               }`}
             >
               <Camera className="w-4 h-4" />
@@ -84,10 +84,10 @@ export default function GalleryContent() {
             </button>
             <button
               onClick={() => { setActiveTab('videos'); setSelectedCategory('All'); }}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-full text-sm font-semibold shadow-xs transition-all duration-300 focus:outline-none cursor-pointer ${
+              className={`flex items-center space-x-2 px-6 py-3 rounded-full text-sm font-semibold shadow-xs transition-all duration-250 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffc107] cursor-pointer ${
                 activeTab === 'videos'
                   ? 'bg-brand-green text-white ring-2 ring-brand-green ring-offset-2'
-                  : 'bg-brand-gray-light text-brand-gray-dark hover:bg-brand-gray-muted'
+                  : 'bg-brand-gray-light text-brand-gray-dark hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C]'
               }`}
             >
               <Video className="w-4 h-4" />
@@ -102,10 +102,10 @@ export default function GalleryContent() {
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(cat)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107] ${
                     selectedCategory === cat
                       ? 'bg-[#006B4F] text-white shadow-xs'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-600 hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C]'
                   }`}
                 >
                   {cat}
@@ -131,7 +131,7 @@ export default function GalleryContent() {
               <h3 className="text-lg font-bold text-brand-green-dark">
                 {activeTab === 'photos' ? 'No photos available yet.' : 'No videos available yet.'}
               </h3>
-              <p className="text-sm text-brand-gray mt-1 max-w-sm mx-auto font-light">
+              <p className="text-[14.5px] text-[#4b5563] mt-1 max-w-sm mx-auto font-normal">
                 {activeTab === 'photos'
                   ? 'Check back soon for high-resolution operational photographs.'
                   : 'Check back soon for video briefings and showcase recordings.'}
@@ -233,7 +233,7 @@ export default function GalleryContent() {
             <div className="text-center py-20 border-2 border-dashed border-brand-gray-muted rounded-2xl bg-brand-gray-light max-w-2xl mx-auto">
               <Tag className="w-12 h-12 text-brand-gray mx-auto mb-4" />
               <h3 className="text-lg font-bold text-brand-green-dark">No Matching Items Found</h3>
-              <p className="text-sm text-brand-gray mt-1 max-w-sm mx-auto font-light">
+              <p className="text-[14.5px] text-[#4b5563] mt-1 max-w-sm mx-auto font-normal">
                 Try selecting a different category filter.
               </p>
             </div>
@@ -253,7 +253,7 @@ export default function GalleryContent() {
             >
               <button
                 onClick={() => setLightboxItem(null)}
-                className="absolute top-4 right-4 p-2 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors z-10 cursor-pointer"
+                className="absolute top-4 right-4 p-2 rounded-full bg-black/60 text-white hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] transition-colors duration-200 z-10 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -274,7 +274,7 @@ export default function GalleryContent() {
                   )}
                 </div>
                 {lightboxItem.description && (
-                  <p className="text-xs text-gray-600 font-light leading-relaxed">{lightboxItem.description}</p>
+                  <p className="text-[13.5px] sm:text-sm text-gray-700 font-normal leading-relaxed">{lightboxItem.description}</p>
                 )}
                 {lightboxItem.caption && (
                   <p className="text-[11px] text-gray-500 italic">{lightboxItem.caption}</p>
@@ -311,7 +311,7 @@ export default function GalleryContent() {
             >
               <button
                 onClick={() => setActiveVideo(null)}
-                className="absolute top-4 right-4 p-2 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors z-20 cursor-pointer"
+                className="absolute top-4 right-4 p-2 rounded-full bg-black/60 text-white hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] transition-colors duration-200 z-20 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>

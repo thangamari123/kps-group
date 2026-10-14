@@ -122,7 +122,7 @@ export default function Header() {
       {/* 1. MAIN NAVBAR (Pill Shaped White Container) */}
       <div className="w-[95%] max-w-[1360px] bg-white rounded-full shadow-[0_10px_35px_rgba(0,0,0,0.12)] border border-slate-100/90 px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 flex items-center justify-between relative z-20 pointer-events-auto">
         
-        {/* Left Side: K.P.S Logo + DELIVERY SMILE */}
+        {/* Left Side: KPS Logo + DELIVERY SMILE */}
         <Link
           href="/"
           className="flex flex-col items-center justify-center shrink-0 group select-none mr-3 sm:mr-6"
@@ -218,14 +218,14 @@ export default function Header() {
           {/* Get Quote Pill Button */}
           <button
             onClick={() => window.dispatchEvent(new CustomEvent('open-quote-modal'))}
-            className="group flex items-center bg-[#073B2C] hover:bg-[#0A4D3A] text-white rounded-full pl-4 sm:pl-5 pr-1.5 sm:pr-1.5 py-1.5 transition-all duration-300 shadow-md hover:shadow-lg focus:outline-none cursor-pointer select-none"
+            className="group flex items-center bg-[#073B2C] hover:bg-[#ffc107] active:bg-[#e0a800] text-white hover:text-[#073B2C] active:text-[#073B2C] rounded-full pl-4 sm:pl-5 pr-1.5 sm:pr-1.5 py-1.5 transition-all duration-250 shadow-md hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffc107] focus-visible:ring-offset-2 cursor-pointer select-none"
             aria-label="Get Quote"
           >
-            <span className="text-xs sm:text-sm font-bold tracking-tight text-white mr-2.5 sm:mr-3">
+            <span className="text-xs sm:text-sm font-bold tracking-tight text-white group-hover:text-[#073B2C] group-active:text-[#073B2C] mr-2.5 sm:mr-3 transition-colors duration-250">
               Get Quote
             </span>
-            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#f59e0b] group-hover:bg-[#fbbf24] flex items-center justify-center transition-transform duration-300 group-hover:scale-105 shadow-xs">
-              <ArrowUpRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white stroke-[2.5]" />
+            <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#f59e0b] group-hover:bg-[#073B2C] group-active:bg-[#073B2C] flex items-center justify-center transition-all duration-250 group-hover:scale-105 shadow-xs">
+              <ArrowUpRight className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white group-hover:text-[#ffc107] group-active:text-[#ffc107] stroke-[2.5] transition-colors duration-250" />
             </span>
           </button>
 
@@ -233,7 +233,7 @@ export default function Header() {
           <div className="lg:hidden flex items-center">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 text-slate-700 hover:text-[#073B2C] rounded-full focus:outline-none"
+              className="p-2 text-slate-700 hover:text-[#073B2C] hover:bg-[#ffc107]/20 active:bg-[#e0a800]/30 rounded-full focus:outline-none transition-colors duration-200"
               aria-label="Toggle navigation menu"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -365,7 +365,7 @@ export default function Header() {
               <div className="pt-4 space-y-3">
                 <a
                   href={`tel:${companyDetails.contact.phone}`}
-                  className="flex items-center justify-center space-x-2 text-[#073B2C] py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-xs hover:bg-slate-100 transition-colors"
+                  className="flex items-center justify-center space-x-2 text-[#073B2C] py-2.5 bg-slate-50 border border-slate-200 hover:border-[#ffc107] hover:bg-[#ffc107]/15 active:bg-[#e0a800]/25 rounded-xl font-bold text-xs transition-all duration-200"
                 >
                   <Phone className="w-3.5 h-3.5 text-[#0F5B44]" />
                   <span>24/7 Support: {companyDetails.contact.phone}</span>
@@ -376,10 +376,10 @@ export default function Header() {
                     setIsOpen(false);
                     window.dispatchEvent(new CustomEvent('open-quote-modal'));
                   }}
-                  className="w-full flex items-center justify-center bg-[#073B2C] hover:bg-[#0A4D3A] text-white font-bold py-3 px-4 rounded-xl shadow-md transition-colors cursor-pointer"
+                  className="w-full flex items-center justify-center bg-[#073B2C] hover:bg-[#ffc107] active:bg-[#e0a800] text-white hover:text-[#073B2C] active:text-[#073B2C] font-bold py-3 px-4 rounded-xl shadow-md transition-all duration-250 cursor-pointer group"
                 >
                   <span>Get Quote</span>
-                  <ArrowUpRight className="w-4 h-4 ml-1.5 text-brand-yellow stroke-[2.5]" />
+                  <ArrowUpRight className="w-4 h-4 ml-1.5 text-brand-yellow group-hover:text-[#073B2C] group-active:text-[#073B2C] stroke-[2.5] transition-colors duration-250" />
                 </button>
               </div>
 

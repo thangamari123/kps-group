@@ -12,8 +12,8 @@
   
   --color-brand-gray-light: #f8f9fa;
   --color-brand-gray-muted: #e9ecef;
-  --color-brand-gray: #6c757d;
-  --color-brand-gray-dark: #212529;
+  --color-brand-gray: #4b5563;
+  --color-brand-gray-dark: #1e293b;
 
   --color-admin-primary: #006B4F;
   --color-admin-deep: #004D3A;
@@ -38,13 +38,62 @@
     background-color: #ffffff;
     color: var(--color-brand-gray-dark);
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Custom focus ring for accessibility */
+  p {
+    line-height: 1.72;
+  }
+
+  strong, b {
+    font-weight: 650;
+  }
+
+  /* Custom focus ring for accessibility using #ffc107 */
   :focus-visible {
     outline: none;
-    outline: 2px solid var(--color-brand-green);
+    outline: 2px solid #ffc107;
     outline-offset: 2px;
+  }
+}
+
+/* Enhanced body copy and readable paragraph tokens */
+.body-copy {
+  font-size: clamp(15px, 1.05vw, 17.5px);
+  line-height: 1.72;
+  font-weight: 420;
+  color: #374151;
+}
+
+.body-copy strong,
+.body-copy b {
+  font-weight: 650;
+  color: #073B2C;
+}
+
+.lead-copy {
+  font-size: clamp(16px, 1.2vw, 19px);
+  line-height: 1.68;
+  font-weight: 450;
+  color: #1f2937;
+}
+
+.lead-copy strong,
+.lead-copy b {
+  font-weight: 700;
+  color: #073B2C;
+}
+
+/* Accessible global button interaction & reduced motion standards */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
@@ -133,5 +182,33 @@
 @media (min-width: 640px) {
   .why-card-container {
     clip-path: polygon(0 0, 97% 0, 100% 3%, 100% 100%, 0 100%);
+  }
+}
+
+/* Pan-India Branch Network Responsive Grid */
+.branch-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 351px) {
+  .branch-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+}
+
+@media (min-width: 481px) {
+  .branch-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .branch-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
   }
 }

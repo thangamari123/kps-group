@@ -47,7 +47,7 @@ export default function IndustryContent({ industry }) {
             </h1>
 
             {/* Sub-description */}
-            <p className="text-xs sm:text-base text-gray-200 leading-relaxed font-light max-w-2xl">
+            <p className="text-[14.5px] sm:text-base text-gray-100 leading-relaxed font-normal max-w-2xl">
               {industry.fullDesc}
             </p>
 
@@ -99,7 +99,7 @@ export default function IndustryContent({ industry }) {
                         {item.title}
                       </h3>
                     </div>
-                    <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light pl-8">
+                    <p className="text-xs sm:text-sm text-[#4b5563] leading-relaxed font-normal pl-8">
                       {item.desc}
                     </p>
                   </div>
@@ -118,7 +118,7 @@ export default function IndustryContent({ industry }) {
                 </h3>
               </div>
 
-              <p className="text-xs sm:text-sm text-gray-200 leading-relaxed font-light">
+              <p className="text-sm sm:text-[15px] text-gray-100 leading-relaxed font-normal">
                 {industry.kpsSolution}
               </p>
 
@@ -168,7 +168,7 @@ export default function IndustryContent({ industry }) {
                 <h3 className="text-base font-bold text-brand-green-dark">
                   {step.title}
                 </h3>
-                <p className="text-xs text-brand-gray leading-relaxed font-light">
+                <p className="text-xs sm:text-[13px] text-[#4b5563] leading-relaxed font-normal">
                   {step.desc}
                 </p>
               </div>
@@ -246,7 +246,7 @@ export default function IndustryContent({ industry }) {
           <h2 className="text-xl sm:text-3xl font-black text-white">
             Need Tailored Logistics for Your {industry.title} Operations?
           </h2>
-          <p className="text-xs sm:text-sm text-gray-300 font-light">
+          <p className="text-sm sm:text-base text-gray-200 font-normal">
             Contact our senior logistics engineers for customized routing, customs duty advisory, and rate estimations.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2">

@@ -3,14 +3,14 @@ import AwardsContent from '@/components/corporate/AwardsContent';
 
 export const metadata: Metadata = {
   title: 'Awards & Recognitions | KPS Worldwide Logistics',
-  description: 'A comprehensive record of prestigious industry awards, customer partner appreciations, and conclave recognitions honoring K.P.S.',
+  description: 'A comprehensive record of prestigious industry awards, customer partner appreciations, and conclave recognitions honoring KPS.',
   keywords: ['KPS awards', 'shipping awards India', 'logistics excellence award', 'South East Cargo Conclave CEO of the year', 'CII awards'],
   alternates: {
     canonical: 'https://www.kpsgroups.net/awards',
   },
   openGraph: {
     title: 'Awards & Recognitions | KPS Worldwide Logistics',
-    description: 'A comprehensive record of prestigious industry awards, customer partner appreciations, and conclave recognitions honoring K.P.S.',
+    description: 'A comprehensive record of prestigious industry awards, customer partner appreciations, and conclave recognitions honoring KPS.',
     url: 'https://www.kpsgroups.net/awards',
     siteName: 'KPS Worldwide Logistics',
     locale: 'en_US',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Awards & Recognitions | KPS Worldwide Logistics',
-    description: 'A comprehensive record of prestigious industry awards, customer partner appreciations, and conclave recognitions honoring K.P.S.',
+    description: 'A comprehensive record of prestigious industry awards, customer partner appreciations, and conclave recognitions honoring KPS.',
   },
 };
 
@@ -28,7 +28,7 @@ export default function AwardsPage() {
     '@context': 'https://schema.org',
     '@type': 'AboutPage',
     name: 'Awards & Recognitions - KPS Worldwide Logistics',
-    description: 'A comprehensive record of prestigious industry awards, customer partner appreciations, and conclave recognitions honoring K.P.S.',
+    description: 'A comprehensive record of prestigious industry awards, customer partner appreciations, and conclave recognitions honoring KPS.',
     url: 'https://www.kpsgroups.net/awards',
     publisher: {
       '@type': 'Organization',

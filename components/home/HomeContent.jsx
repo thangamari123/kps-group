@@ -622,7 +622,7 @@ export default function HomeContent() {
               >
                 <Link
                   href="/quote"
-                  className="inline-flex items-center justify-center space-x-1 xs:space-x-1.5 sm:space-x-2.5 bg-brand-yellow hover:bg-brand-yellow-light text-brand-green-dark font-extrabold px-2.5 py-1.5 xs:px-3.5 xs:py-2 sm:px-8 sm:py-4 text-[10px] xs:text-[11px] sm:text-sm rounded-md xs:rounded-lg sm:rounded-xl shadow-md sm:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-brand-yellow text-center"
+                  className="inline-flex items-center justify-center space-x-1 xs:space-x-1.5 sm:space-x-2.5 bg-[#ffc107] hover:bg-[#ffcd39] active:bg-[#e0a800] text-[#073b2c] font-extrabold px-2.5 py-1.5 xs:px-3.5 xs:py-2 sm:px-8 sm:py-4 text-[10px] xs:text-[11px] sm:text-sm rounded-md xs:rounded-lg sm:rounded-xl shadow-md sm:shadow-xl transition-all duration-250 transform hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffc107] text-center"
                 >
                   <span>Get Quote</span>
                   <ArrowRight className="w-2.5 h-2.5 xs:w-3 xs:h-3 sm:w-4 sm:h-4" />
@@ -630,7 +630,7 @@ export default function HomeContent() {
 
                 <Link
                   href="/services"
-                  className="inline-flex items-center justify-center space-x-1 xs:space-x-1.5 sm:space-x-2 bg-white/10 hover:bg-white/20 border border-white/30 backdrop-blur-md text-white font-bold px-2.5 py-1.5 xs:px-3.5 xs:py-2 sm:px-8 sm:py-4 text-[10px] xs:text-[11px] sm:text-sm rounded-md xs:rounded-lg sm:rounded-xl shadow-sm sm:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-white text-center"
+                  className="inline-flex items-center justify-center space-x-1 xs:space-x-1.5 sm:space-x-2 bg-white/10 hover:bg-[#ffc107] hover:border-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] border border-white/30 backdrop-blur-md text-white font-bold px-2.5 py-1.5 xs:px-3.5 xs:py-2 sm:px-8 sm:py-4 text-[10px] xs:text-[11px] sm:text-sm rounded-md xs:rounded-lg sm:rounded-xl shadow-sm sm:shadow-lg transition-all duration-250 transform hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffc107] text-center"
                 >
                   <span>Explore Capabilities</span>
                 </Link>
@@ -707,13 +707,13 @@ export default function HomeContent() {
             <div className="lg:col-span-7 order-1 space-y-3">
               <div>
                 <span className="text-brand-green font-bold text-xs uppercase tracking-widest block">
-                  ABOUT K.P.S
+                  ABOUT KPS
                 </span>
                 <div className="w-10 h-[2px] bg-brand-yellow mt-1 mb-4"></div>
               </div>
               
               <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-brand-green-dark leading-tight">
-                About K.P.S
+                About KPS
               </h2>
 
               <p className="text-base sm:text-lg font-extrabold text-brand-yellow-dark">
@@ -730,7 +730,7 @@ export default function HomeContent() {
               <div className="rounded-2xl overflow-hidden shadow-2xl relative z-10 aspect-square bg-brand-green-dark">
                 <img
                   src="https://res.cloudinary.com/vm9q4qwp/image/upload/v1788966808/about_card.png"
-                  alt="About K.P.S"
+                  alt="About KPS"
                   className="w-full h-full object-cover transform hover:scale-102 transition-transform duration-500"
                 />
               </div>
@@ -738,12 +738,12 @@ export default function HomeContent() {
 
             {/* Content & Features Block */}
             <div className="lg:col-span-7 order-3 lg:order-2 space-y-4 sm:space-y-5 mt-4 lg:mt-0">
-              <p className="text-sm sm:text-base text-brand-gray leading-relaxed font-light">
-                Founded by <strong className="font-bold text-brand-green-dark">Mr. Srinivasa Pragasam</strong>, K.P.S has grown from a humble beginning into a trusted name in shipping and logistics. With over <strong className="font-bold text-brand-green-dark">40 years of industry experience</strong>, we combine reliable service, strong global relationships, and modern logistics solutions to move your cargo with confidence.
+              <p className="text-[15px] sm:text-base md:text-[17px] text-[#374151] leading-[1.75] font-normal">
+                Founded by <strong className="font-semibold text-brand-green-dark">Mr. Srinivasa Pragasam</strong>, KPS has grown from a humble beginning into a trusted name in shipping and logistics. With over <strong className="font-semibold text-brand-green-dark">40 years of industry experience</strong>, we combine reliable service, strong global relationships, and modern logistics solutions to move your cargo with confidence.
               </p>
 
-              <p className="text-xs sm:text-sm text-brand-gray leading-relaxed font-light">
-                Today, under the leadership of Managing Director <strong className="font-bold text-brand-green-dark">Mr. B.S. Prassanna</strong>, we combine licensed customs clearance heritage with advanced digital operations, multimodal freight forwarding, and specialized project cargo handling across key global trade corridors.
+              <p className="text-[14px] sm:text-[15.5px] text-[#4b5563] leading-[1.72] font-normal">
+                Today, under the leadership of Managing Director <strong className="font-semibold text-brand-green-dark">Mr. B.S. Prassanna</strong>, we combine <strong className="font-semibold text-brand-green-dark">licensed customs clearance</strong> heritage with <strong className="font-semibold text-brand-green-dark">advanced digital operations</strong>, multimodal freight forwarding, and specialized project cargo handling across key global trade corridors.
               </p>
 
               {/* Core Values Strip */}
@@ -764,7 +764,7 @@ export default function HomeContent() {
                   </div>
                   <div>
                     <h4 className="text-xs sm:text-sm font-bold text-brand-green-dark leading-snug">40+ Years Legacy</h4>
-                    <p className="text-[11px] text-brand-gray font-light mt-0.5">Continuous trust & excellence since 1985.</p>
+                    <p className="text-xs text-[#4b5563] font-normal mt-0.5">Continuous trust & excellence since 1985.</p>
                   </div>
                 </div>
 
@@ -774,7 +774,7 @@ export default function HomeContent() {
                   </div>
                   <div>
                     <h4 className="text-xs sm:text-sm font-bold text-brand-green-dark leading-snug">Licensed Custom Broker</h4>
-                    <p className="text-[11px] text-brand-gray font-light mt-0.5">Reg. 50 in-house customs clearance desks.</p>
+                    <p className="text-xs text-[#4b5563] font-normal mt-0.5">Reg. 50 in-house customs clearance desks.</p>
                   </div>
                 </div>
 
@@ -784,7 +784,7 @@ export default function HomeContent() {
                   </div>
                   <div>
                     <h4 className="text-xs sm:text-sm font-bold text-brand-green-dark leading-snug">Global Multimodal</h4>
-                    <p className="text-[11px] text-brand-gray font-light mt-0.5">Ocean, air, road & FTWZ warehousing.</p>
+                    <p className="text-xs text-[#4b5563] font-normal mt-0.5">Ocean, air, road & FTWZ warehousing.</p>
                   </div>
                 </div>
 
@@ -794,7 +794,7 @@ export default function HomeContent() {
                   </div>
                   <div>
                     <h4 className="text-xs sm:text-sm font-bold text-brand-green-dark leading-snug">6,000+ Clients</h4>
-                    <p className="text-[11px] text-brand-gray font-light mt-0.5">Trusted by leading industrial enterprises.</p>
+                    <p className="text-xs text-[#4b5563] font-normal mt-0.5">Trusted by leading industrial enterprises.</p>
                   </div>
                 </div>
               </div>
@@ -1301,7 +1301,7 @@ export default function HomeContent() {
               <h4 className="text-sm sm:text-lg font-extrabold text-white">
                 Chennai (Head Office)
               </h4>
-              <p className="text-[11px] sm:text-xs text-gray-300 font-light">
+              <p className="text-xs sm:text-[13px] text-gray-200 font-normal leading-relaxed">
                 No. 14, 6th Floor, A.K. Nayak Bhavan, Jahangir Street, Second Line Beach, Parrys, Chennai 600 001, Tamil Nadu, India
               </p>
             </div>
@@ -1342,7 +1342,7 @@ export default function HomeContent() {
                 <button
                   type="button"
                   onClick={() => setSelectedOffice(null)}
-                  className="absolute top-4 right-4 p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors"
+                  className="absolute top-4 right-4 p-1.5 rounded-full bg-gray-100 hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] text-gray-600 transition-colors duration-200"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -1416,7 +1416,7 @@ export default function HomeContent() {
                 <button
                   type="button"
                   onClick={() => setSelectedAward(null)}
-                  className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors z-10 shadow-xs"
+                  className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-full bg-gray-100 hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] text-gray-700 transition-colors duration-200 z-10 shadow-xs"
                   aria-label="Close"
                 >
                   <X className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -1446,7 +1446,7 @@ export default function HomeContent() {
                       {selectedAward.title}
                     </h3>
 
-                    <p className="text-xs text-gray-600 leading-relaxed font-light">
+                    <p className="text-[13px] sm:text-sm text-gray-700 leading-relaxed font-normal">
                       {selectedAward.description}
                     </p>
 
@@ -1566,7 +1566,7 @@ export default function HomeContent() {
                               e.stopPropagation();
                               setActiveAwardSlide((prev) => (prev - 1 + 3) % 3);
                             }}
-                            className="w-5 h-5 rounded-full bg-gray-100 hover:bg-brand-green hover:text-white flex items-center justify-center transition-colors text-gray-700 shadow-2xs"
+                            className="w-5 h-5 rounded-full bg-gray-100 hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] flex items-center justify-center transition-colors duration-200 text-gray-700 shadow-2xs"
                             aria-label="Previous Award"
                           >
                             <ChevronLeft className="w-3 h-3" />
@@ -1577,7 +1577,7 @@ export default function HomeContent() {
                               e.stopPropagation();
                               setActiveAwardSlide((prev) => (prev + 1) % 3);
                             }}
-                            className="w-5 h-5 rounded-full bg-gray-100 hover:bg-brand-green hover:text-white flex items-center justify-center transition-colors text-gray-700 shadow-2xs"
+                            className="w-5 h-5 rounded-full bg-gray-100 hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] flex items-center justify-center transition-colors duration-200 text-gray-700 shadow-2xs"
                             aria-label="Next Award"
                           >
                             <ChevronRight className="w-3 h-3" />
