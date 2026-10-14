@@ -1,27 +1,6 @@
 // Frontend CMS Media Client: R2 Uploads, Deletion & URL Helpers
 import { auth } from './firebase';
-
-function getApiBaseUrl(): string {
-  const envUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (envUrl) {
-    const urls = envUrl.split(',').map((u) => u.trim()).filter(Boolean);
-    if (urls.length > 1) {
-      if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-        const local = urls.find((u) => u.includes('localhost') || u.includes('127.0.0.1'));
-        if (local) return local.replace(/\/+$/, '');
-      } else {
-        const prod = urls.find((u) => !u.includes('localhost') && !u.includes('127.0.0.1'));
-        if (prod) return prod.replace(/\/+$/, '');
-      }
-    }
-    if (urls[0]) return urls[0].replace(/\/+$/, '');
-  }
-
-  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-    return 'http://localhost:8787';
-  }
-  return 'https://kps-backend-api.kpsandfairway.workers.dev';
-}
+import { getApiBaseUrl, buildApiUrl } from './api-config';
 
 async function getFirebaseToken(): Promise<string | null> {
   if (typeof window === 'undefined' || !auth?.currentUser) return null;
@@ -55,12 +34,11 @@ export const cmsApi = {
       return urlOrKey;
     }
 
-    const apiBase = getApiBaseUrl();
     const cleanKey = urlOrKey.replace(/^\/+/, '');
     if (cleanKey.startsWith('api/media/')) {
-      return `${apiBase}/${cleanKey}`;
+      return buildApiUrl(`/${cleanKey}`);
     }
-    return `${apiBase}/api/media/${cleanKey}`;
+    return buildApiUrl(`/api/media/${cleanKey}`);
   },
 
   /**
@@ -77,8 +55,7 @@ export const cmsApi = {
       throw new Error('Authentication required: Please log in to upload media.');
     }
 
-    const apiBase = getApiBaseUrl();
-    const endpoint = `${apiBase}/api/admin/media/upload`;
+    const endpoint = buildApiUrl('/api/admin/media/upload');
     const formData = new FormData();
     formData.append('file', file);
     formData.append('prefix', prefix);
@@ -151,8 +128,7 @@ export const cmsApi = {
       const token = await getFirebaseToken();
       if (!token) return false;
 
-      const apiBase = getApiBaseUrl();
-      const endpoint = `${apiBase}/api/admin/media/delete`;
+      const endpoint = buildApiUrl('/api/admin/media/delete');
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -169,3 +145,5 @@ export const cmsApi = {
     }
   },
 };
+
+export { getApiBaseUrl, buildApiUrl };

@@ -1,13 +1,6 @@
 // Resume Upload and Secure Access Client via Cloudflare Worker & R2
 import { auth } from './firebase';
-
-const API_BASE = (
-  process.env.NEXT_PUBLIC_API_URL ||
-  (typeof window !== 'undefined' &&
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:8787'
-    : 'https://api.kpsgroups.net')
-).replace(/\/+$/, '');
+import { buildApiUrl, getApiBaseUrl } from './api-config';
 
 export interface ResumeUploadResult {
   success: boolean;
@@ -34,7 +27,8 @@ export const resumeApi = {
     formData.append('candidate_name', candidateName);
     formData.append('candidate_email', candidateEmail);
 
-    const response = await fetch(`${API_BASE}/api/careers/resume/upload`, {
+    const uploadUrl = buildApiUrl('/api/careers/resume/upload');
+    const response = await fetch(uploadUrl, {
       method: 'POST',
       body: formData,
     });
@@ -50,19 +44,21 @@ export const resumeApi = {
 
     const json = await response.json();
     const data = json.data || json;
+    const finalKey = data.key || data.resume_key || '';
 
     return {
       success: true,
-      key: data.key || data.resume_key,
+      key: finalKey,
       filename: data.filename || data.resume_name || file.name,
       size: data.size || data.resume_size || file.size,
       contentType: data.contentType || file.type || 'application/pdf',
-      url: data.url || `${API_BASE}/api/admin/resumes/stream?key=${encodeURIComponent(data.key || '')}`,
+      url: data.url || (finalKey ? buildApiUrl('/api/admin/resumes/stream', { key: finalKey }) : ''),
     };
   },
 
   /**
    * Securely streams / downloads resume PDF from R2 using current Firebase Admin token
+   * Calls Worker GET /api/admin/resumes/stream?key=...&download=0|1
    */
   async viewOrDownloadResume(
     applicationId: string,
@@ -76,23 +72,66 @@ export const resumeApi = {
       headers['Authorization'] = `Bearer ${idToken}`;
     }
 
-    // Build URL
-    let url = `${API_BASE}/api/admin/applications/${encodeURIComponent(applicationId)}/resume`;
-    if (r2Key) {
-      url = `${API_BASE}/api/admin/resumes/stream?key=${encodeURIComponent(r2Key)}`;
+    // Clean and extract raw R2 key if passed with URL or query parameters
+    let cleanKey = (r2Key || '').trim();
+    if (cleanKey.includes('key=')) {
+      try {
+        const parsed = cleanKey.startsWith('http')
+          ? new URL(cleanKey)
+          : new URL(cleanKey, 'https://dummy.local');
+        const extracted = parsed.searchParams.get('key');
+        if (extracted) {
+          cleanKey = decodeURIComponent(extracted);
+        }
+      } catch {
+        const match = cleanKey.match(/[?&]key=([^&]+)/);
+        if (match && match[1]) {
+          cleanKey = decodeURIComponent(match[1]);
+        }
+      }
     }
-    url += `${url.includes('?') ? '&' : '?'}download=${openInNewTab ? '0' : '1'}`;
+
+    // Build URL using centralized URL constructor
+    let endpoint = '/api/admin/resumes/stream';
+    const params: Record<string, string> = {
+      download: openInNewTab ? '0' : '1',
+    };
+
+    if (cleanKey) {
+      params.key = cleanKey;
+    } else if (applicationId) {
+      endpoint = `/api/admin/applications/${encodeURIComponent(applicationId)}/resume`;
+    }
+
+    const url = buildApiUrl(endpoint, params);
 
     const res = await fetch(url, { headers });
     if (!res.ok) {
-      throw new Error(`Failed to retrieve resume (${res.status} ${res.statusText})`);
+      let errorMsg = `Failed to retrieve resume (${res.status} ${res.statusText})`;
+      try {
+        const errorJson = await res.json();
+        if (errorJson?.error) {
+          errorMsg = errorJson.error;
+        }
+      } catch {}
+      throw new Error(errorMsg);
     }
 
     const blob = await res.blob();
     const blobUrl = window.URL.createObjectURL(blob);
 
     if (openInNewTab) {
-      window.open(blobUrl, '_blank');
+      const opened = window.open(blobUrl, '_blank');
+      // If popup blocker intervened, fall back to anchor click
+      if (!opened) {
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 60000);
     } else {
       const a = document.createElement('a');
       a.href = blobUrl;
@@ -115,10 +154,13 @@ export const resumeApi = {
       headers['Authorization'] = `Bearer ${idToken}`;
     }
 
-    await fetch(`${API_BASE}/api/admin/media/delete`, {
+    const deleteUrl = buildApiUrl('/api/admin/media/delete');
+    await fetch(deleteUrl, {
       method: 'POST',
       headers,
       body: JSON.stringify({ key: r2Key }),
     }).catch((err) => console.warn('R2 resume deletion warning:', err));
   },
 };
+
+export { getApiBaseUrl, buildApiUrl };

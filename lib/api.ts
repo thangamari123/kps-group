@@ -1,12 +1,8 @@
 // Frontend API Client for KPS Backend Cloudflare Worker
 import { auth } from './firebase';
+import { buildApiUrl, getApiBaseUrl } from './api-config';
 
-const API_BASE = (
-  process.env.NEXT_PUBLIC_API_URL ||
-  (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-    ? 'http://localhost:8787'
-    : 'https://api.kpsgroups.net')
-).replace(/\/+$/, '');
+export { getApiBaseUrl, buildApiUrl };
 
 export class ApiError extends Error {
   status: number;
@@ -45,7 +41,7 @@ async function request<T>(
   options: RequestInit = {},
   isRetry = false
 ): Promise<T> {
-  const url = `${API_BASE}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  const url = buildApiUrl(endpoint);
 
   const defaultHeaders: Record<string, string> = {
     Accept: 'application/json',
@@ -251,21 +247,40 @@ export const applicationsApi = {
       body: JSON.stringify({ status }),
     }),
 
-  getResumeUrl: (id: string, download = false) =>
-    `${API_BASE}/api/admin/applications/${encodeURIComponent(id)}/resume${download ? '?download=1' : ''}`,
+  getResumeUrl: (idOrKey: string, download = false) => {
+    const isKey = idOrKey.startsWith('resumes/') || idOrKey.includes('/');
+    if (isKey) {
+      return buildApiUrl('/api/admin/resumes/stream', {
+        key: idOrKey,
+        download: download ? '1' : '0',
+      });
+    }
+    return buildApiUrl(`/api/admin/applications/${encodeURIComponent(idOrKey)}/resume`, {
+      download: download ? '1' : '0',
+    });
+  },
 
   /**
    * Securely fetch resume PDF as a blob using current Firebase credentials
    * and trigger download or return object URL.
    */
-  downloadResumeFile: async (id: string, filename = 'Resume.pdf', openInNewTab = false) => {
+  downloadResumeFile: async (idOrKey: string, filename = 'Resume.pdf', openInNewTab = false) => {
     const idToken = await getFirebaseIdToken();
     const headers: Record<string, string> = {};
     if (idToken) {
       headers['Authorization'] = `Bearer ${idToken}`;
     }
 
-    const url = `${API_BASE}/api/admin/applications/${encodeURIComponent(id)}/resume${!openInNewTab ? '?download=1' : ''}`;
+    const isKey = idOrKey.startsWith('resumes/') || idOrKey.includes('/');
+    const url = isKey
+      ? buildApiUrl('/api/admin/resumes/stream', {
+          key: idOrKey,
+          download: openInNewTab ? '0' : '1',
+        })
+      : buildApiUrl(`/api/admin/applications/${encodeURIComponent(idOrKey)}/resume`, {
+          download: openInNewTab ? '0' : '1',
+        });
+
     const response = await fetch(url, { headers });
 
     if (!response.ok) {
@@ -276,7 +291,16 @@ export const applicationsApi = {
     const blobUrl = window.URL.createObjectURL(blob);
 
     if (openInNewTab) {
-      window.open(blobUrl, '_blank');
+      const opened = window.open(blobUrl, '_blank');
+      if (!opened) {
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 60000);
     } else {
       const a = document.createElement('a');
       a.href = blobUrl;
