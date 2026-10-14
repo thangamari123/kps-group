@@ -10,6 +10,14 @@
 /blog/* /blogs/:splat 301
 /lead-form /quote 301
 
+# Explicit Static Admin Routes - Never rewrite to edit or detail views
+/admin/careers/jobs/new /admin/careers/jobs/new 200
+/admin/careers/jobs/new/ /admin/careers/jobs/new 200
+/admin/careers/jobs /admin/careers/jobs 200
+/admin/careers/jobs/ /admin/careers/jobs 200
+/admin/careers/jobs/edit /admin/careers/jobs/edit 200
+/admin/careers/jobs/edit/ /admin/careers/jobs/edit 200
+
 # Dynamic client-side routes fallback for Cloudflare Pages static hosting
 /career/* /career/view 200
 /careers/* /career/view 200

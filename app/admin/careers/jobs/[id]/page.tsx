@@ -5,7 +5,6 @@ export const dynamic = 'force-static';
 
 export function generateStaticParams() {
   return [
-    { id: 'edit' },
     { id: 'default' },
   ];
 }

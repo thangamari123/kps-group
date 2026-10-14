@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import NewJobView from '@/components/admin/NewJobView';
 import { jobsCms } from '@/lib/careers-firestore';
 import { useToast } from '@/components/admin/Toast';
 import {
@@ -32,7 +33,30 @@ interface EditJobViewProps {
 export default function EditJobView({ jobId }: EditJobViewProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const effectiveId = jobId && jobId !== 'edit' ? jobId : searchParams.get('id') || '';
+  const pathname = usePathname();
+
+  // If this view is accidentally rendered on /new (e.g. from a wildcard proxy), render NewJobView directly
+  const normalizedPath = pathname ? pathname.replace(/\/+$/, '') : '';
+  const isCreateRoute = jobId === 'new' || normalizedPath.endsWith('/admin/careers/jobs/new');
+  if (isCreateRoute) {
+    return <NewJobView />;
+  }
+
+  // Extract ID from pathname if accessed as /admin/careers/jobs/[id] (excluding static segments)
+  let pathJobId = '';
+  if (pathname) {
+    const parts = pathname.split('?')[0].split('/').filter(Boolean);
+    if (parts.length >= 4 && parts[0] === 'admin' && parts[1] === 'careers' && parts[2] === 'jobs') {
+      const seg = parts[3];
+      if (seg !== 'edit' && seg !== 'new' && seg !== 'default') {
+        pathJobId = seg;
+      }
+    }
+  }
+
+  const effectiveId = jobId && jobId !== 'edit' && jobId !== 'default'
+    ? jobId
+    : searchParams.get('id') || pathJobId || '';
   const { success: toastSuccess, error: toastError } = useToast();
 
   const [formData, setFormData] = useState({
@@ -292,7 +316,7 @@ export default function EditJobView({ jobId }: EditJobViewProps) {
             )}
           </div>
 
-          <p className="text-xs text-[#66736E] max-w-md mx-auto font-light leading-relaxed">
+          <p className="text-xs sm:text-[13px] text-[#4b5563] max-w-md mx-auto font-normal leading-relaxed">
             The job document could not be found in Cloud Firestore. It may have been deleted, or a stale seed ID was accessed.
           </p>
 
@@ -677,14 +701,14 @@ export default function EditJobView({ jobId }: EditJobViewProps) {
           <div className="pt-4 border-t border-[#E2E9E5] flex items-center justify-end space-x-3">
             <Link
               href="/admin/careers/jobs"
-              className="px-5 py-2.5 rounded-xl border border-[#E2E9E5] bg-white text-xs font-semibold text-[#17211E] hover:bg-[#F7F9F8] transition-colors"
+              className="px-5 py-2.5 rounded-xl border border-[#E2E9E5] bg-white text-xs font-semibold text-[#17211E] hover:bg-[#ffc107]/20 hover:border-[#ffc107] active:bg-[#e0a800]/30 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-[#ffc107]"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={submitting}
-              className="flex items-center space-x-2 px-6 py-2.5 rounded-xl bg-[#006B4F] hover:bg-[#005A43] text-white text-xs font-bold shadow-sm shadow-[#006B4F]/20 transition-all duration-200 disabled:opacity-50 cursor-pointer"
+              className="flex items-center space-x-2 px-6 py-2.5 rounded-xl bg-[#006B4F] hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white text-xs font-bold shadow-sm shadow-[#006B4F]/20 transition-all duration-250 disabled:opacity-50 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107]"
             >
               {submitting ? (
                 <>
