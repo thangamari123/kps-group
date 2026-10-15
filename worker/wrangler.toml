@@ -12,10 +12,8 @@ FIREBASE_PROJECT_ID = "kps-website-hr-panel"
 [[r2_buckets]]
 binding = "RESUMES_BUCKET"
 bucket_name = "kps-media"
-preview_bucket_name = "kps-media-dev"
 
 # Cloudflare R2 Bucket Binding for CMS Media Assets
 [[r2_buckets]]
 binding = "MEDIA_BUCKET"
 bucket_name = "kps-media"
-preview_bucket_name = "kps-media-dev"

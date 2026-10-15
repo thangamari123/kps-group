@@ -194,32 +194,67 @@ export default function GalleryContent() {
                   className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
                 >
                   {filteredItems.map((video) => {
-                    const posterSrc = cmsApi.resolveMediaUrl(video.posterUrl) || cmsApi.resolveMediaUrl(video.mediaUrl);
+                    const videoSrc = cmsApi.resolveMediaUrl(video.mediaUrl);
                     return (
                       <div
                         key={video.id}
-                        className="relative bg-brand-gray-light rounded-xl overflow-hidden shadow-md aspect-video group cursor-pointer border border-brand-gray-muted"
-                        onClick={() => setActiveVideo(video)}
+                        className="bg-brand-gray-light rounded-xl overflow-hidden shadow-md border border-brand-gray-muted flex flex-col"
                       >
-                        {posterSrc ? (
-                          <img
-                            src={posterSrc}
-                            alt={video.title}
-                            loading="lazy"
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-brand-green-dark/80 flex items-center justify-center">
-                            <Video className="w-10 h-10 text-white/50" />
+                        <div className="relative aspect-video bg-black flex items-center justify-center overflow-hidden">
+                          {video.isEmbed || (video.mediaUrl && (video.mediaUrl.includes('youtube.com') || video.mediaUrl.includes('youtu.be') || video.mediaUrl.includes('vimeo.com'))) ? (
+                            <iframe
+                              src={video.mediaUrl}
+                              title={video.title}
+                              className="w-full h-full border-0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          ) : videoSrc ? (
+                            <video
+                              src={`${videoSrc}#t=0.001`}
+                              controls
+                              preload="metadata"
+                              playsInline
+                              className="w-full h-full object-contain"
+                            >
+                              <source src={videoSrc} type="video/mp4" />
+                              Your browser does not support HTML5 video streaming.
+                            </video>
+                          ) : (
+                            <div className="w-full h-full bg-brand-green-dark/80 flex items-center justify-center">
+                              <Video className="w-10 h-10 text-white/50" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-4 flex-1 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between gap-2 mb-1">
+                              <h4 className="font-bold text-sm text-brand-green-dark line-clamp-1">{video.title}</h4>
+                              {video.category && (
+                                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
+                                  {video.category}
+                                </span>
+                              )}
+                            </div>
+                            {video.description && (
+                              <p className="text-xs text-gray-600 line-clamp-2 mt-1">{video.description}</p>
+                            )}
                           </div>
-                        )}
-                        <div className="absolute inset-0 bg-brand-green-dark/50 flex flex-col items-center justify-center p-4 text-center group-hover:bg-brand-green-dark/40 transition-colors">
-                          <div className="w-12 h-12 rounded-full bg-brand-yellow text-brand-green-dark flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform mb-3">
-                            <Play className="w-5 h-5 ml-1 fill-current" />
-                          </div>
-                          <h4 className="text-white font-bold text-sm drop-shadow">{video.title}</h4>
-                          {video.category && (
-                            <span className="text-[10.5px] text-brand-yellow mt-1">{video.category}</span>
+                          {(video.location || video.date) && (
+                            <div className="flex items-center gap-3 text-[11px] text-gray-500 mt-3 pt-2 border-t border-gray-100">
+                              {video.location && (
+                                <div className="flex items-center space-x-1">
+                                  <MapPin className="w-3 h-3 text-brand-yellow-dark" />
+                                  <span className="truncate max-w-[150px]">{video.location}</span>
+                                </div>
+                              )}
+                              {video.date && (
+                                <div className="flex items-center space-x-1">
+                                  <Calendar className="w-3 h-3 text-brand-yellow-dark" />
+                                  <span>{video.date}</span>
+                                </div>
+                              )}
+                            </div>
                           )}
                         </div>
                       </div>
@@ -327,12 +362,16 @@ export default function GalleryContent() {
               ) : (
                 <video
                   src={cmsApi.resolveMediaUrl(activeVideo.mediaUrl)}
-                  poster={cmsApi.resolveMediaUrl(activeVideo.posterUrl)}
+                  poster={activeVideo.posterUrl ? cmsApi.resolveMediaUrl(activeVideo.posterUrl) : undefined}
                   controls
                   autoPlay
                   playsInline
+                  preload="auto"
                   className="w-full h-full object-contain"
-                />
+                >
+                  <source src={cmsApi.resolveMediaUrl(activeVideo.mediaUrl)} type="video/mp4" />
+                  Your browser does not support HTML5 video streaming.
+                </video>
               )}
             </motion.div>
           </div>

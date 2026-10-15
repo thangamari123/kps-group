@@ -189,14 +189,14 @@ export default {
       if (path === '/api/admin/media/delete' && (method === 'DELETE' || method === 'POST')) {
         return await handleDeleteMedia(request, env);
       }
-      // Public media delivery: GET /api/media/* or GET /media/*
-      if (path.startsWith('/api/media/') && method === 'GET') {
+      // Public media delivery: GET or HEAD /api/media/* or /media/*
+      if (path.startsWith('/api/media/') && (method === 'GET' || method === 'HEAD')) {
         const rawKey = path.substring('/api/media/'.length);
         if (rawKey) {
           return await handleGetPublicMedia(request, env, rawKey);
         }
       }
-      if (path.startsWith('/media/') && method === 'GET') {
+      if (path.startsWith('/media/') && (method === 'GET' || method === 'HEAD')) {
         const rawKey = path.substring('/media/'.length);
         if (rawKey) {
           return await handleGetPublicMedia(request, env, rawKey);

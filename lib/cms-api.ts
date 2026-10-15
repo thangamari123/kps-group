@@ -29,14 +29,37 @@ export const cmsApi = {
    */
   resolveMediaUrl(urlOrKey?: string): string {
     if (!urlOrKey) return '';
-    // If it is already an absolute HTTP/HTTPS URL or data URL
-    if (urlOrKey.startsWith('http://') || urlOrKey.startsWith('https://') || urlOrKey.startsWith('data:')) {
+    if (urlOrKey.startsWith('data:')) {
       return urlOrKey;
     }
 
-    const cleanKey = urlOrKey.replace(/^\/+/, '');
+    // If it's a 3rd party external URL (e.g. YouTube, Vimeo, Unsplash, external CDN), leave as-is
+    if (
+      (urlOrKey.startsWith('http://') || urlOrKey.startsWith('https://')) &&
+      !urlOrKey.includes('localhost:8787') &&
+      !urlOrKey.includes('127.0.0.1:8787') &&
+      !urlOrKey.includes('kps-backend-api')
+    ) {
+      return urlOrKey;
+    }
+
+    // Extract path if it was an absolute URL pointing to our backend API
+    let path = urlOrKey;
+    if (urlOrKey.startsWith('http://') || urlOrKey.startsWith('https://')) {
+      try {
+        const parsed = new URL(urlOrKey);
+        path = parsed.pathname + parsed.search;
+      } catch {
+        path = urlOrKey;
+      }
+    }
+
+    const cleanKey = path.replace(/^\/+/, '');
     if (cleanKey.startsWith('api/media/')) {
       return buildApiUrl(`/${cleanKey}`);
+    }
+    if (cleanKey.startsWith('media/')) {
+      return buildApiUrl(`/api/${cleanKey}`);
     }
     return buildApiUrl(`/api/media/${cleanKey}`);
   },

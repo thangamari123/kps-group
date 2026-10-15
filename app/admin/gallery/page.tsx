@@ -69,8 +69,6 @@ export default function AdminGalleryPage() {
     mediaType: 'image' as 'image' | 'video',
     mediaUrl: '',
     r2Key: '',
-    posterUrl: '',
-    posterKey: '',
     altText: '',
     caption: '',
     featured: false,
@@ -82,13 +80,10 @@ export default function AdminGalleryPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadPercent, setUploadPercent] = useState(0);
   const [uploadStatusText, setUploadStatusText] = useState('');
-  const [uploadingPoster, setUploadingPoster] = useState(false);
-  const [posterPercent, setPosterPercent] = useState(0);
   const cancelUploadRef = useRef<{ abort?: () => void }>({});
 
   // Old media key to clean up on replacement
   const [oldMediaKey, setOldMediaKey] = useState<string | null>(null);
-  const [oldPosterKey, setOldPosterKey] = useState<string | null>(null);
 
   // Deletion State
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -121,7 +116,6 @@ export default function AdminGalleryPage() {
   const handleOpenCreate = () => {
     setEditingItem(null);
     setOldMediaKey(null);
-    setOldPosterKey(null);
     setFormData({
       title: '',
       description: '',
@@ -131,8 +125,6 @@ export default function AdminGalleryPage() {
       mediaType: 'image',
       mediaUrl: '',
       r2Key: '',
-      posterUrl: '',
-      posterKey: '',
       altText: '',
       caption: '',
       featured: false,
@@ -147,7 +139,6 @@ export default function AdminGalleryPage() {
   const handleOpenEdit = (item: GalleryItem) => {
     setEditingItem(item);
     setOldMediaKey(null);
-    setOldPosterKey(null);
     setFormData({
       title: item.title || '',
       description: item.description || '',
@@ -157,8 +148,6 @@ export default function AdminGalleryPage() {
       mediaType: item.mediaType || 'image',
       mediaUrl: item.mediaUrl || '',
       r2Key: item.r2Key || '',
-      posterUrl: item.posterUrl || '',
-      posterKey: item.posterKey || '',
       altText: item.altText || '',
       caption: item.caption || '',
       featured: item.featured ?? false,
@@ -170,12 +159,62 @@ export default function AdminGalleryPage() {
     setModalOpen(true);
   };
 
+  const handleMediaTypeChange = (newType: 'image' | 'video') => {
+    if (newType === formData.mediaType) return;
+    if (formData.mediaUrl) {
+      if (editingItem?.r2Key && !oldMediaKey) {
+        setOldMediaKey(editingItem.r2Key);
+      }
+      setFormData((prev) => ({
+        ...prev,
+        mediaType: newType,
+        mediaUrl: '',
+        r2Key: '',
+        altText: '',
+      }));
+      setUploadPercent(0);
+      setUploadStatusText('');
+      toastSuccess(`Switched to ${newType === 'video' ? 'Video' : 'Photo/Image'} mode. Incompatible media reset.`);
+    } else {
+      setFormData((prev) => ({ ...prev, mediaType: newType }));
+    }
+  };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const isVideo = file.type.startsWith('video/') || formData.mediaType === 'video';
-    const prefix = isVideo ? 'gallery/videos' : 'gallery/images';
+    const isVideoFile =
+      file.type.startsWith('video/') || /\.(mp4|webm|mov|m4v|ogv)$/i.test(file.name);
+    const isImageFile =
+      file.type.startsWith('image/') || /\.(jpg|jpeg|png|webp|avif)$/i.test(file.name);
+
+    // Enforce mutual exclusivity of media types
+    if (formData.mediaType === 'video') {
+      if (isImageFile && !isVideoFile) {
+        toastError('Video selected. Switch to Photo/Image to upload an image.');
+        e.target.value = '';
+        return;
+      }
+      if (!isVideoFile) {
+        toastError('Invalid video format. Please upload an MP4 or WebM video file.');
+        e.target.value = '';
+        return;
+      }
+    } else {
+      if (isVideoFile && !isImageFile) {
+        toastError('Image selected. Switch to Video to upload a video.');
+        e.target.value = '';
+        return;
+      }
+      if (!isImageFile) {
+        toastError('Invalid image format. Please upload a JPG, PNG, WebP, or AVIF image.');
+        e.target.value = '';
+        return;
+      }
+    }
+
+    const prefix = formData.mediaType === 'video' ? 'gallery/videos' : 'gallery/images';
 
     setUploading(true);
     setUploadPercent(0);
@@ -195,47 +234,17 @@ export default function AdminGalleryPage() {
         ...prev,
         mediaUrl: result.url,
         r2Key: result.key,
-        mediaType: isVideo ? 'video' : 'image',
         altText: prev.altText || file.name.split('.')[0].replace(/[-_]/g, ' '),
       }));
 
-      setUploadStatusText('✓ Media asset uploaded to Cloudflare R2 successfully!');
-      toastSuccess('Media asset uploaded successfully.');
+      setUploadStatusText(`✓ ${formData.mediaType === 'video' ? 'Video' : 'Image'} uploaded successfully!`);
+      toastSuccess(`${formData.mediaType === 'video' ? 'Video' : 'Image'} uploaded successfully.`);
     } catch (err: any) {
       toastError(err?.message || 'Media upload failed.');
       setUploadStatusText('');
     } finally {
       setUploading(false);
-    }
-  };
-
-  const handlePosterUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploadingPoster(true);
-    setPosterPercent(0);
-
-    try {
-      if (editingItem?.posterKey && !oldPosterKey) {
-        setOldPosterKey(editingItem.posterKey);
-      }
-
-      const result = await cmsApi.uploadMedia(file, 'gallery/posters', (percent) => {
-        setPosterPercent(percent);
-      });
-
-      setFormData((prev) => ({
-        ...prev,
-        posterUrl: result.url,
-        posterKey: result.key,
-      }));
-
-      toastSuccess('Video poster uploaded.');
-    } catch (err: any) {
-      toastError(err?.message || 'Poster upload failed.');
-    } finally {
-      setUploadingPoster(false);
+      e.target.value = '';
     }
   };
 
@@ -246,7 +255,7 @@ export default function AdminGalleryPage() {
       return;
     }
     if (!formData.mediaUrl.trim()) {
-      toastError('Please upload an image or video before saving.');
+      toastError(`Please upload ${formData.mediaType === 'video' ? 'a video' : 'an image'} before saving.`);
       return;
     }
 
@@ -259,9 +268,6 @@ export default function AdminGalleryPage() {
         // Clean up old media from R2 if replaced
         if (oldMediaKey && oldMediaKey !== formData.r2Key) {
           cmsApi.deleteMedia(oldMediaKey).catch(() => {});
-        }
-        if (oldPosterKey && oldPosterKey !== formData.posterKey) {
-          cmsApi.deleteMedia(oldPosterKey).catch(() => {});
         }
       } else {
         await galleryCms.create(formData);
@@ -517,17 +523,13 @@ export default function AdminGalleryPage() {
                     <td className="px-4 py-4">
                       <div className="w-24 h-16 rounded-xl bg-[#F7F9F8] border border-[#E2E9E5] overflow-hidden relative flex items-center justify-center shrink-0">
                         {item.mediaType === 'video' ? (
-                          item.posterUrl ? (
-                            <img
-                              src={cmsApi.resolveMediaUrl(item.posterUrl)}
-                              alt={item.title}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-[#004D3A] flex items-center justify-center text-white">
-                              <Video className="w-6 h-6 text-emerald-300" />
-                            </div>
-                          )
+                          <video
+                            src={`${cmsApi.resolveMediaUrl(item.mediaUrl)}#t=0.001`}
+                            preload="metadata"
+                            muted
+                            playsInline
+                            className="w-full h-full object-cover pointer-events-none bg-black"
+                          />
                         ) : (
                           <img
                             src={cmsApi.resolveMediaUrl(item.mediaUrl)}
@@ -536,7 +538,7 @@ export default function AdminGalleryPage() {
                           />
                         )}
                         {item.mediaType === 'video' && (
-                          <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/75 text-[9px] text-white font-bold flex items-center space-x-0.5">
+                          <span className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/75 text-[9px] text-white font-bold flex items-center space-x-0.5 pointer-events-none">
                             <Video className="w-2.5 h-2.5 text-emerald-300" />
                             <span>VID</span>
                           </span>
@@ -680,7 +682,7 @@ export default function AdminGalleryPage() {
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       type="button"
-                      onClick={() => setFormData((prev) => ({ ...prev, mediaType: 'image' }))}
+                      onClick={() => handleMediaTypeChange('image')}
                       className={`flex items-center justify-center space-x-2 p-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                         formData.mediaType === 'image'
                           ? 'bg-[#EAF5F1] text-[#006B4F] border-[#006B4F]'
@@ -693,7 +695,7 @@ export default function AdminGalleryPage() {
 
                     <button
                       type="button"
-                      onClick={() => setFormData((prev) => ({ ...prev, mediaType: 'video' }))}
+                      onClick={() => handleMediaTypeChange('video')}
                       className={`flex items-center justify-center space-x-2 p-3 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                         formData.mediaType === 'video'
                           ? 'bg-[#EAF5F1] text-[#006B4F] border-[#006B4F]'
@@ -715,19 +717,20 @@ export default function AdminGalleryPage() {
                   <div className="p-4 border-2 border-dashed border-[#E2E9E5] hover:border-[#006B4F] rounded-2xl bg-[#F7F9F8] text-center space-y-3 transition-colors">
                     {formData.mediaUrl ? (
                       <div className="space-y-3">
-                        <div className="max-h-48 rounded-xl overflow-hidden bg-black/5 flex items-center justify-center border border-[#E2E9E5]">
+                        <div className="max-h-56 rounded-xl overflow-hidden bg-black flex items-center justify-center border border-[#E2E9E5]">
                           {formData.mediaType === 'video' ? (
                             <video
-                              src={cmsApi.resolveMediaUrl(formData.mediaUrl)}
+                              src={`${cmsApi.resolveMediaUrl(formData.mediaUrl)}#t=0.001`}
                               controls
-                              poster={formData.posterUrl ? cmsApi.resolveMediaUrl(formData.posterUrl) : undefined}
-                              className="max-h-48 w-full object-contain"
+                              preload="metadata"
+                              playsInline
+                              className="max-h-56 w-full object-contain"
                             />
                           ) : (
                             <img
                               src={cmsApi.resolveMediaUrl(formData.mediaUrl)}
                               alt="Preview"
-                              className="max-h-48 w-full object-contain"
+                              className="max-h-56 w-full object-contain"
                             />
                           )}
                         </div>
@@ -757,7 +760,7 @@ export default function AdminGalleryPage() {
                             : 'WebP, JPG, PNG or AVIF up to 20MB'}
                         </p>
                         <label className="mt-3 inline-block px-4 py-2 bg-[#006B4F] hover:bg-[#005A43] text-white font-bold rounded-xl cursor-pointer text-xs transition-colors">
-                          Choose File
+                          Choose {formData.mediaType === 'video' ? 'Video' : 'Image'} File
                           <input
                             type="file"
                             accept={formData.mediaType === 'video' ? 'video/mp4,video/webm' : 'image/jpeg,image/png,image/webp,image/avif'}
@@ -786,34 +789,6 @@ export default function AdminGalleryPage() {
                     )}
                   </div>
                 </div>
-
-                {/* Video Poster Image (For videos only) */}
-                {formData.mediaType === 'video' && (
-                  <div className="p-4 bg-[#F7F9F8] border border-[#E2E9E5] rounded-xl space-y-2">
-                    <label className="block text-xs font-bold text-[#17211E] uppercase tracking-wider">
-                      Video Poster / Thumbnail Image (Optional)
-                    </label>
-                    <div className="flex items-center space-x-3">
-                      {formData.posterUrl && (
-                        <img
-                          src={cmsApi.resolveMediaUrl(formData.posterUrl)}
-                          alt="Poster"
-                          className="w-16 h-12 object-cover rounded-lg border border-[#E2E9E5]"
-                        />
-                      )}
-                      <label className="px-3.5 py-2 bg-white border border-[#E2E9E5] text-[#17211E] hover:bg-[#F7F9F8] rounded-xl font-semibold cursor-pointer text-xs">
-                        {uploadingPoster ? `Uploading (${posterPercent}%)...` : formData.posterUrl ? 'Change Poster' : 'Upload Poster Image'}
-                        <input
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          onChange={handlePosterUpload}
-                          disabled={uploadingPoster}
-                          className="hidden"
-                        />
-                      </label>
-                    </div>
-                  </div>
-                )}
 
                 {/* Title & Category */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -41,7 +41,8 @@ export function getCorsHeaders(request: Request, allowedOrigins: string[]): Head
   }
 
   headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, HEAD');
-  headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-Setup-Secret, Accept');
+  headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-Setup-Secret, Accept, Range');
+  headers.set('Access-Control-Expose-Headers', 'Content-Range, Content-Length, Accept-Ranges, ETag');
   headers.set('Access-Control-Max-Age', '86400');
   headers.set('Vary', 'Origin');
 
