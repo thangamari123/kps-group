@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, ChevronDown, ArrowUpRight, Phone, Mail } from 'lucide-react';
+import { Menu, X, ChevronDown, ArrowUpRight, Phone, Mail, LogIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { navigationData } from '@/data/navigation';
 import { companyDetails } from '@/data/company';
@@ -115,8 +115,8 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-2 sm:top-3 md:top-4 inset-x-0 z-50 flex flex-col items-center pointer-events-none transition-transform duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-        isVisible ? 'translate-y-0' : '-translate-y-[160%]'
+      className={`fixed top-[calc(var(--announcement-h,0px)+0.5rem)] sm:top-[calc(var(--announcement-h,0px)+0.75rem)] md:top-[calc(var(--announcement-h,0px)+1rem)] inset-x-0 z-[49] flex flex-col items-center pointer-events-none transition-transform duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+        isVisible ? 'translate-y-0' : '-translate-y-[calc(160%+var(--announcement-h,0px))]'
       }`}
     >
       {/* 1. MAIN NAVBAR (Pill Shaped White Container) */}
@@ -215,6 +215,15 @@ export default function Header() {
 
         {/* Right Side: Get Quote Button + Arrow & Mobile Hamburger */}
         <div className="flex items-center space-x-2 sm:space-x-3">
+          {/* Admin Login (desktop; mobile has it inside the menu) */}
+          <Link
+            href="/admin/login"
+            className="hidden lg:inline-flex items-center gap-1.5 rounded-full border border-[#073B2C]/25 bg-white px-4 py-2 text-sm font-bold text-[#073B2C] transition-all duration-250 hover:border-[#ffc107] hover:bg-[#ffc107] active:bg-[#e0a800] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ffc107] focus-visible:ring-offset-2 select-none"
+          >
+            <LogIn className="w-4 h-4 text-[#0F5B44]" aria-hidden="true" />
+            <span>Login</span>
+          </Link>
+
           {/* Get Quote Pill Button */}
           <button
             onClick={() => window.dispatchEvent(new CustomEvent('open-quote-modal'))}
@@ -381,6 +390,14 @@ export default function Header() {
                   <span>Get Quote</span>
                   <ArrowUpRight className="w-4 h-4 ml-1.5 text-brand-yellow group-hover:text-[#073B2C] group-active:text-[#073B2C] stroke-[2.5] transition-colors duration-250" />
                 </button>
+
+                <Link
+                  href="/admin/login"
+                  className="w-full flex items-center justify-center gap-2 bg-white border border-[#073B2C]/25 hover:border-[#ffc107] hover:bg-[#ffc107]/20 active:bg-[#e0a800]/30 text-[#073B2C] font-bold py-3 px-4 rounded-xl transition-all duration-250"
+                >
+                  <LogIn className="w-4 h-4 text-[#0F5B44]" aria-hidden="true" />
+                  <span>Login</span>
+                </Link>
               </div>
 
             </div>

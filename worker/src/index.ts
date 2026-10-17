@@ -30,6 +30,7 @@ import {
   handleUpdateContact,
   handleDeleteContact,
 } from './routes/contacts';
+import { handleSubmitWebinarRegistration } from './routes/webinar';
 import { handleGetDashboardStats } from './routes/dashboard';
 import {
   handleUploadMedia,
@@ -176,6 +177,13 @@ export default {
           if (method === 'PUT') return await handleUpdateContact(request, env, id);
           if (method === 'DELETE') return await handleDeleteContact(request, env, id);
         }
+      }
+
+      // -------------------------------------------------------------
+      // 6b. Webinar Registrations (public submit only; admins read/manage via Firestore)
+      // -------------------------------------------------------------
+      if (path === '/api/webinar-registrations' && method === 'POST') {
+        return await handleSubmitWebinarRegistration(request, env);
       }
 
       // -------------------------------------------------------------

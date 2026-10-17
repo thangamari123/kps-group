@@ -212,3 +212,21 @@
     gap: 20px;
   }
 }
+
+/* ------------------------------------------------------------------
+   Announcement Bar (fixed above the header; its height is exposed as a
+   CSS variable so the header and page content offset while it is shown)
+------------------------------------------------------------------- */
+html[data-announcement] {
+  --announcement-h: 2.25rem;
+}
+
+@media (min-width: 640px) {
+  html[data-announcement] {
+    --announcement-h: 2.5rem;
+  }
+}
+
+html[data-announcement] body {
+  padding-top: var(--announcement-h);
+}

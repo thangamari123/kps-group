@@ -379,3 +379,23 @@ export const contactsApi = {
       method: 'DELETE',
     }),
 };
+
+// -------------------------------------------------------------
+// Webinar Registrations API (public submit only)
+// -------------------------------------------------------------
+export const webinarRegistrationsApi = {
+  submit: (data: {
+    announcementId: string;
+    fullName: string;
+    email: string;
+    phone: string;
+    /** Honeypot: must stay empty. Real users never see or fill it. */
+    website?: string;
+    /** How long the form was open, used as a basic bot check. */
+    elapsedMs?: number;
+  }) =>
+    request<{ id: string; webinarName?: string; message: string }>('/api/webinar-registrations', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+};

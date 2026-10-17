@@ -7,8 +7,11 @@ import {
   setDoc,
   updateDoc,
   deleteDoc,
+  deleteField,
   query,
   where,
+  orderBy,
+  limit,
   serverTimestamp,
   type DocumentData,
   type QueryConstraint,
@@ -21,6 +24,10 @@ import type {
   AwardItem,
   CMSStats,
   AuditUser,
+  AnnouncementItem,
+  AnnouncementSettings,
+  WebinarRegistration,
+  WebinarRegistrationStatus,
 } from './cms-types';
 import { sanitizeFirestorePayload } from './careers-firestore';
 
@@ -614,3 +621,124 @@ export async function getCmsDashboardStats(): Promise<CMSStats> {
     };
   }
 }
+
+// -------------------------------------------------------------
+// ANNOUNCEMENT BAR FIRESTORE OPERATIONS
+// -------------------------------------------------------------
+const ANNOUNCEMENT_SETTINGS_DOC = ['site_settings', 'announcementBar'] as const;
+
+// Optional text fields: an empty string means "clear this section"
+const ANNOUNCEMENT_OPTIONAL_FIELDS = [
+  'label',
+  'date',
+  'location',
+  'availability',
+  'ctaText',
+  'linkUrl',
+  'webinarTitle',
+] as const;
+
+type AnnouncementInput = Omit<
+  AnnouncementItem,
+  'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'
+>;
+
+export const announcementsCms = {
+  // Admin: every announcement regardless of status
+  async getAll(): Promise<AnnouncementItem[]> {
+    const snapshot = await getDocs(collection(db, 'announcements'));
+    const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() })) as AnnouncementItem[];
+    return items.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+  },
+
+  // Public: only active announcements (matches the Firestore read rule)
+  async getActive(): Promise<AnnouncementItem[]> {
+    const q = query(collection(db, 'announcements'), where('status', '==', 'active'));
+    const snapshot = await getDocs(q);
+    const items = snapshot.docs.map((d) => ({ id: d.id, ...d.data() })) as AnnouncementItem[];
+    return items.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+  },
+
+  async create(data: AnnouncementInput): Promise<string> {
+    const docRef = doc(collection(db, 'announcements'));
+    const auditUser = getCurrentAuditUser();
+    const payload: Record<string, any> = { ...data, sortOrder: Number(data.sortOrder) || 0 };
+    for (const field of ANNOUNCEMENT_OPTIONAL_FIELDS) {
+      if (payload[field] === '') delete payload[field];
+    }
+    await setDoc(
+      docRef,
+      sanitizeFirestorePayload({
+        ...payload,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        createdBy: auditUser,
+        updatedBy: auditUser,
+      })
+    );
+    return docRef.id;
+  },
+
+  async update(id: string, data: Partial<AnnouncementInput>): Promise<void> {
+    const cleanData: Record<string, any> = {
+      ...data,
+      updatedAt: serverTimestamp(),
+      updatedBy: getCurrentAuditUser(),
+    };
+    if (cleanData.sortOrder !== undefined) {
+      cleanData.sortOrder = Number(cleanData.sortOrder) || 0;
+    }
+    delete cleanData.id;
+    // A cleared section must be removed from the document, not silently kept
+    for (const field of ANNOUNCEMENT_OPTIONAL_FIELDS) {
+      if (cleanData[field] === '') cleanData[field] = deleteField();
+    }
+    await updateDoc(doc(db, 'announcements', id), sanitizeFirestorePayload(cleanData));
+  },
+
+  async delete(id: string): Promise<void> {
+    await deleteDoc(doc(db, 'announcements', id));
+  },
+
+  // Bar-wide settings. A missing settings document means "enabled, pause on hover".
+  async getSettings(): Promise<AnnouncementSettings> {
+    const snap = await getDoc(doc(db, ...ANNOUNCEMENT_SETTINGS_DOC));
+    if (!snap.exists()) return { enabled: true, pauseOnHover: true };
+    const data = snap.data();
+    return { enabled: data.enabled !== false, pauseOnHover: data.pauseOnHover !== false };
+  },
+
+  async updateSettings(settings: Partial<AnnouncementSettings>): Promise<void> {
+    await setDoc(
+      doc(db, ...ANNOUNCEMENT_SETTINGS_DOC),
+      { ...settings, updatedAt: serverTimestamp(), updatedBy: getCurrentAuditUser() },
+      { merge: true }
+    );
+  },
+};
+
+// -------------------------------------------------------------
+// WEBINAR REGISTRATIONS (admin only; visitors submit through the Worker API)
+// -------------------------------------------------------------
+const WEBINAR_REGISTRATIONS_FETCH_LIMIT = 2000;
+
+export const webinarRegistrationsCms = {
+  // Newest first. Firestore rules only allow active admins to read this collection.
+  async getAll(): Promise<WebinarRegistration[]> {
+    const q = query(
+      collection(db, 'webinar_registrations'),
+      orderBy('createdAt', 'desc'),
+      limit(WEBINAR_REGISTRATIONS_FETCH_LIMIT)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((d) => ({ id: d.id, ...d.data() })) as WebinarRegistration[];
+  },
+
+  async updateStatus(id: string, status: WebinarRegistrationStatus): Promise<void> {
+    await updateDoc(doc(db, 'webinar_registrations', id), {
+      status,
+      updatedAt: serverTimestamp(),
+      updatedBy: getCurrentAuditUser(),
+    });
+  },
+};

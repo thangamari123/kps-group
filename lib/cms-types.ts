@@ -124,3 +124,64 @@ export interface CMSStats {
   awardsCount: number;
   publishedAwardsCount: number;
 }
+
+// -------------------------------------------------------------
+// 5. Announcement Bar Model
+// -------------------------------------------------------------
+export type AnnouncementSpeed = 'slow' | 'medium' | 'fast';
+export type AnnouncementStatus = 'active' | 'inactive';
+export type AnnouncementCtaAction = 'link' | 'register';
+export type AnnouncementLocationMode = 'none' | 'online' | 'offline' | 'custom';
+
+export interface AnnouncementItem {
+  id: string;
+  /** Small label before the message, e.g. "Announcement" (falls back to "Announcement") */
+  label?: string;
+  /** Main message */
+  text: string;
+  /** ISO date (YYYY-MM-DD), shown as a badge, e.g. "Oct 25, 2026" */
+  date?: string;
+  locationMode?: AnnouncementLocationMode;
+  /** Display text for the location badge ("Online", "Offline" or custom text) */
+  location?: string;
+  /** e.g. "Limited Seats" */
+  availability?: string;
+  /** CTA button text, e.g. "Register Now" */
+  ctaText?: string;
+  /** CTA link (also used by announcements created before the redesign) */
+  linkUrl?: string;
+  /** What the CTA does: open `linkUrl` (default) or the webinar registration popup */
+  ctaAction?: AnnouncementCtaAction;
+  /** Webinar name shown in the registration popup and stored with registrations (defaults to the message) */
+  webinarTitle?: string;
+  speed: AnnouncementSpeed;
+  status: AnnouncementStatus;
+  sortOrder: number;
+  createdAt: any;
+  updatedAt: any;
+  createdBy?: AuditUser;
+  updatedBy?: AuditUser;
+}
+
+export interface AnnouncementSettings {
+  enabled: boolean;
+  pauseOnHover: boolean;
+}
+
+// -------------------------------------------------------------
+// 6. Webinar Registration Model
+// -------------------------------------------------------------
+export type WebinarRegistrationStatus = 'New' | 'Contacted' | 'Confirmed';
+
+export interface WebinarRegistration {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  webinarName: string;
+  announcementId: string;
+  source?: string;
+  status: WebinarRegistrationStatus;
+  createdAt: any;
+  updatedAt: any;
+}

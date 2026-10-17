@@ -67,6 +67,53 @@ service cloud.firestore {
     }
 
     // ============================================================
+    // CMS: ANNOUNCEMENT BAR
+    // ============================================================
+    // Public can read active announcements and the bar's on/off setting.
+    // Authorized active admins can perform full CRUD.
+    match /announcements/{announcementId} {
+      allow read: if (resource != null && resource.data.status == 'active') || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Only the announcement bar on/off document is publicly readable.
+    match /site_settings/announcementBar {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // WEBINAR REGISTRATIONS
+    // ============================================================
+    // Visitors can only CREATE a registration, and only with exactly the expected fields, for an
+    // announcement that is currently active and set up for registration. They can never read,
+    // update or delete registrations. Only active admins can list/manage them.
+    match /webinar_registrations/{registrationId} {
+      allow create: if request.resource.data.keys().hasOnly(['fullName', 'email', 'phone', 'webinarName', 'announcementId', 'source', 'status', 'createdAt', 'updatedAt']) &&
+                       request.resource.data.keys().hasAll(['fullName', 'email', 'phone', 'webinarName', 'announcementId', 'status', 'createdAt', 'updatedAt']) &&
+                       request.resource.data.fullName is string &&
+                       request.resource.data.fullName.size() >= 2 && request.resource.data.fullName.size() <= 100 &&
+                       request.resource.data.email is string &&
+                       request.resource.data.email.size() <= 254 &&
+                       request.resource.data.email.matches('^[^@ ]+@[^@ ]+[.][^@ ]+$') &&
+                       request.resource.data.phone is string &&
+                       request.resource.data.phone.matches('^[+]?[0-9]{10,15}$') &&
+                       request.resource.data.webinarName is string &&
+                       request.resource.data.webinarName.size() >= 1 && request.resource.data.webinarName.size() <= 200 &&
+                       request.resource.data.announcementId is string &&
+                       request.resource.data.announcementId.size() >= 1 && request.resource.data.announcementId.size() <= 100 &&
+                       request.resource.data.status == 'New' &&
+                       request.resource.data.createdAt is timestamp &&
+                       request.resource.data.updatedAt == request.resource.data.createdAt &&
+                       request.resource.data.createdAt >= request.time - duration.value(10, 'm') &&
+                       request.resource.data.createdAt <= request.time + duration.value(10, 'm') &&
+                       exists(/databases/$(database)/documents/announcements/$(request.resource.data.announcementId)) &&
+                       get(/databases/$(database)/documents/announcements/$(request.resource.data.announcementId)).data.status == 'active' &&
+                       get(/databases/$(database)/documents/announcements/$(request.resource.data.announcementId)).data.get('ctaAction', 'link') == 'register';
+      allow read, update, delete: if isAdmin();
+    }
+
+    // ============================================================
     // CAREERS & JOBS
     // ============================================================
     match /jobs/{jobId} {

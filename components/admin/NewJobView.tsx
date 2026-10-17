@@ -11,7 +11,6 @@ import {
   ArrowLeft,
   Save,
   ChevronRight,
-  Sparkles,
   Calendar,
   DollarSign,
   MapPin,
@@ -40,7 +39,6 @@ export default function NewJobView() {
     benefits: '',
     deadline: '',
     status: 'published' as 'published' | 'draft' | 'closed' | 'archived',
-    featured: false,
     sortOrder: 1,
   });
 
@@ -64,15 +62,10 @@ export default function NewJobView() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    const { name, value, type } = e.target;
+    const { name, value } = e.target;
     if (name === 'slug') setSlugManuallyEdited(true);
 
-    if (type === 'checkbox') {
-      const checked = (e.target as HTMLInputElement).checked;
-      setFormData((prev) => ({ ...prev, [name]: checked }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -107,7 +100,7 @@ export default function NewJobView() {
         benefits: parseList(formData.benefits),
         deadline: formData.deadline ? new Date(formData.deadline).toISOString() : undefined,
         status: formData.status,
-        featured: formData.featured,
+        featured: false,
         sortOrder: Number(formData.sortOrder) || 1,
       });
 
@@ -300,7 +293,7 @@ export default function NewJobView() {
             <div>
               <label className="block text-xs font-bold text-[#17211E] uppercase tracking-wider mb-2 flex items-center space-x-1">
                 <DollarSign className="w-3.5 h-3.5 text-[#006B4F]" />
-                <span>Salary / Compensation</span>
+                <span>Salary / Range</span>
               </label>
               <input
                 type="text"
@@ -313,7 +306,7 @@ export default function NewJobView() {
             </div>
           </div>
 
-          {/* Section 3: Deadline, Featured, Sort Order */}
+          {/* Section 3: Deadline, Sort Order */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 items-end">
             <div>
               <label className="block text-xs font-bold text-[#17211E] uppercase tracking-wider mb-2 flex items-center space-x-1">
@@ -342,22 +335,6 @@ export default function NewJobView() {
                 min={1}
                 className="w-full px-4 py-2.5 bg-white border border-[#E2E9E5] rounded-xl text-xs text-[#17211E] focus:outline-none focus:border-[#006B4F]"
               />
-            </div>
-
-            <div className="pb-2">
-              <label className="flex items-center space-x-2.5 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  name="featured"
-                  checked={formData.featured}
-                  onChange={handleChange}
-                  className="w-4 h-4 text-[#006B4F] rounded border-[#E2E9E5] focus:ring-[#006B4F]"
-                />
-                <span className="text-xs font-bold text-[#17211E] flex items-center space-x-1">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Featured Position</span>
-                </span>
-              </label>
             </div>
           </div>
 
