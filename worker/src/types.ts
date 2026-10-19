@@ -9,6 +9,8 @@ export interface Env {
   SESSION_SECRET?: string;
   SETUP_SECRET?: string;
   ENVIRONMENT?: string;
+  /** Google Apps Script Web App /exec URL (secret). Contact Us enquiries are stored in Google Sheets. */
+  APPS_SCRIPT_URL?: string;
 }
 
 export interface MediaUploadResponse {

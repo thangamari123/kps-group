@@ -2,54 +2,107 @@
 import type { Env, ContactMessageRecord } from '../types';
 import { requireAuth, checkRateLimit } from '../auth/middleware';
 import { errorResponse, successResponse, parseAllowedOrigins } from '../utils/response';
-import { isValidEmail, isValidPhone, sanitizeString } from '../utils/validator';
+import { isValidEmail } from '../utils/validator';
+import { isAppsScriptConfigured, saveContactToSheet } from '../utils/appsScript';
+import {
+  SAVE_FAILED,
+  cleanText,
+  cleanMultiline,
+  isPlausibleName,
+  looksLikeBot,
+  markSaved,
+  parsePhone,
+  readJsonBody,
+  sha256Hex,
+  wasRecentlySaved,
+} from '../utils/enquiry';
+
+// Values of the "Service Required" dropdown on the Contact Us form, mapped to the label stored in the sheet.
+const SERVICE_LABELS: Record<string, string> = {
+  'customs-clearance': 'Customs Brokerage',
+  transportation: 'First/Last Mile Transport',
+  'express-delivery': 'Express Delivery',
+  'project-logistics': 'Project Logistics',
+  ftwz: 'Free Trade & Warehousing Zone (FTWZ)',
+  'general-logistics': 'End-To-End Logistics',
+};
 
 /**
  * Public: Submit a Contact Message
+ *
+ * - Validates and sanitizes every field server-side; rate limited per IP, with a honeypot and minimum fill time.
+ * - The submission id is a hash of the enquiry content; a repeat of an enquiry already saved moments ago is
+ *   answered with the same success instead of writing a second row.
+ * - When the Apps Script is configured, success is returned only after it answers {"success": true}.
+ *   If it fails, the visitor gets an error and can retry; nothing is reported as saved.
+ * - Without the Apps Script configuration it falls back to the legacy D1 table, if that binding exists.
  */
 export async function handleSubmitContact(request: Request, env: Env): Promise<Response> {
   const allowedOrigins = parseAllowedOrigins(env.ALLOWED_ORIGINS);
+  const fail = (message: string, status: number) => errorResponse(message, status, request, allowedOrigins);
 
-  // Rate limiting (15 messages per 5 minutes per IP)
-  if (!checkRateLimit(request, 15, 300)) {
-    return errorResponse('Too many messages submitted. Please wait a few minutes.', 429, request, allowedOrigins);
+  if (!checkRateLimit(request, 5, 600)) {
+    return fail('Too many messages submitted. Please wait a few minutes and try again.', 429);
   }
 
+  const parsed = await readJsonBody(request);
+  if ('error' in parsed) return fail(parsed.error, parsed.status);
+  const body = parsed.body;
+
+  const thanks = 'Thank you for contacting KPS. Your message has been received.';
+
+  // Pretend it worked so bots don't adapt.
+  if (looksLikeBot(body)) return successResponse({ id: 'ok', message: thanks }, 201, request, allowedOrigins);
+
+  const name = cleanText(body.name, 100);
+  const email = cleanText(body.email, 254).toLowerCase();
+  const company = cleanText(body.companyName ?? body.company_name, 150);
+  const serviceKey = cleanText(body.serviceRequired ?? body.service_required, 50);
+  const message = cleanMultiline(body.message, 2000);
+  const phoneParts = parsePhone(body);
+
+  if (!isPlausibleName(name)) return fail('Please enter your name.', 400);
+  if (!isValidEmail(email)) return fail('Please enter a valid email address.', 400);
+  if ('error' in phoneParts) return fail(phoneParts.error, 400);
+  const { countryCode, phone } = phoneParts;
+  const service = SERVICE_LABELS[serviceKey];
+  if (!service) return fail('Please select a service.', 400);
+  if (message.length < 5) return fail('Please tell us about your requirements.', 400);
+
+  const fingerprint = [email, countryCode + phone, serviceKey, message.toLowerCase().replace(/\s+/g, ' ')].join('|');
+  const id = `KPS-${(await sha256Hex(fingerprint)).slice(0, 20).toUpperCase()}`;
+  const nowIso = new Date().toISOString();
+  const useSheet = isAppsScriptConfigured(env);
+
   try {
-    const body: any = await request.json();
-    const name = sanitizeString(body?.name);
-    const email = sanitizeString(body?.email)?.toLowerCase();
-    const phone = sanitizeString(body?.phone);
-    const company_name = sanitizeString(body?.companyName || body?.company_name) || null;
-    const service_required = sanitizeString(body?.serviceRequired || body?.service_required) || null;
-    const message = sanitizeString(body?.message);
+    if (useSheet) {
+      if (!wasRecentlySaved(id)) {
+        const saved = await saveContactToSheet(env, { name, email, countryCode, phone, company, service, message });
+        if (!saved.ok) return fail(SAVE_FAILED, 502);
+        markSaved(id);
+      }
+    } else if (!env.DB) {
+      console.error('Contact form: neither APPS_SCRIPT_URL nor a D1 binding is configured.');
+      return fail(SAVE_FAILED, 503);
+    }
 
-    if (!name) return errorResponse('Name is required', 400, request, allowedOrigins);
-    if (!email || !isValidEmail(email)) return errorResponse('A valid email address is required', 400, request, allowedOrigins);
-    if (!phone || !isValidPhone(phone)) return errorResponse('A valid phone number is required (at least 10 digits)', 400, request, allowedOrigins);
-    if (!message) return errorResponse('Message content is required', 400, request, allowedOrigins);
+    // Legacy admin-panel table: best effort once the sheet has confirmed the row; the only store without a sheet.
+    if (env.DB) {
+      try {
+        await env.DB.prepare(
+          `INSERT OR IGNORE INTO contact_messages (id, name, email, phone, company_name, service_required, message, status, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, 'New', ?, ?)`
+        ).bind(id, name, email, `${countryCode} ${phone}`, company || null, service, message, nowIso, nowIso).run();
+      } catch (dbErr: any) {
+        if (!useSheet) throw dbErr;
+        console.error('Contact saved to sheet but D1 mirror failed:', dbErr?.message || dbErr);
+      }
+    }
 
-    const id = crypto.randomUUID();
-    const nowIso = new Date().toISOString();
-
-    await env.DB.prepare(
-      `INSERT INTO contact_messages (id, name, email, phone, company_name, service_required, message, status, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'New', ?, ?)`
-    ).bind(
-      id, name, email, phone, company_name, service_required, message, nowIso, nowIso
-    ).run();
-
-    return successResponse(
-      {
-        id,
-        message: 'Thank you for contacting KPS. Your message has been received.',
-      },
-      201,
-      request,
-      allowedOrigins
-    );
+    return successResponse({ id, message: thanks }, 201, request, allowedOrigins);
   } catch (err: any) {
-    return errorResponse('Failed to submit message: ' + (err?.message || 'Server error'), 500, request, allowedOrigins);
+    console.error('Contact submission failed:', err?.message || err);
+    return fail(SAVE_FAILED, 500);
   }
 }
 

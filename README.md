@@ -128,3 +128,21 @@ npm run dev
 npm run build
 ```
 Deploy the generated `out/` directory to Cloudflare Pages or any static host.
+
+---
+
+## 📬 Contact Us → Google Sheets
+
+`ContactForm` → Worker `POST /api/contact` → Google Apps Script Web App → **KPS-WEB LEADS** sheet. The Worker validates,
+sanitizes, rate-limits and de-duplicates, and reports success only after the script answers `{"success": true}`.
+The script receives `{name, email, countryCode, phone, company, service, message}`.
+
+The Web App URL is configured only as a Worker secret (it is not in the repo or the browser bundle):
+
+```bash
+cd worker
+npx wrangler secret put APPS_SCRIPT_URL   # paste the Web App /exec URL
+npx wrangler deploy
+```
+
+Locally, set `APPS_SCRIPT_URL` in `worker/.dev.vars` (see `.dev.vars.example`). Tests: `cd worker && npm test`.

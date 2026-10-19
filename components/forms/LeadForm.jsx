@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { 
   CheckCircle, Calculator, MapPin, ArrowRight, ArrowLeft, 
   User, Mail, Phone, Building2, Package, ShieldCheck, Sparkles, 
@@ -88,6 +88,15 @@ export default function LeadForm({ isModal = false, onClose = null }) {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const [status, setStatus] = useState('idle');
+
+  // Spam protection: hidden honeypot (real users never fill it) and how long the form has been open
+  const [honeypot, setHoneypot] = useState('');
+  const openedAt = useRef(0);
+  // Synchronous guard: state updates are async, so a fast double-click could otherwise submit twice
+  const submittingRef = useRef(false);
+  useEffect(() => {
+    openedAt.current = Date.now();
+  }, []);
 
   // Input refs for auto-focusing invalid inputs
   const inputRefs = {
@@ -200,8 +209,11 @@ export default function LeadForm({ isModal = false, onClose = null }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submittingRef.current) return;
+    setErrors((prev) => ({ ...prev, submit: '' }));
     if (!validateStep2()) return;
-    
+
+    submittingRef.current = true;
     setStatus('loading');
     
     try {
@@ -209,6 +221,9 @@ export default function LeadForm({ isModal = false, onClose = null }) {
         name: formData.name.trim(),
         email: formData.email.trim(),
         phone: formData.phone.trim(),
+        countryCode: '+91',
+        website: honeypot,
+        elapsedMs: Date.now() - openedAt.current,
         company: formData.company.trim() || undefined,
         service: formData.service,
         origin: formData.origin.trim(),
@@ -218,15 +233,22 @@ export default function LeadForm({ isModal = false, onClose = null }) {
       });
       setStatus('success');
     } catch (err) {
+      // Keep everything the visitor typed so they can retry
       setStatus('idle');
       setErrors((prev) => ({
         ...prev,
-        submit: err?.message || 'Failed to submit quote request. Please try again.',
+        submit:
+          err?.status === 0
+            ? 'Could not reach the server. Please check your connection and try again, or call us directly.'
+            : err?.message || 'Failed to submit quote request. Please try again.',
       }));
+    } finally {
+      submittingRef.current = false;
     }
   };
 
   const handleReset = () => {
+    openedAt.current = Date.now();
     setStatus('idle');
     setStep(1);
     setFormData({
@@ -340,7 +362,20 @@ export default function LeadForm({ isModal = false, onClose = null }) {
           </div>
         </div>
       ) : (
-        <form onSubmit={step === 1 ? handleNextStep : handleSubmit} noValidate className="space-y-2.5 sm:space-y-3">
+        <form onSubmit={step === 1 ? handleNextStep : handleSubmit} noValidate className="relative space-y-2.5 sm:space-y-3">
+          {/* Honeypot: hidden from people and assistive tech, bots tend to fill it */}
+          <div aria-hidden="true" style={{ position: 'absolute', left: '-10000px', width: 1, height: 1, overflow: 'hidden' }}>
+            <label htmlFor="lead-website">Website</label>
+            <input
+              type="text"
+              id="lead-website"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+            />
+          </div>
           <AnimatePresence mode="wait">
             
             {/* STEP 1: Contact Information (Compact & Clean) */}
@@ -677,6 +712,13 @@ export default function LeadForm({ isModal = false, onClose = null }) {
                     </p>
                   )}
                 </div>
+
+                {errors.submit && (
+                  <div role="alert" className="p-2.5 bg-red-50 border border-red-300 rounded-lg text-[11px] text-red-700 flex items-start gap-1.5">
+                    <AlertCircle className="w-3.5 h-3.5 mt-px flex-shrink-0" />
+                    <span>{errors.submit}</span>
+                  </div>
+                )}
 
                 {/* Action Buttons: Back & Submit */}
                 <div className="pt-1 flex items-center gap-2">

@@ -87,6 +87,11 @@ export default function ContactForm() {
     serviceRequired: '',
     message: ''
   });
+  // Spam protection: hidden honeypot (real users never fill it) and the time the form has been open
+  const [honeypot, setHoneypot] = useState('');
+  const openedAt = useRef(0);
+  // Synchronous guard: state updates are async, so a fast double-click could otherwise submit twice
+  const submittingRef = useRef(false);
 
   const [selectedCountry, setSelectedCountry] = useState(COUNTRY_OPTIONS[0]);
   const [isCountryDropdownOpen, setIsCountryDropdownOpen] = useState(false);
@@ -96,6 +101,10 @@ export default function ContactForm() {
   const [touched, setTouched] = useState({});
   const [status, setStatus] = useState('idle'); // idle | loading | success | error
   const [apiError, setApiError] = useState('');
+
+  useEffect(() => {
+    openedAt.current = Date.now();
+  }, []);
 
   // Close country dropdown on outside click
   useEffect(() => {
@@ -193,6 +202,7 @@ export default function ContactForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (submittingRef.current) return;
     setApiError('');
 
     // Mark all as touched on submit attempt
@@ -207,14 +217,17 @@ export default function ContactForm() {
     const isValid = validate();
     if (!isValid) return;
 
+    submittingRef.current = true;
     setStatus('loading');
 
     try {
-      const formattedPhone = `${selectedCountry.code} ${formData.phone.trim()}`;
       await contactsApi.submitContact({
         name: formData.name.trim(),
         email: formData.email.trim().toLowerCase(),
-        phone: formattedPhone,
+        phone: formData.phone.trim(),
+        countryCode: selectedCountry.code,
+        website: honeypot,
+        elapsedMs: Date.now() - openedAt.current,
         companyName: formData.companyName.trim() || undefined,
         serviceRequired: formData.serviceRequired || undefined,
         message: formData.message.trim(),
@@ -232,11 +245,18 @@ export default function ContactForm() {
       setTouched({});
     } catch (err) {
       setStatus('error');
-      setApiError(err?.message || 'Failed to submit inquiry. Please try again or call us directly.');
+      setApiError(
+        err?.status === 0
+          ? 'Could not reach the server. Please check your connection and try again, or call us directly.'
+          : err?.message || 'Failed to submit inquiry. Please try again or call us directly.'
+      );
+    } finally {
+      submittingRef.current = false;
     }
   };
 
   const handleReset = () => {
+    openedAt.current = Date.now();
     setStatus('idle');
     setApiError('');
     setFormData({
@@ -285,6 +305,20 @@ export default function ContactForm() {
               </div>
             </div>
           )}
+
+          {/* Honeypot: hidden from people and assistive tech, bots tend to fill it */}
+          <div aria-hidden="true" style={{ position: 'absolute', left: '-10000px', width: 1, height: 1, overflow: 'hidden' }}>
+            <label htmlFor="contact-website">Website</label>
+            <input
+              type="text"
+              id="contact-website"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+            />
+          </div>
 
           {/* Row 1: Name & Email */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">

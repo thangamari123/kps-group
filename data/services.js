@@ -785,11 +785,11 @@ export const servicesData = {
     id: "ftwz",
     slug: "ftwz",
     sectionLabel: "FREE TRADE & WAREHOUSING ZONE",
-    title: "Free Trade & Warehousing Zone Solutions",
+    title: "Free Trade, Warehousing & Cold Storage Solutions",
     tagline: "Duty-Deferred Global Hubbing",
     shortDesc: "Duty-deferred warehousing inside Free Trade Zones for international trading, hubbing, and tax optimization.",
     description: "KPS provides Free Trade & Warehousing Zone solutions, enabling tax-efficient, flexible storage and distribution for international trade.",
-    seoTitle: "Free Trade & Warehousing Zone (FTWZ) Solutions | KPS Worldwide Logistics",
+    seoTitle: "Free Trade, Warehousing & Cold Storage Solutions | KPS Worldwide Logistics",
     primaryKeyword: "FTWZ logistics services Chennai",
     secondaryKeywords: [
       "free trade warehousing zone",

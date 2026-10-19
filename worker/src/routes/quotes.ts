@@ -2,59 +2,140 @@
 import type { Env, QuoteRequestRecord } from '../types';
 import { requireAuth, checkRateLimit } from '../auth/middleware';
 import { errorResponse, successResponse, parseAllowedOrigins } from '../utils/response';
-import { isValidEmail, isValidPhone, sanitizeString } from '../utils/validator';
+import { isValidEmail } from '../utils/validator';
+import { isAppsScriptConfigured, saveQuoteToSheet } from '../utils/appsScript';
+import {
+  SAVE_FAILED,
+  cleanText,
+  cleanMultiline,
+  isPlausibleName,
+  looksLikeBot,
+  markSaved,
+  parsePhone,
+  readJsonBody,
+  sha256Hex,
+  wasRecentlySaved,
+} from '../utils/enquiry';
+
+// Options of the "Service Required" dropdown in the Request a Quote popup.
+const QUOTE_SERVICES = new Set([
+  'Containerized Cargo (FCL / LCL)',
+  'Multimodal Freight Forwarding',
+  'Customs Brokerage',
+  'Project Cargo & Heavy Lift',
+  'Over Dimensional Cargo (ODC)',
+  'FTWZ Solutions',
+  'Industrial Warehousing',
+  'First & Last Mile Transportation',
+]);
 
 /**
  * Public: Submit a Quote Request
+ *
+ * Same safeguards as the Contact Us form (validation, per-IP rate limit, honeypot, content-hash submission id so a
+ * repeat is not stored twice). With the Apps Script configured the quote is saved as an enquiry of type
+ * "Quote Request" and success is returned only when the script echoes the type and submission id back.
+ * Without it, the legacy D1 table is used if bound.
  */
 export async function handleSubmitQuote(request: Request, env: Env): Promise<Response> {
   const allowedOrigins = parseAllowedOrigins(env.ALLOWED_ORIGINS);
+  const fail = (message: string, status: number) => errorResponse(message, status, request, allowedOrigins);
 
-  // Rate limiting (15 quotes per 5 minutes per IP)
-  if (!checkRateLimit(request, 15, 300)) {
-    return errorResponse('Too many quote requests. Please wait a few minutes.', 429, request, allowedOrigins);
+  if (!checkRateLimit(request, 5, 600)) {
+    return fail('Too many quote requests. Please wait a few minutes and try again.', 429);
   }
 
+  const parsed = await readJsonBody(request);
+  if ('error' in parsed) return fail(parsed.error, parsed.status);
+  const body = parsed.body;
+
+  const thanks = 'Your quote request has been received. Our logistics specialist will connect with you shortly.';
+
+  // Pretend it worked so bots don't adapt.
+  if (looksLikeBot(body)) return successResponse({ id: 'ok', message: thanks }, 201, request, allowedOrigins);
+
+  const name = cleanText(body.name, 100);
+  const email = cleanText(body.email, 254).toLowerCase();
+  const company = cleanText(body.company, 150);
+  const service = cleanText(body.service, 80);
+  const origin = cleanText(body.origin, 150);
+  const destination = cleanText(body.destination, 150);
+  const cargoWeight = cleanText(body.cargoWeight ?? body.cargo_weight, 80);
+  const cargoDetails = cleanMultiline(body.cargoDetails ?? body.cargo_details, 1000);
+  const phoneParts = parsePhone(body);
+
+  if (!isPlausibleName(name)) return fail('Please enter your full name.', 400);
+  if (!isValidEmail(email)) return fail('Please enter a valid email address.', 400);
+  if ('error' in phoneParts) return fail(phoneParts.error, 400);
+  const { countryCode, phone } = phoneParts;
+  if (!QUOTE_SERVICES.has(service)) return fail('Please select a service.', 400);
+  if (origin.length < 2) return fail('Please enter the origin location.', 400);
+  if (destination.length < 2) return fail('Please enter the destination location.', 400);
+  if (origin.toLowerCase() === destination.toLowerCase()) {
+    return fail('Destination cannot be identical to the origin location.', 400);
+  }
+
+  const fingerprint = [
+    'quote',
+    email,
+    countryCode + phone,
+    service,
+    origin.toLowerCase(),
+    destination.toLowerCase(),
+    cargoWeight.toLowerCase(),
+    cargoDetails.toLowerCase().replace(/\s+/g, ' '),
+  ].join('|');
+  const id = `QTE-${(await sha256Hex(fingerprint)).slice(0, 20).toUpperCase()}`;
+  const nowIso = new Date().toISOString();
+  const useSheet = isAppsScriptConfigured(env);
+
   try {
-    const body: any = await request.json();
-    const name = sanitizeString(body?.name);
-    const company = sanitizeString(body?.company) || null;
-    const email = sanitizeString(body?.email)?.toLowerCase();
-    const phone = sanitizeString(body?.phone);
-    const service = sanitizeString(body?.service);
-    const origin = sanitizeString(body?.origin);
-    const destination = sanitizeString(body?.destination);
-    const cargo_weight = sanitizeString(body?.cargoWeight || body?.cargo_weight) || null;
-    const cargo_details = sanitizeString(body?.cargoDetails || body?.cargo_details) || null;
+    if (useSheet) {
+      if (!wasRecentlySaved(id)) {
+        const saved = await saveQuoteToSheet(env, {
+          enquiryType: 'Quote Request',
+          submissionId: id,
+          timestamp: nowIso,
+          status: 'New',
+          name,
+          email,
+          countryCode,
+          phone,
+          company,
+          service,
+          cargoWeight,
+          origin,
+          destination,
+          cargoDetails,
+        });
+        if (!saved.ok) return fail(SAVE_FAILED, 502);
+        markSaved(id);
+      }
+    } else if (!env.DB) {
+      console.error('Quote form: neither APPS_SCRIPT_URL nor a D1 binding is configured.');
+      return fail(SAVE_FAILED, 503);
+    }
 
-    if (!name) return errorResponse('Contact name is required', 400, request, allowedOrigins);
-    if (!email || !isValidEmail(email)) return errorResponse('A valid email address is required', 400, request, allowedOrigins);
-    if (!phone || !isValidPhone(phone)) return errorResponse('A valid phone number is required (at least 10 digits)', 400, request, allowedOrigins);
-    if (!service) return errorResponse('Service selection is required', 400, request, allowedOrigins);
-    if (!origin) return errorResponse('Origin location is required', 400, request, allowedOrigins);
-    if (!destination) return errorResponse('Destination location is required', 400, request, allowedOrigins);
+    // Legacy admin-panel table: best effort once the sheet has confirmed the row; the only store without a sheet.
+    if (env.DB) {
+      try {
+        await env.DB.prepare(
+          `INSERT OR IGNORE INTO quote_requests (id, name, company, email, phone, service, origin, destination, cargo_weight, cargo_details, status, created_at, updated_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'New', ?, ?)`
+        ).bind(
+          id, name, company || null, email, `${countryCode} ${phone}`, service, origin, destination,
+          cargoWeight || null, cargoDetails || null, nowIso, nowIso
+        ).run();
+      } catch (dbErr: any) {
+        if (!useSheet) throw dbErr;
+        console.error('Quote saved to sheet but D1 mirror failed:', dbErr?.message || dbErr);
+      }
+    }
 
-    const id = crypto.randomUUID();
-    const nowIso = new Date().toISOString();
-
-    await env.DB.prepare(
-      `INSERT INTO quote_requests (id, name, company, email, phone, service, origin, destination, cargo_weight, cargo_details, status, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'New', ?, ?)`
-    ).bind(
-      id, name, company, email, phone, service, origin, destination, cargo_weight, cargo_details, nowIso, nowIso
-    ).run();
-
-    return successResponse(
-      {
-        id,
-        message: 'Your quote request has been received. Our logistics specialist will connect with you shortly.',
-      },
-      201,
-      request,
-      allowedOrigins
-    );
+    return successResponse({ id, message: thanks }, 201, request, allowedOrigins);
   } catch (err: any) {
-    return errorResponse('Failed to submit quote request: ' + (err?.message || 'Server error'), 500, request, allowedOrigins);
+    console.error('Quote submission failed:', err?.message || err);
+    return fail(SAVE_FAILED, 500);
   }
 }
 

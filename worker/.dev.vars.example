@@ -3,3 +3,6 @@ FIREBASE_PROJECT_ID=kps-website-hr-panel
 SETUP_SECRET=kps-admin-initial-setup-secret-2026
 ENVIRONMENT=development
 ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,https://www.kpsgroups.net,https://kpsgroups.net
+
+# Contact Us -> Google Sheets (existing Apps Script Web App). A http://localhost URL is also accepted when ENVIRONMENT=development.
+APPS_SCRIPT_URL=https://script.google.com/macros/s/REPLACE_WITH_DEPLOYMENT_ID/exec
