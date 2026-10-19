@@ -26,6 +26,15 @@ export const navigationData = {
         { name: "Downloads & Forms", path: "/corporate/downloads" }
       ]
     },
+    {
+      name: "Importances",
+      path: "#",
+      dropdown: [
+        { name: "FIEO", path: "https://fieo.org/view_section.php?lang=0&id=0,31", external: true },
+        { name: "DGFT", path: "https://www.dgft.gov.in/CP/", external: true },
+        { name: "ICEGATE – Import Trade Guide", path: "https://www.icegate.gov.in/Webappl/Trade-Guide-on-Imports", external: true }
+      ]
+    },
     { name: "Blog", path: "/blogs" },
     { name: "Contact Us", path: "/contact-us" }
   ],

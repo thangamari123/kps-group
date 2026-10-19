@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { usePathname } from 'next/navigation';
 import { X, User, Mail, Phone, CheckCircle2, AlertCircle, Loader2, Video } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { webinarRegistrationsApi } from '@/lib/api';
 import { OPEN_WEBINAR_REGISTRATION_EVENT } from '@/lib/announcement-utils';
 
@@ -26,6 +26,32 @@ type Status = 'idle' | 'submitting' | 'success';
 
 const EMPTY: FormValues = { fullName: '', email: '', phone: '' };
 const EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+const AUTO_OPEN_DELAY_MS = 2000;
+const POPUP_STATE_KEY = 'kps-webinar-popup-v1';
+
+type PopupState = Record<string, 'registered' | 'dismissed'>;
+
+// State is kept per announcement so a newly announced webinar can still be shown to returning visitors.
+function readPopupState(): PopupState {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(POPUP_STATE_KEY) || 'null');
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function markPopupState(announcementId: string, value: 'registered' | 'dismissed') {
+  try {
+    const state = readPopupState();
+    if (state[announcementId] === 'registered') return;
+    state[announcementId] = value;
+    localStorage.setItem(POPUP_STATE_KEY, JSON.stringify(state));
+  } catch {
+    /* storage unavailable: the popup may show again next visit, which is acceptable */
+  }
+}
 
 function validate(values: FormValues): FieldErrors {
   const errors: FieldErrors = {};
@@ -52,6 +78,7 @@ const inputBase =
 
 export default function WebinarRegistrationModal() {
   const pathname = usePathname();
+  const reduceMotion = useReducedMotion();
   const [target, setTarget] = useState<OpenDetail | null>(null);
   const [values, setValues] = useState<FormValues>(EMPTY);
   const [honeypot, setHoneypot] = useState('');
@@ -68,8 +95,16 @@ export default function WebinarRegistrationModal() {
 
   const isOpen = target !== null;
 
+  const isAdminRoute = pathname?.startsWith('/admin') ?? false;
+  const autoScheduledRef = useRef(false);
+  const targetIdRef = useRef<string | null>(null);
+  const registeredRef = useRef(false);
+  targetIdRef.current = target?.announcementId ?? null;
+
   const close = useCallback(() => {
     if (submittingRef.current) return;
+    // Closing without registering counts as a dismissal, so the auto popup won't return on the next visit
+    if (targetIdRef.current && !registeredRef.current) markPopupState(targetIdRef.current, 'dismissed');
     setTarget(null);
   }, []);
 
@@ -77,6 +112,7 @@ export default function WebinarRegistrationModal() {
     const onOpen = (e: Event) => {
       const detail = (e as CustomEvent<OpenDetail>).detail;
       if (!detail?.announcementId) return;
+      registeredRef.current = false;
       returnFocusRef.current = detail.opener || (document.activeElement as HTMLElement | null);
       openedAtRef.current = Date.now();
       submittingRef.current = false;
@@ -90,6 +126,46 @@ export default function WebinarRegistrationModal() {
     window.addEventListener(OPEN_WEBINAR_REGISTRATION_EVENT, onOpen);
     return () => window.removeEventListener(OPEN_WEBINAR_REGISTRATION_EVENT, onOpen);
   }, []);
+
+  // First-visit popup: once per page load, 2s after mount, never on admin pages. Uses the same active
+  // "register" announcement as the announcement bar, so the existing worker route validates it.
+  useEffect(() => {
+    if (isAdminRoute || autoScheduledRef.current) return;
+    autoScheduledRef.current = true;
+    let cancelled = false;
+    const timer = window.setTimeout(async () => {
+      try {
+        const seen = readPopupState();
+        const { announcementsCms } = await import('@/lib/cms-firestore');
+        const [settings, active] = await Promise.all([
+          announcementsCms.getSettings().catch(() => ({ enabled: true })),
+          announcementsCms.getActive(),
+        ]);
+        if (cancelled || !settings.enabled) return;
+        const webinar = active.find(
+          (a) => a.ctaAction === 'register' && !seen[a.id] && (a.webinarTitle || a.text || '').trim()
+        );
+        if (!webinar) return;
+        // Don't stack on top of another dialog the visitor already opened
+        if (document.querySelector('[role="dialog"][aria-modal="true"]')) return;
+        // Re-read in case another tab registered/dismissed while we were loading
+        if (readPopupState()[webinar.id]) return;
+        window.dispatchEvent(
+          new CustomEvent<OpenDetail>(OPEN_WEBINAR_REGISTRATION_EVENT, {
+            detail: { announcementId: webinar.id, webinarName: (webinar.webinarTitle || webinar.text).trim() },
+          })
+        );
+      } catch (err) {
+        // A failed lookup must never get in the way of browsing the site
+        console.warn('Webinar popup skipped:', err);
+      }
+    }, AUTO_OPEN_DELAY_MS);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+      autoScheduledRef.current = false;
+    };
+  }, [isAdminRoute]);
 
   // Lock page scroll while open, focus the first field, and hand focus back on close
   useEffect(() => {
@@ -106,6 +182,7 @@ export default function WebinarRegistrationModal() {
 
   // Navigating away closes the popup
   useEffect(() => {
+    if (targetIdRef.current && !registeredRef.current) markPopupState(targetIdRef.current, 'dismissed');
     setTarget(null);
   }, [pathname]);
 
@@ -173,8 +250,12 @@ export default function WebinarRegistrationModal() {
         elapsedMs: Date.now() - openedAtRef.current,
       });
       setSuccessMessage(result?.message || 'Thank you for registering. We will contact you with the webinar details.');
+      registeredRef.current = true;
+      markPopupState(target.announcementId, 'registered');
       setStatus('success');
     } catch (err: any) {
+      // Already on file for this email: treat as registered so the popup stops appearing
+      if (err?.status === 409) markPopupState(target.announcementId, 'registered');
       setSubmitError(
         err?.status === 0
           ? 'Could not reach the server. Please check your connection and try again.'
@@ -204,10 +285,10 @@ export default function WebinarRegistrationModal() {
             aria-labelledby="webinar-reg-title"
             aria-describedby="webinar-reg-subtitle"
             onClick={(e) => e.stopPropagation()}
-            initial={{ opacity: 0, scale: 0.96, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 10 }}
-            transition={{ type: 'spring', damping: 26, stiffness: 340 }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 10 }}
+            animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 10 }}
+            transition={reduceMotion ? { duration: 0 } : { type: 'spring', damping: 26, stiffness: 340 }}
             className="relative w-full max-w-md my-auto max-h-[94vh] flex flex-col bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
           >
             {/* Header */}

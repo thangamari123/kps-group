@@ -18,6 +18,7 @@ export default function Header() {
 
   const lastScrollY = useRef(0);
   const isTicking = useRef(false);
+  const navRef = useRef(null);
 
   // Close mobile menu and dropdowns on route change
   useEffect(() => {
@@ -92,6 +93,29 @@ export default function Header() {
     }
   };
 
+  // Close an open desktop dropdown on Escape or when tapping/clicking outside it (touch has no mouseleave)
+  useEffect(() => {
+    if (!activeDropdown) return;
+    const onPointerDown = (e) => {
+      // The mobile drawer manages its own accordion; this is for the desktop nav only
+      if (window.innerWidth < 1024) return;
+      if (navRef.current && !navRef.current.contains(e.target)) setActiveDropdown(null);
+    };
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setActiveDropdown(null);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [activeDropdown]);
+
+  // External links open in a new tab; internal ones use the Next.js router
+  const dropdownLinkProps = (item) =>
+    item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+
   const isActive = (path, dropdown) => {
     if (path === '/') {
       return pathname === '/';
@@ -139,7 +163,7 @@ export default function Header() {
         </Link>
 
         {/* Center Navigation Links (Desktop) */}
-        <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
+        <nav ref={navRef} className="hidden lg:flex items-center space-x-4 min-[1150px]:space-x-6 xl:space-x-8">
           {navigationData.header.map((link) => {
             if (link.dropdown) {
               const dropdownActive = isActive(link.path, link.dropdown);
@@ -150,8 +174,22 @@ export default function Header() {
                   className="relative group py-2"
                   onMouseEnter={() => setActiveDropdown(link.name)}
                   onMouseLeave={() => setActiveDropdown(null)}
+                  onBlur={(e) => {
+                    if (!e.currentTarget.contains(e.relatedTarget)) setActiveDropdown(null);
+                  }}
                 >
                   <button
+                    type="button"
+                    aria-haspopup="true"
+                    aria-expanded={isDropdownOpen}
+                    onClick={() => setActiveDropdown(link.name)}
+                    onFocus={() => setActiveDropdown(link.name)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        setActiveDropdown(link.name);
+                      }
+                    }}
                     className={`flex items-center space-x-1 font-semibold text-[14.5px] xl:text-[15px] transition-all duration-200 hover:text-[#0F5B44] focus:outline-none cursor-pointer ${
                       dropdownActive ? 'text-[#0F5B44] font-bold' : 'text-[#1f2937]'
                     }`}
@@ -179,6 +217,7 @@ export default function Header() {
                           <Link
                             key={item.name}
                             href={item.path}
+                            {...dropdownLinkProps(item)}
                             className={`block px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 ${
                               pathname === item.path
                                 ? 'text-[#0F5B44] bg-[#eaf4ef] font-bold'
@@ -316,6 +355,7 @@ export default function Header() {
                                 <Link
                                   key={subItem.name}
                                   href={subItem.path}
+                                  {...dropdownLinkProps(subItem)}
                                   className={`block py-2 px-3 rounded-lg text-sm font-medium ${
                                     pathname === subItem.path ? 'text-[#0F5B44] font-bold bg-white shadow-xs' : 'text-slate-600 hover:text-[#0F5B44]'
                                   }`}

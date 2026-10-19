@@ -152,15 +152,20 @@ export default function AboutContent() {
           </div>
 
           {/* 2-Card Responsive Compact Grid: 1 Column on Mobile, 2 Columns on Desktop */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-8 max-w-6xl items-stretch mx-auto">
             
             {/* Card 1: Founder & Chairman */}
-            <div className="bg-white rounded-2xl border border-brand-gray-muted shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between group">
+            <div className="bg-white rounded-2xl border border-brand-gray-muted shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between group h-full min-w-0">
               <div>
                 {/* Photo Container */}
-                <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
                   <img
                     src={founderImg}
+                    width={1600}
+                    height={1068}
+                    loading="lazy"
+                    decoding="async"
+                    sizes="(min-width: 1024px) 560px, 100vw"
                     alt="Founder & Chairman Mr. Srinivasa Pragasam"
                     className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
                   />
@@ -190,12 +195,12 @@ export default function AboutContent() {
                 <div className="h-1 bg-gradient-to-r from-brand-yellow via-brand-yellow-light to-brand-yellow"></div>
 
                 {/* Card Body */}
-                <div className="p-5 sm:p-7 space-y-3.5">
-                  <p className="text-[13.5px] sm:text-[14.5px] text-[#374151] leading-[1.72] font-normal">
+                <div className="p-4 sm:p-5 space-y-3">
+                  <p className="text-[13px] sm:text-[14px] text-[#374151] leading-[1.65] font-normal">
                     I began this journey in <strong className="font-semibold text-brand-green-dark">1985</strong> at the age of 24 without any industry background — just inspiration from my uncle and an eagerness to learn. Through hard work and independent study, I cleared the required examinations and <strong className="font-semibold text-brand-green-dark">secured my logistics license</strong> to build something of my own.
                   </p>
 
-                  <p className="text-[13.5px] sm:text-[14.5px] text-[#374151] leading-[1.72] font-normal">
+                  <p className="text-[13px] sm:text-[14px] text-[#374151] leading-[1.65] font-normal">
                     One unforgettable moment came during a bank visit when I helped an elderly gentleman struggling to fill a cheque deposit form. A month later, ready to retire, that same gentleman handed me his entire logistics operation — <strong className="font-semibold text-brand-green-dark">becoming our foundational client</strong>.
                   </p>
 
@@ -206,21 +211,26 @@ export default function AboutContent() {
               </div>
 
               {/* Card Footer */}
-              <div className="px-5 pb-5 sm:px-7 sm:pb-6 pt-2 border-t border-brand-gray-muted/60 flex items-center justify-between text-[11px] sm:text-xs text-brand-gray">
+              <div className="px-4 pb-4 sm:px-5 sm:pb-4 pt-2 border-t border-brand-gray-muted/60 flex items-center justify-between text-[11px] sm:text-xs text-brand-gray">
                 <span className="font-semibold text-brand-green-dark">Leadership Handover: 2008</span>
                 <span className="text-brand-yellow-dark font-bold">40+ Years of Excellence</span>
               </div>
             </div>
 
             {/* Card 2: Managing Director */}
-            <div className="bg-white rounded-2xl border border-brand-gray-muted shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between group">
+            <div className="bg-white rounded-2xl border border-brand-gray-muted shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between group h-full min-w-0">
               <div>
                 {/* Photo Container */}
-                <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
                   <img
                     src={mdImg}
+                    width={413}
+                    height={531}
+                    loading="lazy"
+                    decoding="async"
+                    sizes="(min-width: 1024px) 560px, 100vw"
                     alt="Managing Director Mr. B.S. Prassanna"
-                    className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
+                    className="w-full h-full object-cover object-[50%_18%] group-hover:scale-103 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
 
@@ -248,12 +258,12 @@ export default function AboutContent() {
                 <div className="h-1 bg-gradient-to-r from-brand-green via-brand-green-light to-brand-green"></div>
 
                 {/* Card Body */}
-                <div className="p-5 sm:p-7 space-y-3.5">
-                  <p className="text-[13.5px] sm:text-[14.5px] text-[#374151] leading-[1.72] font-normal">
+                <div className="p-4 sm:p-5 space-y-3">
+                  <p className="text-[13px] sm:text-[14px] text-[#374151] leading-[1.65] font-normal">
                     In <strong className="font-semibold text-brand-green-dark">2008</strong>, at the age of just 20, <strong className="font-semibold text-brand-green-dark">Mr. B.S. Prassanna</strong> stepped into the shipping and logistics industry, taking over the reins of KPS after completing his Bachelor’s degree in <strong className="font-semibold text-brand-green-dark">Computer Engineering</strong>. He entered with a clear vision: to modernize traditional logistics through <strong className="font-semibold text-brand-green-dark">digital automation</strong> and simplified client workflows.
                   </p>
 
-                  <p className="text-[13.5px] sm:text-[14.5px] text-[#374151] leading-[1.72] font-normal">
+                  <p className="text-[13px] sm:text-[14px] text-[#374151] leading-[1.65] font-normal">
                     Prassanna’s focus has been <strong className="font-semibold text-brand-green-dark">eliminating supply chain complexity</strong> and <strong className="font-semibold text-brand-green-dark">maximizing transparency</strong>. By identifying key industry friction points, he developed tech-enabled tracking and custom clearance protocols that significantly elevated operational velocity, client satisfaction, and corporate trust.
                   </p>
 
@@ -276,7 +286,7 @@ export default function AboutContent() {
               </div>
 
               {/* Card Footer */}
-              <div className="px-5 pb-5 sm:px-7 sm:pb-6 pt-2 border-t border-brand-gray-muted/60 flex items-center justify-between text-[11px] sm:text-xs text-brand-gray">
+              <div className="px-4 pb-4 sm:px-5 sm:pb-4 pt-2 border-t border-brand-gray-muted/60 flex items-center justify-between text-[11px] sm:text-xs text-brand-gray">
                 <span className="font-semibold text-brand-green-dark">Leadership: Next-Gen Supply Chain</span>
                 <span className="text-brand-green font-bold">Technology & Innovation</span>
               </div>

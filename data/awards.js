@@ -1,6 +1,26 @@
 // KPS Awards & Honors Data (Normalized for Next.js)
 export const awardsData = [
   {
+    id: 7,
+    title: "Best Business Partner Award 2025–2026 for Best Performance of CHA",
+    year: "2026",
+    date: "15th October 2026, Chennai",
+    organization: "Chennai Port Authority",
+    category: "Customs House Agency (CHA) Excellence",
+    description: "Honored with the Best Business Partner Award 2025–2026 by Chennai Port Authority at the 145th Port Day Celebration 2026 for outstanding performance in Customs House Agency (CHA) services — a milestone of excellence, trust, and commitment.",
+    image: "/images/chennai-port-best-business-partner-certificate.webp"
+  },
+  {
+    id: 6,
+    title: "Best Business Partner Award 2025–26 for Best Performance of CHA",
+    year: "2025",
+    date: "145th Port Day Celebration, Chennai",
+    organization: "Chennai Port Authority",
+    category: "Best Business Partner Award",
+    description: "Honored with the Best Business Partner Award 2025–26 by Chennai Port Authority for outstanding CHA performance during the 145th Port Day Celebration — a milestone of excellence, trust, and commitment.",
+    image: "/images/chennai-port-best-business-partner.webp"
+  },
+  {
     id: 1,
     title: "Kangaro 10th Anniversary Logistics Partner of Honour (2015 - 2025)",
     year: "2025",
