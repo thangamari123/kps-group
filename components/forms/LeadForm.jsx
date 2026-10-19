@@ -266,6 +266,12 @@ export default function LeadForm({ isModal = false, onClose = null }) {
     setTouched({});
   };
 
+  // Close from the Thank You screen: clear the form, then close the popup (if this form is in one)
+  const handleClose = () => {
+    handleReset();
+    onClose?.();
+  };
+
   // Helper for input styling based on exact UI screenshot
   const getInputWrapperClass = (fieldName) => {
     const isInvalid = touched[fieldName] && errors[fieldName];
@@ -328,37 +334,23 @@ export default function LeadForm({ isModal = false, onClose = null }) {
 
       {/* Success View */}
       {status === 'success' ? (
-        <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-4 sm:p-6 text-center animate-in fade-in zoom-in-95 duration-300">
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#14533d] text-white rounded-full flex items-center justify-center mx-auto mb-2 shadow-xs">
-            <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+        <div role="status" aria-live="polite" className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-5 sm:p-7 text-center animate-in fade-in zoom-in-95 duration-300">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#14533d] text-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-xs">
+            <CheckCircle className="w-6 h-6 sm:w-7 sm:h-7" />
           </div>
-          <h4 className="text-base sm:text-lg font-bold text-[#0f3c2d] mb-1">Quote Request Submitted!</h4>
-          <p className="text-xs text-gray-600 max-w-sm mx-auto leading-relaxed">
-            Thank you, <strong className="text-[#0f3c2d]">{formData.name}</strong>. Your request has been received. Our team will review your shipment details and respond within 24 hours.
+          <h4 className="text-lg sm:text-xl font-bold text-[#0f3c2d] mb-2">Thank You for Your Enquiry!</h4>
+          <p className="text-xs sm:text-sm text-gray-600 max-w-sm mx-auto leading-relaxed">
+            Your quote request has been submitted successfully. Our logistics team will review your details and contact you soon.
           </p>
 
-          <div className="mt-3 p-3 bg-white rounded-lg border border-gray-100 text-left text-[11px] sm:text-xs max-w-xs sm:max-w-sm mx-auto space-y-1 text-gray-700 shadow-xs">
-            <p><span className="font-semibold text-[#0f3c2d]">Service:</span> {formData.service}</p>
-            <p><span className="font-semibold text-[#0f3c2d]">Route:</span> {formData.origin} &rarr; {formData.destination}</p>
-            <p><span className="font-semibold text-[#0f3c2d]">Phone:</span> +91 {formData.phone}</p>
-            <p><span className="font-semibold text-[#0f3c2d]">Email:</span> {formData.email}</p>
-          </div>
-
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-            <button 
-              onClick={handleReset}
-              className="inline-flex items-center space-x-1 bg-[#14533d] hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white font-bold text-xs px-4 py-2 rounded-lg transition-all duration-250 shadow-xs cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107]"
+          <div className="mt-5 flex items-center justify-center">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="inline-flex items-center justify-center bg-[#14533d] hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white font-bold text-xs sm:text-sm px-8 py-2.5 rounded-lg transition-all duration-250 shadow-xs cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107]"
             >
-              <span>Submit Another Quote</span>
+              Close
             </button>
-            {onClose && (
-              <button 
-                onClick={onClose}
-                className="inline-flex items-center space-x-1 bg-gray-100 border border-gray-200 text-gray-700 hover:bg-[#ffc107] hover:text-[#073B2C] hover:border-[#ffc107] active:bg-[#e0a800] active:text-[#073B2C] font-semibold text-xs px-3.5 py-2 rounded-lg transition-all duration-250 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107]"
-              >
-                <span>Close</span>
-              </button>
-            )}
           </div>
         </div>
       ) : (
