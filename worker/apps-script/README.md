@@ -5,25 +5,31 @@ The Web App URL lives only in the Worker secret `APPS_SCRIPT_URL`; the browser n
 
 | Form | Worker route | Enquiry type | Where it is stored |
 | --- | --- | --- | --- |
-| Contact Us | `POST /api/contact` | (unchanged payload) | your existing Contact Us tab, handled by your existing code |
+| Contact Us | none (opens WhatsApp from the browser) | n/a | not saved to the sheet; the `/api/contact` Worker route still exists but the form no longer calls it |
 | Request a Quote | `POST /api/quotes` | `Quote Request` | new `Quote Requests` tab, handled by `QuoteRequests.gs` |
 
-## One-time step: add quote handling to your existing Apps Script project
+## One-time step: install the two script files in your existing Apps Script project
 
-Your deployed script only knows the Contact Us payload, so it must be extended once. Until this is done, quote
-submissions show an error (the Worker refuses to report success unless the script echoes the quote's submission ID back),
-and Contact Us keeps working.
+The project needs exactly two files. `Code.gs` is the only place that defines `doPost` and `doGet`.
 
 1. Open the **existing** Apps Script project behind the KPS-WEB LEADS sheet (Extensions → Apps Script).
-2. Add a new file `QuoteRequests.gs` and paste the contents of [`QuoteRequests.gs`](./QuoteRequests.gs).
-3. At the very top of your existing `doPost(e)` add:
-   ```js
-   var quoteReply = routeQuoteRequest_(e);
-   if (quoteReply) return quoteReply;
-   ```
-   Contact Us requests return `null` from `routeQuoteRequest_` and continue into your existing code unchanged.
+2. Replace the whole contents of `code.gs` with [`Code.gs`](./Code.gs) (it routes quotes first via `routeQuoteRequest_(e)`).
+3. Make the quote file contain [`QuoteRequests.gs`](./QuoteRequests.gs) (Apps Script adds `.gs` to file names itself, so a file shown as
+   `QuoteRequests.gs.gs` is fine). Do not add a second `doPost` or `doGet` anywhere.
 4. If the project is not opened from the spreadsheet (it uses `openById`), add a Script property `SPREADSHEET_ID`.
 5. **Deploy → Manage deployments → Edit (pencil) → Version: New version → Deploy.** Keep the same deployment so the URL does not change.
+
+Contact Us no longer goes through this script, so requests that are not quotes are refused (`unsupported_request`) and write nothing.
+
+### Check the deployment without writing any data
+
+```bash
+curl -sL -H "Content-Type: text/plain" --data '{"enquiryType":"Quote Request"}' "<your Web app /exec URL>"
+```
+
+- `{"success":false,"error":"invalid"}` → the quote handler is live (nothing is written for an invalid payload).
+- `{"success":false,"message":"Missing required field: …"}` (e.g. `name`) → the deployment is still the old code: the new version was not
+  deployed, or `code.gs` was not replaced with `Code.gs` from this folder. Quote submissions will keep failing with an error.
 
 The `Quote Requests` tab is created on the first quote with these columns:
 

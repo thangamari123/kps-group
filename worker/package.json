@@ -9,7 +9,7 @@
     "deploy": "wrangler deploy",
     "types": "wrangler types",
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/contact.test.mjs tests/quote.test.mjs"
+    "test": "node --test tests/contact.test.mjs tests/quote.test.mjs tests/entrypoint.test.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240923.0",

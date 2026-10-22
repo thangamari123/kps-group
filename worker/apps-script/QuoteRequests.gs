@@ -37,8 +37,10 @@ function routeQuoteRequest_(e) {
     if (!q) return quoteJson_({ success: false, error: 'invalid' });
     return quoteJson_(saveQuote_(q));
   } catch (err) {
-    console.error(err && err.message ? err.message : String(err));
-    return quoteJson_({ success: false, error: 'server_error' });
+    var detail = err && err.message ? err.message : String(err);
+    console.error(detail);
+    // The Worker logs this reply for the operator; it is never shown to website visitors.
+    return quoteJson_({ success: false, error: 'server_error', message: detail.slice(0, 200) });
   }
 }
 
@@ -126,10 +128,26 @@ function getQuoteSheet_() {
   var ss = getQuoteSpreadsheet_();
   var sheet = ss.getSheetByName(QUOTE_SHEET_NAME) || ss.insertSheet(QUOTE_SHEET_NAME);
   if (sheet.getLastRow() === 0) {
+    // Brand-new, empty tab: write the header row. An existing tab is never cleared or overwritten.
     sheet.getRange(1, 1, 1, QUOTE_HEADERS.length).setValues([QUOTE_HEADERS]).setFontWeight('bold');
     sheet.setFrozenRows(1);
+  } else {
+    assertQuoteHeaders_(sheet);
   }
   return sheet;
+}
+
+/**
+ * Rows are written by position, so an existing tab must already have exactly these headers in this order.
+ * If not, refuse to write (nothing is changed) instead of putting values under the wrong columns.
+ */
+function assertQuoteHeaders_(sheet) {
+  var existing = sheet.getRange(1, 1, 1, QUOTE_HEADERS.length).getValues()[0];
+  for (var i = 0; i < QUOTE_HEADERS.length; i++) {
+    if (String(existing[i]).trim().toLowerCase() !== QUOTE_HEADERS[i].toLowerCase()) {
+      throw new Error('Quote Requests header mismatch in column ' + (i + 1) + ': expected "' + QUOTE_HEADERS[i] + '" but found "' + String(existing[i]).slice(0, 40) + '". Nothing was written.');
+    }
+  }
 }
 
 function quoteJson_(obj) {

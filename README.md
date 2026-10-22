@@ -131,18 +131,14 @@ Deploy the generated `out/` directory to Cloudflare Pages or any static host.
 
 ---
 
-## 📬 Contact Us → Google Sheets
+## 📬 Contact Us (WhatsApp) and Request a Quote (Google Sheets)
 
-`ContactForm` → Worker `POST /api/contact` → Google Apps Script Web App → **KPS-WEB LEADS** sheet. The Worker validates,
-sanitizes, rate-limits and de-duplicates, and reports success only after the script answers `{"success": true}`.
-The script receives `{name, email, countryCode, phone, company, service, message}`.
+- **Contact Us:** on a valid submit the browser opens WhatsApp (`wa.me`) with the enquiry pre-filled, using the business number
+  from `data/company.js` (`companyDetails.contact.whatsappUrl`). Nothing is stored. If the pop-up is blocked the form shows
+  the message with an "Open WhatsApp" link and a copy button.
+- **Request a Quote:** `LeadForm` → Worker `POST /api/quotes` → Google Apps Script Web App → `Quote Requests` tab of the
+  KPS-WEB LEADS sheet. Success is shown only after the script confirms the row. Setup and deployment steps (including the
+  one-time Apps Script update) are in [worker/apps-script/README.md](worker/apps-script/README.md).
 
-The Web App URL is configured only as a Worker secret (it is not in the repo or the browser bundle):
-
-```bash
-cd worker
-npx wrangler secret put APPS_SCRIPT_URL   # paste the Web App /exec URL
-npx wrangler deploy
-```
-
-Locally, set `APPS_SCRIPT_URL` in `worker/.dev.vars` (see `.dev.vars.example`). Tests: `cd worker && npm test`.
+The Web App URL is a Worker secret only (`npx wrangler secret put APPS_SCRIPT_URL`); it is not in the repo or the browser bundle.
+Worker tests: `cd worker && npm test`.

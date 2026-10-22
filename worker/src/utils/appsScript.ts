@@ -77,7 +77,12 @@ async function postToSheet(env: Env, payload: object): Promise<any | null> {
     // Script errors and sign-in pages come back as HTML with HTTP 200, so JSON.parse is the real check.
     const data: any = JSON.parse(await res.text());
     if (data?.success === true) return data;
-    console.error('Apps Script did not confirm the save:', String(data?.error || data?.message || 'unknown response').slice(0, 200));
+    const reason = String(data?.error || data?.message || 'unknown response').slice(0, 200);
+    console.error('Apps Script did not confirm the save:', reason);
+    if ((payload as any)?.enquiryType === 'Quote Request' && /^Missing required field/i.test(reason)) {
+      // The Contact Us validator answered, so the deployed script has no quote handler (or routeQuoteRequest_ is not called first in doPost).
+      console.error('Hint: the deployed Apps Script is still the old version. Add QuoteRequests.gs, call routeQuoteRequest_(e) first in doPost, and redeploy a new version.');
+    }
     return null;
   } catch (err: any) {
     console.error('Apps Script request failed:', err?.name || '', err?.message || err);

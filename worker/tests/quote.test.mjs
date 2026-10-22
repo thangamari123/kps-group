@@ -306,3 +306,86 @@ test('Contact Us works even when the script has no quote handler', async () => {
   assert.equal(status, 201);
   assert.equal(app.contactRows.length, 1);
 });
+
+// ---- Sheet schema: header order, value order, existing data
+const SCHEMA = [
+  ['Submission ID', 'submissionId'], ['Timestamp', 'timestamp'], ['Enquiry Type', 'enquiryType'], ['Status', 'status'],
+  ['Name', 'name'], ['Email', 'email'], ['Country Code', 'countryCode'], ['Phone', 'phone'], ['Company', 'company'],
+  ['Service Required', 'service'], ['Cargo Weight / Volume', 'cargoWeight'], ['Origin', 'origin'],
+  ['Destination', 'destination'], ['Cargo Specifications', 'cargoDetails'],
+];
+const scriptPayload = () => ({
+  enquiryType: 'Quote Request', submissionId: 'QTE-0123456789ABCDEF0123', timestamp: '2026-10-22T10:00:00.000Z', status: 'New',
+  name: 'Name Sentinel', email: 'email@sentinel.example', countryCode: '+91', phone: '9876543210', company: 'Company Sentinel',
+  service: 'Service Sentinel', cargoWeight: 'Weight Sentinel', origin: 'Origin Sentinel', destination: 'Destination Sentinel',
+  cargoDetails: 'Specs Sentinel',
+});
+
+test('schema: new tab gets exactly the 14 expected headers, and every value lands under its own header', async () => {
+  reset();
+  const payload = scriptPayload();
+  assert.equal(JSON.parse(app.doPost(JSON.stringify(payload))).success, true);
+  const [header, row] = app.tabs.get('Quote Requests');
+  assert.deepEqual(header, SCHEMA.map(([h]) => h));
+  assert.equal(row.length, SCHEMA.length);
+  SCHEMA.forEach(([h, key], i) => assert.equal(row[i], payload[key], `column ${i + 1} "${h}" must hold ${key}`));
+});
+
+test('schema: the Worker sends every field the sheet needs, under the names the script reads', async () => {
+  reset();
+  await quote(quoteBody());
+  assert.deepEqual(Object.keys(calls[0]).sort(), SCHEMA.map(([, k]) => k).sort());
+});
+
+test('existing tab with the right headers and records: records untouched, new row appended below, headers not rewritten', async () => {
+  reset();
+  const existing = [
+    SCHEMA.map(([h]) => h),
+    ['QTE-AAAAAAAAAAAAAAAAAAAA', '2026-09-01T00:00:00.000Z', 'Quote Request', 'Contacted', 'Old One', 'one@x.co', '+91', '9000000001', '', 'Customs Brokerage', '', 'A1', 'B1', 'first'],
+    ['QTE-BBBBBBBBBBBBBBBBBBBB', '2026-09-02T00:00:00.000Z', 'Quote Request', 'New', 'Old Two', 'two@x.co', '+44', '7000000002', 'Co', 'Express Delivery', '1t', 'A2', 'B2', 'second'],
+  ];
+  const snapshot = JSON.parse(JSON.stringify(existing));
+  app.tabs.set('Quote Requests', existing);
+  const res = await quote(quoteBody());
+  assert.equal(res.status, 201);
+  const grid = app.tabs.get('Quote Requests');
+  assert.deepEqual(grid.slice(0, 3), snapshot, 'existing header and records must be unchanged');
+  assert.equal(grid.length, 4);
+  assert.equal(grid[3][0], res.json.data.id);
+  assert.equal(grid[3][2], 'Quote Request');
+});
+
+test('existing tab headers are matched case-insensitively and ignoring stray spaces', async () => {
+  reset();
+  app.tabs.set('Quote Requests', [SCHEMA.map(([h]) => ` ${h.toUpperCase()} `)]);
+  assert.equal((await quote(quoteBody())).status, 201);
+  assert.equal(app.tabs.get('Quote Requests').length, 2);
+});
+
+test('existing tab with headers in a different order: refuses to write, changes nothing, Worker reports an error', async () => {
+  reset();
+  const swapped = SCHEMA.map(([h]) => h);
+  [swapped[4], swapped[5]] = [swapped[5], swapped[4]]; // Email before Name
+  const existing = [swapped, ['QTE-AAAAAAAAAAAAAAAAAAAA', 't', 'Quote Request', 'New', 'x@y.co', 'Old', '+91', '9', '', 's', '', 'a', 'b', 'c']];
+  const snapshot = JSON.parse(JSON.stringify(existing));
+  app.tabs.set('Quote Requests', existing);
+
+  const direct = JSON.parse(app.doPost(JSON.stringify(scriptPayload())));
+  assert.equal(direct.success, false);
+  assert.match(direct.message, /header mismatch in column 5/);
+
+  const res = await quote(quoteBody());
+  assert.equal(res.status, 502);
+  assert.equal(res.json.success, false);
+  assert.deepEqual(app.tabs.get('Quote Requests'), snapshot, 'nothing may be added, cleared or overwritten');
+});
+
+test('existing tab with a different number of columns or a missing header cell is also refused', async () => {
+  reset();
+  const short = SCHEMA.map(([h]) => h).slice(0, 10);
+  app.tabs.set('Quote Requests', [short]);
+  const direct = JSON.parse(app.doPost(JSON.stringify(scriptPayload())));
+  assert.equal(direct.success, false);
+  assert.match(direct.message, /header mismatch in column 11/);
+  assert.deepEqual(app.tabs.get('Quote Requests'), [short]);
+});
