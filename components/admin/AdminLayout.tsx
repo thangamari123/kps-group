@@ -24,6 +24,7 @@ import {
   BookOpen,
   Megaphone,
   CalendarCheck,
+  Trophy,
 } from 'lucide-react';
 import DeleteConfirmModal from './DeleteConfirmModal';
 
@@ -92,6 +93,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       items: [
         { name: 'Gallery', href: '/admin/gallery', icon: Camera },
         { name: 'Blogs', href: '/admin/blogs', icon: BookOpen },
+        { name: 'Awards', href: '/admin/awards', icon: Trophy },
         { name: 'Announcement Bar', href: '/admin/announcements', icon: Megaphone },
         { name: 'Webinar Registrations', href: '/admin/webinar-registrations', icon: CalendarCheck },
       ],
@@ -114,6 +116,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (pathname === '/admin') return { title: 'Dashboard Overview', section: 'Overview' };
     if (pathname.startsWith('/admin/gallery')) return { title: 'Gallery Management', section: 'Content' };
     if (pathname.startsWith('/admin/blogs')) return { title: 'Blog Management', section: 'Content' };
+    if (pathname.startsWith('/admin/awards')) return { title: 'Awards Management', section: 'Content' };
     if (pathname.startsWith('/admin/announcements')) return { title: 'Announcement Bar', section: 'Content' };
     if (pathname.startsWith('/admin/webinar-registrations')) return { title: 'Webinar Registrations', section: 'Content' };
     if (pathname.startsWith('/admin/careers/jobs/new')) return { title: 'Create Job Post', section: 'Careers' };

@@ -32,6 +32,7 @@ export default function CareerApplicationForm({
   jobSlug = '',
   isClosed = false,
   deadline = '',
+  onCancel = null,
 } = {}) {
   const [formData, setFormData] = useState({
     candidateName: '',
@@ -281,17 +282,29 @@ export default function CareerApplicationForm({
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-6 md:p-10 border border-gray-100">
-      <div className="border-b border-gray-100 pb-5 mb-8">
-        <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-widest block mb-1">
-          {jobTitle ? 'Direct Application' : 'Candidate Portal'}
-        </span>
-        <h3 className="text-2xl font-black text-brand-green-dark">
-          {jobTitle ? `Apply for ${jobTitle}` : 'Submit Your Application'}
-        </h3>
-        <p className="text-[#4b5563] text-xs sm:text-sm mt-1 font-normal leading-relaxed">
-          Fill in your credentials and upload your resume. Our HR recruitment team reviews every profile.
-        </p>
+    <div className="bg-white rounded-xl shadow-sm p-5 sm:p-6 md:p-10 border border-gray-200">
+      <div className="border-b border-gray-100 pb-5 mb-8 flex flex-col-reverse sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+        <div>
+          <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-widest block mb-1">
+            {jobTitle ? 'Direct Application' : 'Candidate Portal'}
+          </span>
+          <h3 className="text-2xl font-black text-brand-green-dark">
+            {jobTitle ? `Apply for ${jobTitle}` : 'Submit Your Application'}
+          </h3>
+          <p className="text-[#4b5563] text-xs sm:text-sm mt-1 font-normal leading-relaxed">
+            Fill in your credentials and upload your resume. Our HR recruitment team reviews every profile.
+          </p>
+        </div>
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={status === 'uploading' || status === 'saving'}
+            className="shrink-0 self-end sm:self-auto min-h-10 px-4 py-1.5 rounded-lg text-xs font-bold text-gray-600 bg-gray-100 hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] transition-all duration-250 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107] disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Cancel
+          </button>
+        )}
       </div>
 
       {status === 'success' ? (

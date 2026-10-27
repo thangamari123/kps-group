@@ -12,6 +12,7 @@ import {
   where,
   orderBy,
   limit,
+  runTransaction,
   serverTimestamp,
   type DocumentData,
   type QueryConstraint,
@@ -577,6 +578,92 @@ export const awardsCms = {
       )
     );
     await Promise.all(updatePromises);
+  },
+
+  /**
+   * Creates awards under fixed ids, skipping ids that already exist, in ONE atomic transaction: either every missing
+   * award is created or none is, and repeating the call (or running it from two browsers) never makes a duplicate.
+   * Resolves the number of awards actually created.
+   */
+  async createManyIfAbsent(
+    items: { id: string; data: Omit<AwardItem, 'id' | 'createdAt' | 'updatedAt' | 'createdBy'> }[]
+  ): Promise<number> {
+    if (items.length === 0) return 0;
+    const auditUser = getCurrentAuditUser();
+
+    return runTransaction(db, async (tx) => {
+      const refs = items.map((item) => doc(db, 'awards', item.id));
+      const snaps = await Promise.all(refs.map((ref) => tx.get(ref)));
+      let created = 0;
+      snaps.forEach((snap, index) => {
+        if (snap.exists()) return;
+        const { data } = items[index];
+        tx.set(
+          refs[index],
+          sanitizeFirestorePayload({
+            ...data,
+            year: isNaN(Number(data.year)) ? data.year : Number(data.year),
+            sortOrder: Number(data.sortOrder) || 0,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+            createdBy: auditUser,
+            updatedBy: auditUser,
+          })
+        );
+        created += 1;
+      });
+      return created;
+    });
+  },
+
+  /**
+   * True when an R2 object key is still used by any record (awards, gallery, blogs, CSR), optionally ignoring one award.
+   * Any lookup that fails counts as "referenced", so a file is never deleted on uncertainty.
+   */
+  async isMediaKeyReferenced(key: string, excludeAwardId?: string): Promise<boolean> {
+    if (!key) return false;
+    const places: [string, string][] = [
+      ['awards', 'imageKey'],
+      ['awards', 'documentKey'],
+      ['gallery', 'r2Key'],
+      ['gallery', 'posterKey'],
+      ['blogs', 'featuredImageKey'],
+      ['csr', 'mediaKey'],
+    ];
+    try {
+      for (const [collectionName, field] of places) {
+        const snap = await getDocs(query(collection(db, collectionName), where(field, '==', key)));
+        if (snap.docs.some((d) => !(collectionName === 'awards' && d.id === excludeAwardId))) {
+          return true;
+        }
+      }
+      return false;
+    } catch (err) {
+      console.warn(`Could not verify whether media "${key}" is still referenced; keeping it:`, err);
+      return true;
+    }
+  },
+
+  /**
+   * Public marker (site_settings/awardsSource) saying the awards list is managed in the admin panel.
+   * The public page then never falls back to the built-in static list when nothing is published.
+   * Reading fails safe: any error means "not managed" (old behaviour).
+   */
+  async isManagedInAdmin(): Promise<boolean> {
+    try {
+      const snap = await getDoc(doc(db, 'site_settings', 'awardsSource'));
+      return snap.exists() && snap.data()?.managed === true;
+    } catch {
+      return false;
+    }
+  },
+
+  async markManagedInAdmin(): Promise<void> {
+    await setDoc(
+      doc(db, 'site_settings', 'awardsSource'),
+      { managed: true, updatedAt: serverTimestamp(), updatedBy: getCurrentAuditUser() },
+      { merge: true }
+    );
   },
 };
 

@@ -7,6 +7,7 @@ import { getCmsDashboardStats } from '@/lib/cms-firestore';
 import { jobsCms, applicationsCms } from '@/lib/careers-firestore';
 import type { CMSStats } from '@/lib/cms-types';
 import type { JobItem, CandidateApplication } from '@/lib/careers-types';
+import { getEffectiveJobStatus } from '@/lib/job-deadline';
 import { useAuth } from '@/lib/AuthContext';
 import { useToast } from '@/components/admin/Toast';
 import {
@@ -64,7 +65,8 @@ export default function AdminDashboardPage() {
         getCmsDashboardStats().catch(() => null),
       ]);
 
-      const publishedCount = allJobs.filter((j) => j.status === 'published').length;
+      // A published job whose closing date has passed is no longer active
+      const publishedCount = allJobs.filter((j) => getEffectiveJobStatus(j) === 'published').length;
 
       setStats({
         totalJobs: allJobs.length,
@@ -412,12 +414,14 @@ export default function AdminDashboardPage() {
                     <span className="text-xs font-bold text-[#17211E] truncate">{job.title}</span>
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
-                        job.status === 'published'
+                        getEffectiveJobStatus(job) === 'published'
                           ? 'bg-[#EAF5F1] text-[#006B4F] border border-[#006B4F]/30'
+                          : getEffectiveJobStatus(job) === 'expired'
+                          ? 'bg-red-50 text-[#DC2626] border border-red-200'
                           : 'bg-amber-50 text-[#D97706] border border-amber-200'
                       }`}
                     >
-                      {job.status}
+                      {getEffectiveJobStatus(job) === 'expired' ? 'Closed / Expired' : job.status}
                     </span>
                   </div>
                   <p className="text-[11px] text-[#66736E] truncate mt-0.5 font-medium">

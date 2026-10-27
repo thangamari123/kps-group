@@ -94,9 +94,12 @@ export interface AwardItem {
   title: string;
   organization: string;
   year: number | string;
+  /** Display date shown on the public card, e.g. "15th October 2026, Chennai" (falls back to the year) */
+  date?: string;
   category: string;
   description: string;
   content?: string;
+  /** Local site path ("/images/...") for the original awards, or the R2 delivery path ("/api/media/<imageKey>") */
   imageUrl: string;
   imageKey?: string;
   documentUrl?: string;

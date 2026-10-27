@@ -21,6 +21,7 @@ import type {
   ApplicationStatus,
 } from './careers-types';
 import type { AuditUser } from './cms-types';
+import { getDeadlineDate, isDeadlinePassed, isJobOpenForApplications } from './job-deadline';
 
 /**
  * Recursively removes `undefined` properties from objects and arrays.
@@ -528,6 +529,22 @@ export const applicationsCms = {
 
     const cleanEmail = data.email.toLowerCase().trim();
     const effectiveJobId = data.jobId || 'general';
+
+    // A job only accepts applications while it is published and its closing date has not passed.
+    // (Firestore security rules and the Worker enforce the same rule, so this is not the only line of defence.)
+    if (effectiveJobId !== 'general' && effectiveJobId !== 'general-application') {
+      const job = await jobsCms.getById(effectiveJobId);
+      if (!job) {
+        throw new Error('This position is not accepting applications.');
+      }
+      if (!isJobOpenForApplications(job)) {
+        throw new Error(
+          getDeadlineDate(job.deadline) && isDeadlinePassed(job.deadline)
+            ? 'The application deadline for this position has passed.'
+            : 'Applications for this position are closed.'
+        );
+      }
+    }
 
     if (effectiveJobId && effectiveJobId !== 'general' && effectiveJobId !== 'general-application') {
       const isDuplicate = await this.checkDuplicate(cleanEmail, effectiveJobId);

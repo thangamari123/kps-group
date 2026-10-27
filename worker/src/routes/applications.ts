@@ -8,6 +8,7 @@ import {
   getFirestoreDoc,
   checkDuplicateApplicationInFirestore,
 } from '../utils/firestore';
+import { checkJobAcceptingApplications } from '../utils/jobApplications';
 
 // Supported Resume MIME types & extensions
 const ALLOWED_RESUME_TYPES = [
@@ -126,20 +127,13 @@ export async function handleCreateApplication(request: Request, env: Env): Promi
       else if (ext === '.docx') mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     }
 
-    // 4. Validate job in Firestore if not general
-    if (jobId && jobId !== 'general' && jobId !== 'general-application') {
-      const jobDoc = await getFirestoreDoc(projectId, 'jobs', jobId);
-      if (jobDoc) {
-        if (jobDoc.status === 'archived' || jobDoc.status === 'closed') {
-          return errorResponse('Applications for this position are closed.', 400, request, allowedOrigins);
-        }
-        if (jobDoc.deadline && new Date(jobDoc.deadline).getTime() < Date.now()) {
-          return errorResponse('The application deadline for this position has passed.', 400, request, allowedOrigins);
-        }
-        if (jobDoc.title) {
-          jobTitle = jobDoc.title;
-        }
-      }
+    // 4. The job must be published and its closing date must not have passed (general applications have no job)
+    const jobGate = await checkJobAcceptingApplications(projectId, jobId);
+    if (!jobGate.ok) {
+      return errorResponse(jobGate.message, jobGate.status, request, allowedOrigins);
+    }
+    if (jobGate.title) {
+      jobTitle = jobGate.title;
     }
 
     if (!jobTitle) {
@@ -259,6 +253,7 @@ export async function handleCreateApplication(request: Request, env: Env): Promi
  */
 export async function handleUploadResume(request: Request, env: Env): Promise<Response> {
   const allowedOrigins = parseAllowedOrigins(env.ALLOWED_ORIGINS);
+  const projectId = env.FIREBASE_PROJECT_ID || 'kps-website-hr-panel';
 
   // Rate limit public uploads (15 uploads per 5 minutes per IP)
   if (!checkRateLimit(request, 15, 300)) {
@@ -279,6 +274,12 @@ export async function handleUploadResume(request: Request, env: Env): Promise<Re
 
     if (!resumeFile || typeof resumeFile === 'string') {
       return errorResponse('Resume document file is required', 400, request, allowedOrigins);
+    }
+
+    // Do not store files for a job that is closed or past its application deadline
+    const jobGate = await checkJobAcceptingApplications(projectId, jobId);
+    if (!jobGate.ok) {
+      return errorResponse(jobGate.message, jobGate.status, request, allowedOrigins);
     }
 
     // Validate size

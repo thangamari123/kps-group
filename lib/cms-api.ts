@@ -33,6 +33,11 @@ export const cmsApi = {
       return urlOrKey;
     }
 
+    // Static files shipped with the website (public/images/...), e.g. the original award images: not R2 keys
+    if (urlOrKey.startsWith('/images/')) {
+      return urlOrKey;
+    }
+
     // If it's a 3rd party external URL (e.g. YouTube, Vimeo, Unsplash, external CDN), leave as-is
     if (
       (urlOrKey.startsWith('http://') || urlOrKey.startsWith('https://')) &&

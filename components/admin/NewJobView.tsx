@@ -311,7 +311,7 @@ export default function NewJobView() {
             <div>
               <label className="block text-xs font-bold text-[#17211E] uppercase tracking-wider mb-2 flex items-center space-x-1">
                 <Calendar className="w-3.5 h-3.5 text-[#006B4F]" />
-                <span>Application Deadline</span>
+                <span>Application Closing Date</span>
               </label>
               <input
                 type="date"
@@ -320,6 +320,9 @@ export default function NewJobView() {
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 bg-white border border-[#E2E9E5] rounded-xl text-xs text-[#17211E] focus:outline-none focus:border-[#006B4F] cursor-pointer"
               />
+              <p className="mt-1.5 text-[11px] text-[#66736E] leading-snug">
+                Open through this date (IST); the job closes automatically after it. Leave empty for no closing date.
+              </p>
             </div>
 
             <div>

@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams, usePathname } from 'next/navigation';
 import { jobsCms } from '@/lib/careers-firestore';
 import CareerApplicationForm from '@/components/forms/CareerApplicationForm';
+import { getDeadlineDate, isJobOpenForApplications } from '@/lib/job-deadline';
+import { formatAnnouncementDate } from '@/lib/announcement-utils';
 import {
   Briefcase,
   MapPin,
@@ -31,6 +33,17 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
   const [loading, setLoading] = useState(true);
   const [notFoundState, setNotFoundState] = useState(false);
   const [copied, setCopied] = useState(false);
+  // The application form stays hidden until the visitor clicks Apply. It is tied to the job it was opened for,
+  // so it can never carry over to a different job.
+  const [formJobId, setFormJobId] = useState<string | null>(null);
+  const showForm = !!job && formJobId === job.id;
+  const applyRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (showForm) {
+      applyRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+    }
+  }, [showForm]);
 
   // 1. Resolve effective slug from query parameter (?slug=... or ?id=...), prop, or pathname
   const targetSlug = useMemo(() => {
@@ -177,8 +190,9 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
   const benefits = parseListItems(job.benefits);
 
   const employmentType = job.employmentType || job.employment_type || 'Full Time';
-  const isDeadlinePassed = job.deadline && new Date(job.deadline).getTime() < Date.now();
-  const isClosed = isDeadlinePassed || job.status === 'closed';
+  // Open only while published and the closing date (through the end of that day, IST) has not passed
+  const isClosed = !isJobOpenForApplications(job);
+  const closingDate = formatAnnouncementDate(getDeadlineDate(job.deadline)) || String(job.deadline || '');
 
   return (
     <div className="bg-white text-brand-gray-dark">
@@ -238,7 +252,7 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
               {job.deadline && (
                 <div className="flex items-center space-x-1.5">
                   <Calendar className="w-4 h-4 text-brand-yellow shrink-0" />
-                  <span>Apply before {job.deadline}</span>
+                  <span>{isClosed ? 'Closed on' : 'Apply before'} {closingDate}</span>
                 </div>
               )}
             </div>
@@ -246,12 +260,13 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
             {/* Actions */}
             <div className="pt-6 flex flex-wrap items-center gap-3">
               {!isClosed ? (
-                <a
-                  href="#apply-section"
-                  className="bg-brand-yellow hover:bg-[#ffd54f] active:bg-[#e0a800] text-brand-green-dark font-extrabold text-xs sm:text-sm py-3 px-6 rounded-xl shadow-lg transition-all duration-250 hover:scale-105 focus-visible:ring-2 focus-visible:ring-[#ffc107]"
+                <button
+                  type="button"
+                  onClick={() => setFormJobId(job.id)}
+                  className="bg-brand-yellow hover:bg-[#ffd54f] active:bg-[#e0a800] text-brand-green-dark font-extrabold text-xs sm:text-sm py-3 px-6 rounded-xl shadow-lg transition-all duration-250 hover:scale-105 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107]"
                 >
                   Apply for this Position
-                </a>
+                </button>
               ) : (
                 <div className="bg-red-500/20 text-red-100 border border-red-400/30 font-bold text-xs py-3 px-6 rounded-xl">
                   Applications Closed for this Role
@@ -413,12 +428,13 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
                 </div>
 
                 {!isClosed ? (
-                  <a
-                    href="#apply-section"
-                    className="block text-center w-full bg-brand-green hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white font-bold py-3 rounded-xl text-xs shadow-md transition-all duration-250 focus-visible:ring-2 focus-visible:ring-[#ffc107]"
+                  <button
+                    type="button"
+                    onClick={() => setFormJobId(job.id)}
+                    className="block text-center w-full bg-brand-green hover:bg-[#ffc107] hover:text-[#073B2C] active:bg-[#e0a800] active:text-[#073B2C] text-white font-bold py-3 rounded-xl text-xs shadow-md transition-all duration-250 cursor-pointer focus-visible:ring-2 focus-visible:ring-[#ffc107]"
                   >
                     Apply Now
-                  </a>
+                  </button>
                 ) : (
                   <div className="text-center w-full bg-gray-200 text-gray-600 font-bold py-3 rounded-xl text-xs">
                     Applications Closed
@@ -441,20 +457,28 @@ export default function JobDetailView({ initialSlug }: JobDetailViewProps) {
         </div>
       </section>
 
-      {/* 3. Embedded Application Form Section */}
-      <section id="apply-section" className="py-16 bg-brand-gray-light border-t border-brand-gray-muted">
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="max-w-3xl mx-auto">
-            <CareerApplicationForm
-              jobId={job.id}
-              jobTitle={job.title}
-              jobSlug={job.slug}
-              isClosed={isClosed}
-              deadline={job.deadline}
-            />
+      {/* 3. Application form: hidden until Apply is clicked (a closed job shows its "Applications Closed" notice instead) */}
+      {(showForm || isClosed) && (
+        <section
+          id="apply-section"
+          ref={applyRef}
+          className="py-16 bg-brand-gray-light border-t border-brand-gray-muted scroll-mt-20"
+        >
+          <div className="container mx-auto px-4 sm:px-6">
+            <div className="max-w-3xl mx-auto">
+              <CareerApplicationForm
+                key={job.id}
+                jobId={job.id}
+                jobTitle={job.title}
+                jobSlug={job.slug}
+                isClosed={isClosed}
+                deadline={job.deadline}
+                onCancel={isClosed ? null : () => setFormJobId(null)}
+              />
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
     </div>
   );
 }

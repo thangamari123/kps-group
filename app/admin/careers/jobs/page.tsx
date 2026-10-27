@@ -7,6 +7,8 @@ import { useAuth } from '@/lib/AuthContext';
 import { useToast } from '@/components/admin/Toast';
 import DeleteConfirmModal from '@/components/admin/DeleteConfirmModal';
 import type { JobItem, JobStatus } from '@/lib/careers-types';
+import { getDeadlineDate, getEffectiveJobStatus } from '@/lib/job-deadline';
+import { formatAnnouncementDate } from '@/lib/announcement-utils';
 import {
   Briefcase,
   Plus,
@@ -276,10 +278,15 @@ export default function AdminJobsPage() {
                     {/* Status Badge & Toggle */}
                     <td className="px-4 py-4">
                       <select
-                        value={job.status}
-                        onChange={(e) => handleToggleStatus(job, e.target.value as JobStatus)}
+                        // A published job past its closing date is shown as Closed / Expired (the stored status is not changed)
+                        value={getEffectiveJobStatus(job)}
+                        onChange={(e) => {
+                          if (e.target.value !== job.status) handleToggleStatus(job, e.target.value as JobStatus);
+                        }}
                         className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border focus:outline-none cursor-pointer ${
-                          job.status === 'published'
+                          getEffectiveJobStatus(job) === 'expired'
+                            ? 'bg-red-50 text-[#DC2626] border-red-200'
+                            : job.status === 'published'
                             ? 'bg-[#EAF5F1] text-[#006B4F] border-[#006B4F]/30'
                             : job.status === 'draft'
                             ? 'bg-amber-50 text-[#D97706] border-amber-200'
@@ -288,6 +295,9 @@ export default function AdminJobsPage() {
                             : 'bg-slate-100 text-[#66736E] border-slate-200'
                         }`}
                       >
+                        {getEffectiveJobStatus(job) === 'expired' && (
+                          <option value="expired" disabled>Closed / Expired</option>
+                        )}
                         <option value="published">Published</option>
                         <option value="draft">Draft</option>
                         <option value="closed">Closed</option>
@@ -317,7 +327,12 @@ export default function AdminJobsPage() {
                       {job.deadline ? (
                         <div className="flex items-center space-x-1">
                           <Calendar className="w-3.5 h-3.5 text-[#66736E]" />
-                          <span>{job.deadline}</span>
+                          <span>{formatAnnouncementDate(getDeadlineDate(job.deadline)) || String(job.deadline)}</span>
+                          {getEffectiveJobStatus(job) === 'expired' && (
+                            <span className="ml-1 text-[10px] font-bold text-[#DC2626] bg-red-50 border border-red-200 px-1.5 py-0.5 rounded-full">
+                              Expired
+                            </span>
+                          )}
                         </div>
                       ) : (
                         <span className="text-emerald-700 font-medium">Open</span>

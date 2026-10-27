@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import PageHero from '@/components/common/PageHero';
+import AwardAnnouncement from '@/components/corporate/AwardAnnouncement';
 import { awardsData } from '@/data/awards';
 import { awardsCms } from '@/lib/cms-firestore';
 import { cmsApi } from '@/lib/cms-api';
@@ -17,6 +18,9 @@ export default function AwardsContent() {
   const [selectedYear, setSelectedYear] = useState('ALL');
   const [sortOrder, setSortOrder] = useState('desc');
   const [cmsAwards, setCmsAwards] = useState([]);
+  // True once the awards list is managed in the admin panel: nothing published then means an empty list,
+  // never the built-in static awards.
+  const [managedInAdmin, setManagedInAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,10 +28,13 @@ export default function AwardsContent() {
     async function loadAwards() {
       try {
         const list = await awardsCms.getPublished();
+        const hasPublished = !!(list && list.length > 0);
+        const managed = hasPublished ? false : await awardsCms.isManagedInAdmin();
         if (isMounted) {
-          if (list && list.length > 0) {
+          if (hasPublished) {
             setCmsAwards(list);
           }
+          setManagedInAdmin(managed);
           setLoading(false);
         }
       } catch (err) {
@@ -51,11 +58,11 @@ export default function AwardsContent() {
         content: a.content,
         image: cmsApi.resolveMediaUrl(a.imageUrl) || 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=800&q=80',
         documentUrl: a.documentUrl ? cmsApi.resolveMediaUrl(a.documentUrl) : null,
-        date: a.year ? String(a.year) : 'Annual Award'
+        date: a.date || (a.year ? String(a.year) : 'Annual Award')
       }));
     }
-    return awardsData;
-  }, [cmsAwards]);
+    return managedInAdmin ? [] : awardsData;
+  }, [cmsAwards, managedInAdmin]);
 
   const availableYears = useMemo(() => {
     const years = Array.from(new Set(activeData.map((item) => item.year))).sort().reverse();
@@ -94,6 +101,8 @@ export default function AwardsContent() {
         description="At KPS, we take pride in being recognized by prominent shipping conclaves, maritime councils, and multinational logistics partners for our four-decade legacy of excellence and dependable service." 
         bgImage="https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1920&q=80"
       />
+
+      <AwardAnnouncement />
 
       <section className="py-12 sm:py-20 text-brand-gray-dark bg-white">
         <div className="container mx-auto px-3 sm:px-6">
@@ -140,6 +149,12 @@ export default function AwardsContent() {
               </div>
             </div>
           </div>
+
+          {!loading && processedAwards.length === 0 && (
+            <p className="max-w-6xl mx-auto text-center text-sm text-gray-500 py-12">
+              No awards are published at the moment.
+            </p>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 max-w-6xl mx-auto">
             {processedAwards.map((award, index) => {

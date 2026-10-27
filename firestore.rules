@@ -82,6 +82,13 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Marker that the Awards list is managed in the admin panel (read by the public Awards page so that, once
+    // everything is unpublished or deleted, it shows an empty list instead of its built-in fallback awards).
+    match /site_settings/awardsSource {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // ============================================================
     // WEBINAR REGISTRATIONS
     // ============================================================
@@ -121,10 +128,38 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Applications are only accepted for a job that is published and whose closing date has not passed.
+    // The closing date is stored as "YYYY-MM-DD" or an ISO string at 00:00 UTC of that date (a Timestamp is also
+    // understood). The job stays open THROUGH that date in India Standard Time (UTC+05:30), so the cutoff is
+    // 00:00 UTC of the closing date + 18h30m (= 00:00 IST of the next day). Keep in sync with lib/job-deadline.ts.
+    function deadlineNotPassed(deadline) {
+      return deadline is string
+        ? request.time < timestamp.date(
+            int(deadline.split('T')[0].split('-')[0]),
+            int(deadline.split('T')[0].split('-')[1]),
+            int(deadline.split('T')[0].split('-')[2])) + duration.value(1110, 'm')
+        : (deadline is timestamp ? request.time < deadline + duration.value(1110, 'm') : true);
+    }
+
+    function jobIsOpen(job) {
+      return job.get('status', '') in ['published', 'active'] &&
+             (job.get('deadline', null) == null ||
+              job.get('deadline', null) == '' ||
+              deadlineNotPassed(job.get('deadline', null)));
+    }
+
+    // 'general' ids are open applications that are not tied to a job document.
+    function jobAcceptsApplications(jobId) {
+      return jobId == 'general' || jobId == 'general-application' ||
+             (exists(/databases/$(database)/documents/jobs/$(jobId)) &&
+              jobIsOpen(get(/databases/$(database)/documents/jobs/$(jobId)).data));
+    }
+
     match /applications/{applicationId} {
       allow create: if request.resource.data.jobId is string &&
                        request.resource.data.candidateName is string &&
-                       request.resource.data.email is string;
+                       request.resource.data.email is string &&
+                       jobAcceptsApplications(request.resource.data.jobId);
       allow read, update, delete: if isAdmin();
     }
 

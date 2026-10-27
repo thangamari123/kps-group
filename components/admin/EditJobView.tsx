@@ -4,7 +4,9 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import NewJobView from '@/components/admin/NewJobView';
+import { deleteField } from 'firebase/firestore';
 import { jobsCms } from '@/lib/careers-firestore';
+import { getDeadlineDate, isDeadlinePassed } from '@/lib/job-deadline';
 import { useToast } from '@/components/admin/Toast';
 import {
   Briefcase,
@@ -112,15 +114,8 @@ export default function EditJobView({ jobId }: EditJobViewProps) {
           return String(val);
         };
 
-        let dl = '';
-        if (found.deadline) {
-          try {
-            const d = found.deadline?.toDate ? found.deadline.toDate() : new Date(found.deadline);
-            if (!isNaN(d.getTime())) {
-              dl = d.toISOString().split('T')[0];
-            }
-          } catch {}
-        }
+        // The closing date exactly as the public site and server enforce it
+        const dl = getDeadlineDate(found.deadline) || '';
 
         setFormData({
           title: found.title || '',
@@ -208,7 +203,8 @@ export default function EditJobView({ jobId }: EditJobViewProps) {
         qualifications: parseList(formData.qualifications),
         skills: parseList(formData.skills),
         benefits: parseList(formData.benefits),
-        deadline: formData.deadline ? new Date(formData.deadline).toISOString() : undefined,
+        // An emptied field removes the closing date (undefined would leave the old one in place)
+        deadline: formData.deadline ? new Date(formData.deadline).toISOString() : (deleteField() as any),
         status: formData.status,
         featured: formData.featured,
         sortOrder: Number(formData.sortOrder) || 1,
@@ -567,7 +563,7 @@ export default function EditJobView({ jobId }: EditJobViewProps) {
             <div>
               <label className="block text-xs font-bold text-[#17211E] uppercase tracking-wider mb-2 flex items-center space-x-1">
                 <Calendar className="w-3.5 h-3.5 text-[#006B4F]" />
-                <span>Application Deadline</span>
+                <span>Application Closing Date</span>
               </label>
               <input
                 type="date"
@@ -576,6 +572,14 @@ export default function EditJobView({ jobId }: EditJobViewProps) {
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 bg-white border border-[#E2E9E5] rounded-xl text-xs text-[#17211E] focus:outline-none focus:border-[#006B4F] cursor-pointer"
               />
+              <p className="mt-1.5 text-[11px] text-[#66736E] leading-snug">
+                Open through this date (IST); the job closes automatically after it. Leave empty for no closing date.
+              </p>
+              {formData.status === 'published' && isDeadlinePassed(formData.deadline) && (
+                <p className="mt-1 text-[11px] font-bold text-[#DC2626]">
+                  This closing date has passed, so the job is Closed / Expired. Pick a later date to accept applications again.
+                </p>
+              )}
             </div>
 
             <div>
