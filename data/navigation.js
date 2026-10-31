@@ -27,7 +27,7 @@ export const navigationData = {
       ]
     },
     {
-      name: "Importances",
+      name: "Links",
       path: "#",
       dropdown: [
         { name: "FIEO", path: "https://fieo.org/view_section.php?lang=0&id=0,31", external: true },

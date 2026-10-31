@@ -2,8 +2,11 @@ import type { Metadata } from 'next';
 import HomeContent from '@/components/home/HomeContent';
 
 export const metadata: Metadata = {
-  title: 'Global Supply Chains. Engineered to Scale. | KPS Worldwide Logistics',
-  description: 'KPS Worldwide Logistics Pvt. Ltd. is your premier partner for containerized freight, global break bulk, RoRo operations, and complex over dimensional cargo in Chennai, India.',
+  title: 'Customs Broker & Freight Forwarder Chennai | KPS Logistics',
+  description: 'Licensed customs broker and freight forwarder in Chennai since 1985. Containerized cargo, ODC, project logistics and FTWZ warehousing across South India.',
+  alternates: {
+    canonical: 'https://kpsgroups.net/',
+  },
   keywords: [
     'KPS Worldwide Logistics',
     'KPS Worldwide Logistics Pvt Ltd',
