@@ -22,6 +22,9 @@ export const metadata: Metadata = {
     shortcut: '/images/kpslogo-tab.webp',
     apple: '/images/kpslogo-tab.webp',
   },
+  verification: {
+    google: 'VZBx5j6CUSw7o-q_Ro8t3zYXXpInn5usuttOCk9Ppy4',
+  },
 };
 
 // Runs before first paint: if the last visit had active announcements, reserve the bar's space
