@@ -20,6 +20,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/services/ftwz',
     '/fcl-shipping-chennai',
     '/logistics-company-chennai',
+    '/freight-forwarder-chennai',
+    '/logistics-services-chennai',
     '/industries/automotive-logistics',
     '/industries/automotive-parts-logistics',
     '/industries/fmcg-logistics',

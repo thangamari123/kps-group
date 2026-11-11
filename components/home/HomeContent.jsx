@@ -729,7 +729,7 @@ export default function HomeContent() {
               {/* About Section Card Image */}
               <div className="rounded-2xl overflow-hidden shadow-2xl relative z-10 aspect-square bg-brand-green-dark">
                 <img
-                  src="https://res.cloudinary.com/vm9q4qwp/image/upload/v1788966808/about_card.png"
+                  src="/images/about_card.webp"
                   alt="About KPS"
                   className="w-full h-full object-cover transform hover:scale-102 transition-transform duration-500"
                 />
