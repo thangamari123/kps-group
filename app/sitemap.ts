@@ -22,6 +22,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/logistics-company-chennai',
     '/freight-forwarder-chennai',
     '/logistics-services-chennai',
+    '/customs-broker-chennai',
+    '/customs-clearance-agent-chennai',
     '/industries/automotive-logistics',
     '/industries/automotive-parts-logistics',
     '/industries/fmcg-logistics',
