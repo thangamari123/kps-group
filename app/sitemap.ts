@@ -17,6 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/services/warehousing',
     '/services/project-logistics',
     '/services/odc',
+    '/services/cold-storage',
     '/services/ftwz',
     '/fcl-shipping-chennai',
     '/container-shipping-chennai',
