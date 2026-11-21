@@ -31,19 +31,23 @@ export default function ContainerLoadCalculator() {
   const [weightUnit, setWeightUnit] = useState<WeightUnit>('kg');
   const [volUnit, setVolUnit] = useState<VolumeUnit>('CBM');
 
-  // 3. Carton Dimensions
-  const [dimL, setDimL] = useState<number>(30);
-  const [dimB, setDimB] = useState<number>(25);
-  const [dimH, setDimH] = useState<number>(20);
+  // 3. Carton Dimensions (stored as strings for natural editing, deletion, and decimal entry)
+  const [dimLStr, setDimLStr] = useState<string>('30');
+  const [dimBStr, setDimBStr] = useState<string>('25');
+  const [dimHStr, setDimHStr] = useState<string>('20');
+  // Canonical physical dimensions in mm to eliminate round-trip conversion drift
+  const canonicalMMRef = useRef<{ L: number; B: number; H: number }>({ L: 300, B: 250, H: 200 });
 
   // 4. Weight & Quantity
-  const [cartonWt, setCartonWt] = useState<number>(10);
-  const [cartonQty, setCartonQty] = useState<number>(1000);
+  const [cartonWtStr, setCartonWtStr] = useState<string>('10');
+  const [cartonQtyStr, setCartonQtyStr] = useState<string>('1000');
+  const canonicalWtKgRef = useRef<number>(10);
+  const canonicalPayloadKgRef = useRef<number>(CONTAINERS['20GP'].payload);
 
   // 5. Loading conditions
   const [upright, setUpright] = useState<boolean>(true);
   const [maxLayers, setMaxLayers] = useState<string>(''); // blank = no limit
-  const [customPayload, setCustomPayload] = useState<number>(CONTAINERS['20GP'].payload);
+  const [customPayloadStr, setCustomPayloadStr] = useState<string>(String(CONTAINERS['20GP'].payload));
 
   // Toast message
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -158,39 +162,64 @@ export default function ContainerLoadCalculator() {
     [ctype, resetView]
   );
 
-  // Handle Dimension Unit Change - converts displayed L, B, H without changing physical mm
+  // Handle Dimension Unit Change - converts displayed L, B, H strings without changing physical mm
   const handleDimUnitChange = (newUnit: DimensionUnit) => {
     if (newUnit === dimUnit) return;
-    const curL_mm = dimensionToMM(dimL, dimUnit);
-    const curB_mm = dimensionToMM(dimB, dimUnit);
-    const curH_mm = dimensionToMM(dimH, dimUnit);
+    const oldUnit = dimUnit;
     setDimUnit(newUnit);
+
     const decimals = newUnit === 'm' || newUnit === 'ft' ? 3 : newUnit === 'in' ? 2 : 1;
-    setDimL(Number(mmToDimension(curL_mm, newUnit).toFixed(decimals)));
-    setDimB(Number(mmToDimension(curB_mm, newUnit).toFixed(decimals)));
-    setDimH(Number(mmToDimension(curH_mm, newUnit).toFixed(decimals)));
+
+    const convertVal = (valStr: string, key: 'L' | 'B' | 'H') => {
+      const trimmed = valStr.trim();
+      if (!trimmed) return '';
+      const parsed = parseFloat(trimmed);
+      if (isNaN(parsed) || parsed <= 0) return valStr;
+
+      if (!canonicalMMRef.current[key] || canonicalMMRef.current[key] <= 0) {
+        canonicalMMRef.current[key] = dimensionToMM(parsed, oldUnit);
+      }
+      const converted = mmToDimension(canonicalMMRef.current[key], newUnit);
+      return String(Number(converted.toFixed(decimals)));
+    };
+
+    setDimLStr((prev) => convertVal(prev, 'L'));
+    setDimBStr((prev) => convertVal(prev, 'B'));
+    setDimHStr((prev) => convertVal(prev, 'H'));
   };
 
   // Handle Weight Unit Change - converts displayed cartonWt and payload without changing physical kg
   const handleWeightUnitChange = (newUnit: WeightUnit) => {
     if (newUnit === weightUnit) return;
-    const curWt_kg = weightToKG(cartonWt, weightUnit);
-    const curPayload_kg = weightToKG(customPayload, weightUnit);
     setWeightUnit(newUnit);
-    const wtDecimals = newUnit === 'MT' ? 4 : 2;
-    const plDecimals = newUnit === 'MT' ? 2 : 0;
-    setCartonWt(Number(kgToWeight(curWt_kg, newUnit).toFixed(wtDecimals)));
-    setCustomPayload(Number(kgToWeight(curPayload_kg, newUnit).toFixed(plDecimals)));
+
+    const convertWt = (valStr: string, isPayload: boolean) => {
+      const trimmed = valStr.trim();
+      if (!trimmed) return '';
+      const parsed = parseFloat(trimmed);
+      if (isNaN(parsed) || parsed < 0) return valStr;
+
+      const canonicalKg = isPayload
+        ? canonicalPayloadKgRef.current
+        : canonicalWtKgRef.current;
+      const converted = kgToWeight(canonicalKg, newUnit);
+      const decimals = newUnit === 'MT' ? (isPayload ? 2 : 4) : (isPayload ? 0 : 2);
+      return String(Number(converted.toFixed(decimals)));
+    };
+
+    setCartonWtStr((prev) => convertWt(prev, false));
+    setCustomPayloadStr((prev) => convertWt(prev, true));
   };
 
   // Handle Container Type Switch
   const handleContainerSwitch = (newCtype: '20GP' | '40GP' | '40HC') => {
     setCtype(newCtype);
-    setPayloadTouched(false);
-    // update default payload in selected weight unit
-    const defaultKg = CONTAINERS[newCtype].payload;
-    const converted = kgToWeight(defaultKg, weightUnit);
-    setCustomPayload(Number(converted.toFixed(weightUnit === 'MT' ? 2 : 0)));
+    if (!payloadTouched) {
+      const defaultKg = CONTAINERS[newCtype].payload;
+      canonicalPayloadKgRef.current = defaultKg;
+      const converted = kgToWeight(defaultKg, weightUnit);
+      setCustomPayloadStr(String(Number(converted.toFixed(weightUnit === 'MT' ? 2 : 0))));
+    }
     resetView(newCtype);
   };
 
@@ -577,31 +606,64 @@ export default function ContainerLoadCalculator() {
   // Recalculate and update 3D visualization
   const updateCalculation = useCallback(() => {
     const C = CONTAINERS[ctype];
-    const L_mm = dimensionToMM(dimL, dimUnit);
-    const B_mm = dimensionToMM(dimB, dimUnit);
-    const H_mm = dimensionToMM(dimH, dimUnit);
-    const boxMM: [number, number, number] = [L_mm, B_mm, H_mm];
+    buildContainer(C);
 
-    const wtKG = weightToKG(cartonWt, weightUnit);
-    const payloadKG = weightToKG(customPayload, weightUnit) || C.payload;
-    const N = Math.max(0, Math.floor(cartonQty));
-    const lim = Math.floor(parseFloat(maxLayers)) || 0;
+    const parsedQty = parseInt(cartonQtyStr.trim(), 10);
+    const isQtyValid = !isNaN(parsedQty) && parsedQty >= 1;
 
-    if (boxMM.some((v) => v <= 0) || N <= 0) {
-      setErrMsg('Enter carton L, B, H and no. of cartons.');
+    const parsedL = parseFloat(dimLStr.trim());
+    const parsedB = parseFloat(dimBStr.trim());
+    const parsedH = parseFloat(dimHStr.trim());
+    const isDimsValid =
+      !isNaN(parsedL) && parsedL > 0 &&
+      !isNaN(parsedB) && parsedB > 0 &&
+      !isNaN(parsedH) && parsedH > 0;
+
+    const parsedWt = parseFloat(cartonWtStr.trim());
+    const isWtValid = !isNaN(parsedWt) && parsedWt >= 0;
+
+    const parsedPayload = parseFloat(customPayloadStr.trim());
+    const isPayloadValid = !isNaN(parsedPayload) && parsedPayload > 0;
+
+    if (!isQtyValid || !isDimsValid || !isWtValid || !isPayloadValid) {
+      buildBoxes([]);
+      buildFree(C, 0, 0);
+      lastCalcRef.current = null;
+      if (
+        dimLStr.trim() === '' ||
+        dimBStr.trim() === '' ||
+        dimHStr.trim() === '' ||
+        cartonQtyStr.trim() === ''
+      ) {
+        setErrMsg('Enter carton L, B, H and no. of cartons.');
+      } else if (!isDimsValid || !isQtyValid) {
+        setErrMsg('Dimensions and quantity must be positive numbers.');
+      } else if (!isPayloadValid) {
+        setErrMsg('Enter a valid maximum payload.');
+      }
       return;
     }
-    setErrMsg('');
+
+    const L_mm = dimensionToMM(parsedL, dimUnit);
+    const B_mm = dimensionToMM(parsedB, dimUnit);
+    const H_mm = dimensionToMM(parsedH, dimUnit);
+    const boxMM: [number, number, number] = [L_mm, B_mm, H_mm];
+
+    const wtKG = weightToKG(parsedWt, weightUnit);
+    const payloadKG = weightToKG(parsedPayload, weightUnit) || C.payload;
+    const N = parsedQty;
+    const lim = Math.floor(parseFloat(maxLayers.trim())) || 0;
 
     const r = calculateLoad(C, boxMM, wtKG, N, upright, lim, payloadKG);
     if (r.p.count === 0) {
       setErrMsg('This carton is larger than the container inside size in every allowed orientation.');
+    } else {
+      setErrMsg('');
     }
 
     const loaded = Math.min(N, r.eff);
     const list = calculatePositions(C, r.p, Math.min(loaded, RENDER_CAP));
 
-    buildContainer(C);
     buildBoxes(list);
 
     // Animation transition
@@ -647,7 +709,19 @@ export default function ContainerLoadCalculator() {
       payloadKG,
       wtUsed,
     };
-  }, [ctype, dimL, dimB, dimH, dimUnit, cartonWt, weightUnit, cartonQty, upright, maxLayers, customPayload]);
+  }, [
+    ctype,
+    dimLStr,
+    dimBStr,
+    dimHStr,
+    dimUnit,
+    cartonWtStr,
+    weightUnit,
+    cartonQtyStr,
+    upright,
+    maxLayers,
+    customPayloadStr,
+  ]);
 
   useEffect(() => {
     updateCalculation();
@@ -668,7 +742,11 @@ export default function ContainerLoadCalculator() {
 
   // Copy result for WhatsApp / Mail
   const handleCopyResult = async () => {
-    if (!lastCalcRef.current) return;
+    if (!lastCalcRef.current || !isInputCompleteAndValid) {
+      setToastMsg('Please enter valid carton dimensions and quantity first');
+      setTimeout(() => setToastMsg(null), 2500);
+      return;
+    }
     const d = lastCalcRef.current;
     const C = d.C;
 
@@ -716,36 +794,59 @@ Indicative only. KPS Worldwide Logistics Pvt Ltd · www.kpsgroups.net · 044-450
 
   // Calculation display values
   const C = CONTAINERS[ctype];
-  const L_mm = dimensionToMM(dimL, dimUnit);
-  const B_mm = dimensionToMM(dimB, dimUnit);
-  const H_mm = dimensionToMM(dimH, dimUnit);
-  const boxMM: [number, number, number] = [L_mm, B_mm, H_mm];
-  const wtKG = weightToKG(cartonWt, weightUnit);
-  const payloadKG = weightToKG(customPayload, weightUnit) || C.payload;
-  const N = Math.max(0, Math.floor(cartonQty));
-  const lim = Math.floor(parseFloat(maxLayers)) || 0;
+  const parsedQty = parseInt(cartonQtyStr.trim(), 10);
+  const isQtyValid = !isNaN(parsedQty) && parsedQty >= 1;
 
-  const currentCalc = calculateLoad(C, boxMM, wtKG, N, upright, lim, payloadKG);
+  const parsedL = parseFloat(dimLStr.trim());
+  const parsedB = parseFloat(dimBStr.trim());
+  const parsedH = parseFloat(dimHStr.trim());
+  const isDimsValid =
+    !isNaN(parsedL) && parsedL > 0 &&
+    !isNaN(parsedB) && parsedB > 0 &&
+    !isNaN(parsedH) && parsedH > 0;
+
+  const parsedWt = parseFloat(cartonWtStr.trim());
+  const isWtValid = !isNaN(parsedWt) && parsedWt >= 0;
+
+  const parsedPayload = parseFloat(customPayloadStr.trim());
+  const isPayloadValid = !isNaN(parsedPayload) && parsedPayload > 0;
+
+  const isInputCompleteAndValid = isQtyValid && isDimsValid && isWtValid && isPayloadValid;
+
+  const L_mm = isDimsValid ? dimensionToMM(parsedL, dimUnit) : 0;
+  const B_mm = isDimsValid ? dimensionToMM(parsedB, dimUnit) : 0;
+  const H_mm = isDimsValid ? dimensionToMM(parsedH, dimUnit) : 0;
+  const boxMM: [number, number, number] = [L_mm, B_mm, H_mm];
+  const wtKG = isWtValid ? weightToKG(parsedWt, weightUnit) : 0;
+  const payloadKG = isPayloadValid ? weightToKG(parsedPayload, weightUnit) : C.payload;
+  const N = isQtyValid ? parsedQty : 0;
+  const lim = Math.floor(parseFloat(maxLayers.trim())) || 0;
+
+  const currentCalc = isInputCompleteAndValid
+    ? calculateLoad(C, boxMM, wtKG, N, upright, lim, payloadKG)
+    : { p: { count: 0, blocks: [] }, wCap: 0, eff: 0, limBy: 'Space' as const, need: Infinity };
   const loaded = Math.min(N, currentCalc.eff);
-  const boxCbm = (boxMM[0] * boxMM[1] * boxMM[2]) / 1e9;
+  const boxCbm = isDimsValid ? (boxMM[0] * boxMM[1] * boxMM[2]) / 1e9 : 0;
   const contCbm = (C.L * C.W * C.H) / 1e9;
-  const volPct = (loaded * boxCbm) / contCbm * 100;
+  const volPct = isInputCompleteAndValid && contCbm > 0 ? ((loaded * boxCbm) / contCbm) * 100 : 0;
   const wtUsed = loaded * wtKG;
-  const wtPct = (wtUsed / payloadKG) * 100;
-  const fits = N <= currentCalc.eff && currentCalc.p.count > 0;
+  const wtPct = isInputCompleteAndValid && payloadKG > 0 ? (wtUsed / payloadKG) * 100 : 0;
+  const fits = isInputCompleteAndValid && N <= currentCalc.eff && currentCalc.p.count > 0;
   const lastX = lastCalcRef.current?.lastX || 0;
 
   // Comparison row calculations
   const compRows = (['20GP', '40GP', '40HC'] as const).map((k) => {
     const c = CONTAINERS[k];
     const pl = k === ctype ? payloadKG : c.payload;
-    const rr = calculateLoad(c, boxMM, wtKG, N, upright, lim, pl);
+    const rr = isInputCompleteAndValid
+      ? calculateLoad(c, boxMM, wtKG, N, upright, lim, pl)
+      : { p: { count: 0, blocks: [] }, wCap: 0, eff: 0, limBy: '—' as const, need: Infinity };
     return {
       k,
       name: c.name,
-      eff: rr.eff,
-      need: rr.need,
-      limBy: rr.p.count ? rr.limBy : 'Too large',
+      eff: isInputCompleteAndValid ? rr.eff : 0,
+      need: isInputCompleteAndValid ? rr.need : Infinity,
+      limBy: isInputCompleteAndValid ? (rr.p.count ? rr.limBy : 'Too large') : '—',
       isSel: k === ctype,
     };
   });
@@ -835,8 +936,16 @@ Indicative only. KPS Worldwide Logistics Pvt Ltd · www.kpsgroups.net · 044-450
                   inputMode="decimal"
                   min="0"
                   step="any"
-                  value={dimL || ''}
-                  onChange={(e) => setDimL(parseFloat(e.target.value) || 0)}
+                  placeholder="Length"
+                  value={dimLStr}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setDimLStr(val);
+                    const n = parseFloat(val);
+                    if (!isNaN(n) && n > 0) {
+                      canonicalMMRef.current.L = dimensionToMM(n, dimUnit);
+                    }
+                  }}
                   className="w-full py-2 px-2 border border-[#d9e1ec] rounded-xl text-xs sm:text-sm font-bold text-[#1b2430] focus:outline-none focus:border-[#1557a8]"
                 />
               </div>
@@ -850,8 +959,16 @@ Indicative only. KPS Worldwide Logistics Pvt Ltd · www.kpsgroups.net · 044-450
                   inputMode="decimal"
                   min="0"
                   step="any"
-                  value={dimB || ''}
-                  onChange={(e) => setDimB(parseFloat(e.target.value) || 0)}
+                  placeholder="Breadth"
+                  value={dimBStr}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setDimBStr(val);
+                    const n = parseFloat(val);
+                    if (!isNaN(n) && n > 0) {
+                      canonicalMMRef.current.B = dimensionToMM(n, dimUnit);
+                    }
+                  }}
                   className="w-full py-2 px-2 border border-[#d9e1ec] rounded-xl text-xs sm:text-sm font-bold text-[#1b2430] focus:outline-none focus:border-[#1557a8]"
                 />
               </div>
@@ -865,8 +982,16 @@ Indicative only. KPS Worldwide Logistics Pvt Ltd · www.kpsgroups.net · 044-450
                   inputMode="decimal"
                   min="0"
                   step="any"
-                  value={dimH || ''}
-                  onChange={(e) => setDimH(parseFloat(e.target.value) || 0)}
+                  placeholder="Height"
+                  value={dimHStr}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setDimHStr(val);
+                    const n = parseFloat(val);
+                    if (!isNaN(n) && n > 0) {
+                      canonicalMMRef.current.H = dimensionToMM(n, dimUnit);
+                    }
+                  }}
                   className="w-full py-2 px-2 border border-[#d9e1ec] rounded-xl text-xs sm:text-sm font-bold text-[#1b2430] focus:outline-none focus:border-[#1557a8]"
                 />
               </div>
@@ -886,8 +1011,16 @@ Indicative only. KPS Worldwide Logistics Pvt Ltd · www.kpsgroups.net · 044-450
                   inputMode="decimal"
                   min="0"
                   step="any"
-                  value={cartonWt || ''}
-                  onChange={(e) => setCartonWt(parseFloat(e.target.value) || 0)}
+                  placeholder="Weight"
+                  value={cartonWtStr}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setCartonWtStr(val);
+                    const n = parseFloat(val);
+                    if (!isNaN(n) && n >= 0) {
+                      canonicalWtKgRef.current = weightToKG(n, weightUnit);
+                    }
+                  }}
                   className="w-full py-2 px-2 border border-[#d9e1ec] rounded-xl text-xs sm:text-sm font-bold text-[#1b2430] focus:outline-none focus:border-[#1557a8]"
                 />
               </div>
@@ -915,7 +1048,9 @@ Indicative only. KPS Worldwide Logistics Pvt Ltd · www.kpsgroups.net · 044-450
                 <label htmlFor="cartonQty" className="text-[11px] font-semibold text-[#5e6b7a]">
                   No. of Cartons
                 </label>
-                <span className="text-[11px] font-bold text-[#0b2e59]">{fmt(cartonQty)} ctns</span>
+                <span className="text-[11px] font-bold text-[#0b2e59]">
+                  {isQtyValid ? `${fmt(parsedQty)} ctns` : '— ctns'}
+                </span>
               </div>
               <input
                 id="cartonQty"
@@ -923,8 +1058,9 @@ Indicative only. KPS Worldwide Logistics Pvt Ltd · www.kpsgroups.net · 044-450
                 inputMode="numeric"
                 min="1"
                 step="1"
-                value={cartonQty || ''}
-                onChange={(e) => setCartonQty(Math.max(1, parseInt(e.target.value) || 1))}
+                placeholder="e.g. 1000"
+                value={cartonQtyStr}
+                onChange={(e) => setCartonQtyStr(e.target.value)}
                 className="w-full py-2 px-2 border border-[#d9e1ec] rounded-xl text-xs sm:text-sm font-bold text-[#1b2430] focus:outline-none focus:border-[#1557a8] mb-2"
               />
 
@@ -935,10 +1071,10 @@ Indicative only. KPS Worldwide Logistics Pvt Ltd · www.kpsgroups.net · 044-450
                 id="qtySlider"
                 type="range"
                 min="1"
-                max={Math.max(10, Math.ceil(Math.max(currentCalc.eff * 1.25, cartonQty)))}
+                max={Math.max(10, Math.ceil(Math.max((currentCalc?.eff || 0) * 1.25, isQtyValid ? parsedQty : 1000)))}
                 step="1"
-                value={cartonQty}
-                onChange={(e) => setCartonQty(parseInt(e.target.value) || 1)}
+                value={isQtyValid ? Math.max(1, parsedQty) : 1}
+                onChange={(e) => setCartonQtyStr(e.target.value)}
                 className="w-full h-2 bg-[#d9e1ec] rounded-lg appearance-none cursor-pointer accent-[#1f9d4c]"
               />
             </div>
@@ -986,13 +1122,19 @@ Indicative only. KPS Worldwide Logistics Pvt Ltd · www.kpsgroups.net · 044-450
                 <input
                   id="customPayload"
                   type="number"
-                  inputMode="numeric"
+                  inputMode="decimal"
                   min="0"
                   step="any"
-                  value={customPayload || ''}
+                  placeholder="Max payload"
+                  value={customPayloadStr}
                   onChange={(e) => {
                     setPayloadTouched(true);
-                    setCustomPayload(parseFloat(e.target.value) || 0);
+                    const val = e.target.value;
+                    setCustomPayloadStr(val);
+                    const n = parseFloat(val);
+                    if (!isNaN(n) && n > 0) {
+                      canonicalPayloadKgRef.current = weightToKG(n, weightUnit);
+                    }
                   }}
                   className="w-full py-2 px-2 border border-[#d9e1ec] rounded-xl text-xs sm:text-sm font-bold text-[#1b2430] focus:outline-none focus:border-[#1557a8]"
                 />
@@ -1056,16 +1198,20 @@ Indicative only. KPS Worldwide Logistics Pvt Ltd · www.kpsgroups.net · 044-450
             {/* Verdict Badge */}
             <div
               className={`absolute right-2.5 top-2.5 py-1.5 px-3 rounded-xl font-extrabold text-xs sm:text-sm text-white shadow-md z-10 ${
-                fits ? 'bg-[#1f9d4c]' : 'bg-[#c8322f]'
+                !isInputCompleteAndValid
+                  ? 'bg-[#5e6b7a]'
+                  : fits
+                  ? 'bg-[#1f9d4c]'
+                  : 'bg-[#c8322f]'
               }`}
             >
-              {fits ? '✓ FITS' : '✗ DOES NOT FIT'}
+              {!isInputCompleteAndValid ? 'AWAITING INPUT' : fits ? '✓ FITS' : '✗ DOES NOT FIT'}
             </div>
 
             {/* Overlay Fill Progress Indicator */}
             <div className="absolute left-2.5 bottom-2.5 bg-white/95 backdrop-blur-xs rounded-xl p-2.5 min-w-[190px] shadow-md border border-slate-100 z-10">
               <div className="text-xl sm:text-2xl font-black text-[#0b2e59] leading-none">
-                {fmt(volPct, 1)}%
+                {isInputCompleteAndValid ? `${fmt(volPct, 1)}%` : '—'}
                 <small className="text-xs font-bold text-[#5e6b7a] ml-1">filled</small>
               </div>
               <div className="h-2 bg-[#cfdbea] rounded-full my-1.5 overflow-hidden">
@@ -1073,14 +1219,22 @@ Indicative only. KPS Worldwide Logistics Pvt Ltd · www.kpsgroups.net · 044-450
                   className={`h-full rounded-full transition-all duration-300 ${
                     volPct > 100 ? 'bg-[#c8322f]' : volPct > 90 ? 'bg-[#d98a00]' : 'bg-[#1f9d4c]'
                   }`}
-                  style={{ width: `${Math.min(100, volPct)}%` }}
+                  style={{ width: `${isInputCompleteAndValid ? Math.min(100, volPct) : 0}%` }}
                 />
               </div>
               <div className="text-xs font-bold text-[#1b2430]">
-                {fmt(loaded)} ctns inside · {fmt(lastX / 1000, 2)} m of {fmt(C.L / 1000, 2)} m used
+                {isInputCompleteAndValid
+                  ? `${fmt(loaded)} ctns inside · ${fmt(lastX / 1000, 2)} m of ${fmt(C.L / 1000, 2)} m used`
+                  : 'Enter dimensions & quantity'}
               </div>
-              <div className={`text-[11px] font-bold mt-0.5 ${fits ? 'text-[#157a39]' : 'text-[#c8322f]'}`}>
-                {fits
+              <div
+                className={`text-[11px] font-bold mt-0.5 ${
+                  !isInputCompleteAndValid ? 'text-[#5e6b7a]' : fits ? 'text-[#157a39]' : 'text-[#c8322f]'
+                }`}
+              >
+                {!isInputCompleteAndValid
+                  ? 'Awaiting valid inputs'
+                  : fits
                   ? `Room for ~${fmt(currentCalc.eff - N)} more ctns`
                   : `${fmt(N - currentCalc.eff)} ctns won't fit (${currentCalc.limBy.toLowerCase()})`}
               </div>
@@ -1095,64 +1249,63 @@ Indicative only. KPS Worldwide Logistics Pvt Ltd · www.kpsgroups.net · 044-450
           {/* Results Card */}
           <section className="bg-white border border-[#d9e1ec] rounded-2xl p-4 sm:p-6 shadow-xs space-y-4">
             {/* Fit / No-fit Banner */}
-            <div
-              className={`rounded-xl p-3 sm:p-4 text-xs sm:text-sm leading-relaxed border ${
-                fits
-                  ? 'bg-[#e6f6ec] border-[#b6e3c6] text-[#14532d]'
-                  : 'bg-[#fdecec] border-[#f3c1c0] text-[#7a1d1b]'
-              }`}
-            >
-              {fits ? (
-                <>
-                  <b className="text-sm sm:text-base">Yes. All {fmt(N)} cartons fit in one {C.name}.</b>
-                  <div className="mt-1">
-                    Space left for about <b>{fmt(currentCalc.eff - N)}</b> more cartons. Cargo uses about{' '}
-                    <b>{fmt(lastX / 1000, 2)} m</b> of the {fmt(C.L / 1000, 2)} m container length.
-                  </div>
-                </>
-              ) : (
-                <>
-                  <b className="text-sm sm:text-base">
-                    No. Only {fmt(currentCalc.eff)} of {fmt(N)} cartons fit in one {C.name}.
-                  </b>
-                  <div className="mt-1">
-                    <b>{fmt(N - currentCalc.eff)}</b> cartons will be left out (limited by{' '}
-                    <b>{currentCalc.limBy.toLowerCase()}</b>). You will need{' '}
-                    <b>{isFinite(currentCalc.need) ? `${currentCalc.need} × ${C.name}` : 'a larger container'}</b>.
-                  </div>
-                </>
-              )}
-            </div>
+            {!isInputCompleteAndValid ? (
+              <div className="rounded-xl p-3 sm:p-4 text-xs sm:text-sm leading-relaxed border bg-[#f0f4f9] border-[#d9e1ec] text-[#5e6b7a] font-medium">
+                <b className="text-sm sm:text-base text-[#0b2e59]">Ready to Calculate</b>
+                <div className="mt-1">
+                  Enter carton Length, Breadth, Height and number of cartons above to calculate container loading and view 3D packing.
+                </div>
+              </div>
+            ) : fits ? (
+              <div className="rounded-xl p-3 sm:p-4 text-xs sm:text-sm leading-relaxed border bg-[#e6f6ec] border-[#b6e3c6] text-[#14532d]">
+                <b className="text-sm sm:text-base">Yes. All {fmt(N)} cartons fit in one {C.name}.</b>
+                <div className="mt-1">
+                  Space left for about <b>{fmt(currentCalc.eff - N)}</b> more cartons. Cargo uses about{' '}
+                  <b>{fmt(lastX / 1000, 2)} m</b> of the {fmt(C.L / 1000, 2)} m container length.
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-xl p-3 sm:p-4 text-xs sm:text-sm leading-relaxed border bg-[#fdecec] border-[#f3c1c0] text-[#7a1d1b]">
+                <b className="text-sm sm:text-base">
+                  No. Only {fmt(currentCalc.eff)} of {fmt(N)} cartons fit in one {C.name}.
+                </b>
+                <div className="mt-1">
+                  <b>{fmt(N - currentCalc.eff)}</b> cartons will be left out (limited by{' '}
+                  <b>{currentCalc.limBy.toLowerCase()}</b>). You will need{' '}
+                  <b>{isFinite(currentCalc.need) ? `${currentCalc.need} × ${C.name}` : 'a larger container'}</b>.
+                </div>
+              </div>
+            )}
 
             {/* KPI Metrics */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               {/* Loaded */}
               <div className="bg-[#e8f0fb] rounded-xl p-3">
                 <div className="text-[10px] font-bold text-[#5e6b7a] uppercase tracking-wider">Cartons Loaded</div>
-                <div className="text-xl sm:text-2xl font-black text-[#0b2e59] mt-0.5">{fmt(loaded)}</div>
-                <div className="text-[11px] text-[#5e6b7a]">of {fmt(N)} requested</div>
+                <div className="text-xl sm:text-2xl font-black text-[#0b2e59] mt-0.5">{isInputCompleteAndValid ? fmt(loaded) : '—'}</div>
+                <div className="text-[11px] text-[#5e6b7a]">of {isInputCompleteAndValid ? fmt(N) : '—'} requested</div>
               </div>
 
               {/* Max Fit */}
               <div className="bg-[#e8f0fb] rounded-xl p-3">
                 <div className="text-[10px] font-bold text-[#5e6b7a] uppercase tracking-wider">Max That Fit</div>
-                <div className="text-xl sm:text-2xl font-black text-[#0b2e59] mt-0.5">{fmt(currentCalc.eff)}</div>
-                <div className="text-[10.5px] text-[#5e6b7a] truncate" title={`Space: ${fmt(currentCalc.p.count)} · Wt: ${isFinite(currentCalc.wCap) ? fmt(currentCalc.wCap) : '—'}`}>
-                  Space {fmt(currentCalc.p.count)} · Wt {isFinite(currentCalc.wCap) ? fmt(currentCalc.wCap) : '—'}
+                <div className="text-xl sm:text-2xl font-black text-[#0b2e59] mt-0.5">{isInputCompleteAndValid ? fmt(currentCalc.eff) : '—'}</div>
+                <div className="text-[10.5px] text-[#5e6b7a] truncate" title={isInputCompleteAndValid ? `Space: ${fmt(currentCalc.p.count)} · Wt: ${isFinite(currentCalc.wCap) ? fmt(currentCalc.wCap) : '—'}` : '—'}>
+                  {isInputCompleteAndValid ? `Space ${fmt(currentCalc.p.count)} · Wt ${isFinite(currentCalc.wCap) ? fmt(currentCalc.wCap) : '—'}` : '—'}
                 </div>
               </div>
 
               {/* Volume Used */}
               <div className="bg-[#e8f0fb] rounded-xl p-3">
                 <div className="text-[10px] font-bold text-[#5e6b7a] uppercase tracking-wider">Volume Used</div>
-                <div className="text-xl sm:text-2xl font-black text-[#0b2e59] mt-0.5">{fmt(volPct, 1)}%</div>
+                <div className="text-xl sm:text-2xl font-black text-[#0b2e59] mt-0.5">{isInputCompleteAndValid ? `${fmt(volPct, 1)}%` : '—'}</div>
                 <div className="text-[10.5px] text-[#5e6b7a] truncate">
-                  {fmt(cbmToVolume(loaded * boxCbm, volUnit), volUnit === 'L' ? 0 : 2)} {volUnit}
+                  {isInputCompleteAndValid ? `${fmt(cbmToVolume(loaded * boxCbm, volUnit), volUnit === 'L' ? 0 : 2)} ${volUnit}` : '—'}
                 </div>
                 <div className="h-1.5 bg-[#cfdbea] rounded-full mt-1.5 overflow-hidden">
                   <div
                     className={`h-full rounded-full ${volPct > 100 ? 'bg-[#c8322f]' : volPct > 90 ? 'bg-[#d98a00]' : 'bg-[#1f9d4c]'}`}
-                    style={{ width: `${Math.min(100, volPct)}%` }}
+                    style={{ width: `${isInputCompleteAndValid ? Math.min(100, volPct) : 0}%` }}
                   />
                 </div>
               </div>
@@ -1160,14 +1313,14 @@ Indicative only. KPS Worldwide Logistics Pvt Ltd · www.kpsgroups.net · 044-450
               {/* Weight Used */}
               <div className="bg-[#e8f0fb] rounded-xl p-3">
                 <div className="text-[10px] font-bold text-[#5e6b7a] uppercase tracking-wider">Weight Used</div>
-                <div className="text-xl sm:text-2xl font-black text-[#0b2e59] mt-0.5">{fmt(wtPct, 1)}%</div>
+                <div className="text-xl sm:text-2xl font-black text-[#0b2e59] mt-0.5">{isInputCompleteAndValid ? `${fmt(wtPct, 1)}%` : '—'}</div>
                 <div className="text-[10.5px] text-[#5e6b7a] truncate">
-                  {fmt(kgToWeight(wtUsed, weightUnit), weightUnit === 'MT' ? 2 : 0)} of {fmt(kgToWeight(payloadKG, weightUnit), weightUnit === 'MT' ? 2 : 0)} {weightUnit}
+                  {isInputCompleteAndValid ? `${fmt(kgToWeight(wtUsed, weightUnit), weightUnit === 'MT' ? 2 : 0)} of ${fmt(kgToWeight(payloadKG, weightUnit), weightUnit === 'MT' ? 2 : 0)} ${weightUnit}` : '—'}
                 </div>
                 <div className="h-1.5 bg-[#cfdbea] rounded-full mt-1.5 overflow-hidden">
                   <div
                     className={`h-full rounded-full ${wtPct > 100 ? 'bg-[#c8322f]' : wtPct > 90 ? 'bg-[#d98a00]' : 'bg-[#1f9d4c]'}`}
-                    style={{ width: `${Math.min(100, wtPct)}%` }}
+                    style={{ width: `${isInputCompleteAndValid ? Math.min(100, wtPct) : 0}%` }}
                   />
                 </div>
               </div>
@@ -1198,28 +1351,36 @@ Indicative only. KPS Worldwide Logistics Pvt Ltd · www.kpsgroups.net · 044-450
 
               {/* Block breakdown */}
               <div className="bg-[#fbfcfd] border border-[#d9e1ec] rounded-xl p-3.5 text-xs sm:text-sm text-[#1b2430] space-y-1.5">
-                {currentCalc.p.blocks.map((b, i) => {
-                  const lDisp = fmt(mmToDimension(b.r.o[0], dimUnit), dimUnit === 'm' || dimUnit === 'ft' ? 3 : dimUnit === 'in' ? 2 : 1);
-                  const bDisp = fmt(mmToDimension(b.r.o[1], dimUnit), dimUnit === 'm' || dimUnit === 'ft' ? 3 : dimUnit === 'in' ? 2 : 1);
-                  const hDisp = fmt(mmToDimension(b.r.o[2], dimUnit), dimUnit === 'm' || dimUnit === 'ft' ? 3 : dimUnit === 'in' ? 2 : 1);
-                  return (
-                    <div key={i}>
-                      <b>{i === 0 ? 'Main' : 'Balance'} block:</b> carton placed {lDisp} × {bDisp} × {hDisp} {dimUnit} (along length × across width × height) →{' '}
-                      <b>{b.k}</b> rows × <b>{b.r.ny}</b> across × <b>{b.r.nz}</b> high = <b>{fmt(b.k * b.r.per)}</b> cartons
-                    </div>
-                  );
-                })}
+                {isInputCompleteAndValid && currentCalc.p.blocks.length > 0 ? (
+                  <>
+                    {currentCalc.p.blocks.map((b, i) => {
+                      const lDisp = fmt(mmToDimension(b.r.o[0], dimUnit), dimUnit === 'm' || dimUnit === 'ft' ? 3 : dimUnit === 'in' ? 2 : 1);
+                      const bDisp = fmt(mmToDimension(b.r.o[1], dimUnit), dimUnit === 'm' || dimUnit === 'ft' ? 3 : dimUnit === 'in' ? 2 : 1);
+                      const hDisp = fmt(mmToDimension(b.r.o[2], dimUnit), dimUnit === 'm' || dimUnit === 'ft' ? 3 : dimUnit === 'in' ? 2 : 1);
+                      return (
+                        <div key={i}>
+                          <b>{i === 0 ? 'Main' : 'Balance'} block:</b> carton placed {lDisp} × {bDisp} × {hDisp} {dimUnit} (along length × across width × height) →{' '}
+                          <b>{b.k}</b> rows × <b>{b.r.ny}</b> across × <b>{b.r.nz}</b> high = <b>{fmt(b.k * b.r.per)}</b> cartons
+                        </div>
+                      );
+                    })}
 
-                <div className="pt-2 border-t border-[#d9e1ec]/60 text-[11.5px] sm:text-xs text-[#5e6b7a] space-y-1">
-                  <div>
-                    <b>Volume per carton:</b> {fmt(boxCbm, 4)} CBM ({fmt(boxCbm * 35.3147, 2)} CFT / {fmt(boxCbm * 1000, 1)} L)
+                    <div className="pt-2 border-t border-[#d9e1ec]/60 text-[11.5px] sm:text-xs text-[#5e6b7a] space-y-1">
+                      <div>
+                        <b>Volume per carton:</b> {fmt(boxCbm, 4)} CBM ({fmt(boxCbm * 35.3147, 2)} CFT / {fmt(boxCbm * 1000, 1)} L)
+                      </div>
+                      <div>
+                        <b>Total volume of {fmt(N)} cartons:</b> {fmt(cbmToVolume(N * boxCbm, volUnit), volUnit === 'L' ? 0 : 2)} {volUnit}{' '}
+                        <span className="text-[#5e6b7a]">({fmt(N * boxCbm, 2)} CBM · {fmt(N * boxCbm * 35.3147, 1)} CFT)</span> ·{' '}
+                        <b>Total weight:</b> {fmt(kgToWeight(N * wtKG, weightUnit), weightUnit === 'MT' ? 2 : 0)} {weightUnit}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-xs text-[#5e6b7a] italic py-2">
+                    Enter valid carton dimensions and quantity to view packing orientation and volume breakdown.
                   </div>
-                  <div>
-                    <b>Total volume of {fmt(N)} cartons:</b> {fmt(cbmToVolume(N * boxCbm, volUnit), volUnit === 'L' ? 0 : 2)} {volUnit}{' '}
-                    <span className="text-[#5e6b7a]">({fmt(N * boxCbm, 2)} CBM · {fmt(N * boxCbm * 35.3147, 1)} CFT)</span> ·{' '}
-                    <b>Total weight:</b> {fmt(kgToWeight(N * wtKG, weightUnit), weightUnit === 'MT' ? 2 : 0)} {weightUnit}
-                  </div>
-                </div>
+                )}
               </div>
             </div>
 
@@ -1242,7 +1403,7 @@ Indicative only. KPS Worldwide Logistics Pvt Ltd · www.kpsgroups.net · 044-450
                     {compRows.map((row) => (
                       <tr key={row.k} className={row.isSel ? 'bg-[#f0f6ff] font-bold text-[#0b2e59]' : 'text-[#1b2430]'}>
                         <td className="py-2 px-3">{row.name}</td>
-                        <td className="py-2 px-3">{fmt(row.eff)}</td>
+                        <td className="py-2 px-3">{isInputCompleteAndValid ? fmt(row.eff) : '—'}</td>
                         <td className="py-2 px-3">{isFinite(row.need) ? row.need : '—'}</td>
                         <td className="py-2 px-3">{row.limBy}</td>
                       </tr>
