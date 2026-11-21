@@ -15,7 +15,8 @@ export const navigationData = {
         { name: "Over Dimensional Cargo", path: "/services/odc" },
         { name: "Customs Brokerage", path: "/services/customs-brokerage" },
         { name: "Industrial Warehousing", path: "/services/warehousing" },
-        { name: "Free Trade Warehousing", path: "/services/ftwz" }
+        { name: "Free Trade Warehousing", path: "/services/ftwz" },
+        { name: "3D Container Load Calculator", path: "/container-load-calculator" }
       ]
     },
     {
