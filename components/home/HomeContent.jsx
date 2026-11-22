@@ -1685,6 +1685,39 @@ export default function HomeContent() {
         </div>
       </section>
 
+      {/* SEO Internal Links (Compact) */}
+      <section className="py-5 sm:py-7 bg-[#f8fafc] border-t border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-2.5">
+            {[
+              { title: 'Industrial Warehousing Chennai', href: '/industrial-warehousing-chennai' },
+              { title: 'Free Trade Warehousing Chennai', href: '/free-trade-warehousing-chennai' },
+              { title: 'Customs Brokerage Chennai', href: '/customs-brokerage-chennai' },
+              { title: 'Export Customs Clearance Chennai', href: '/export-customs-clearance-chennai' },
+              { title: 'Customs House Agent Chennai', href: '/customs-house-agent-chennai' },
+              { title: 'Import Customs Clearance Chennai', href: '/import-customs-clearance-chennai' },
+              { title: 'Customs Clearance Agent Chennai', href: '/customs-clearance-agent-chennai' },
+              { title: 'Customs Broker Chennai', href: '/customs-broker-chennai' },
+              { title: 'Logistics Services Chennai', href: '/logistics-services-chennai' },
+              { title: 'Freight Forwarder Chennai', href: '/freight-forwarder-chennai' },
+              { title: 'LCL Shipping Chennai', href: '/lcl-shipping-chennai' },
+              { title: 'Container Shipping Chennai', href: '/container-shipping-chennai' },
+            ].map((link, idx) => (
+              <Link
+                key={idx}
+                href={link.href}
+                className="group flex items-center justify-between px-3.5 py-2 sm:px-4 sm:py-2.5 bg-white rounded-lg border border-slate-200 hover:border-[#1557a8] hover:shadow-xs transition-all duration-150"
+              >
+                <span className="font-medium text-xs sm:text-[13px] text-slate-700 group-hover:text-[#1557a8] transition-colors leading-snug">
+                  {link.title}
+                </span>
+                <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#1557a8] group-hover:translate-x-0.5 transition-all flex-shrink-0 ml-2" />
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Website-Wide Modern Call to Action (CTA) */}
       <CTASection />
     </div>

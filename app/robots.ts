@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/admin/',
     },
-    sitemap: 'https://www.kpsgroups.net/sitemap.xml',
+    sitemap: 'https://kpsgroups.net/sitemap.xml',
   };
 }
